@@ -2,6 +2,10 @@ language: csharp
 sudo: false
 solution: Rabscuttle.sln
 
+branches:
+  only:
+  - master
+
 os:
 - linux
 - osx

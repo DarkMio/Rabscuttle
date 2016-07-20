@@ -51,7 +51,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="core\MainEntryTests.cs" />
+    <Compile Include="networking\NetworkMessageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

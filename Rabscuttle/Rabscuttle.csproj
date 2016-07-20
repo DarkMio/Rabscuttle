@@ -48,6 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="core\MainEntry.cs" />
+    <Compile Include="networking\INetworking.cs" />
+    <Compile Include="networking\NetworkMessage.cs" />
+    <Compile Include="networking\Client.cs" />
+    <Compile Include="networking\StateObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
