@@ -13,5 +13,5 @@ install:
   - nuget restore Rabscuttle.sln
 
 script:
-  - xbuild /p:Configuration=Release Rabscuttle.sln
-  - mono ./packages/NUnit.ConsoleRunner.3.4.1/tools/nunit3-console.exe ./RabscuttleTests/bin/Release/Tests.dll
+  - xbuild /p:Configuration=Debug Rabscuttle.sln
+  - mono ./packages/NUnit.ConsoleRunner.3.4.1/tools/nunit3-console.exe ./RabscuttleTests/bin/Debug/Tests.dll

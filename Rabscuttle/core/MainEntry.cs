@@ -6,13 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Rabscuttle {
-    public class Bot {
+    public class MainEntry {
         static void Main(string[] args) {
             Debug.Print("Hello world.");
         }
 
-        public static int Add(int x, int y) {
-            return x + y;
+        public static bool True() {
+            return true;
         }
     }
 }

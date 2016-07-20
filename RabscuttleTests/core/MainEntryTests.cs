@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Rabscuttle.Tests {
     [TestFixture()]
-    public class RabscuttleTests {
+    public class MainEntryTests {
         [Test()]
-        public void addTest() {
-            Assert.IsTrue(2 == Rabscuttle.Bot.Add(1, 1));
+        public void TrueTest() {
+            Assert.IsTrue(MainEntry.True());
         }
     }
 }
