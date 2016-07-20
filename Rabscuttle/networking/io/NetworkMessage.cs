@@ -12,8 +12,9 @@ namespace Rabscuttle.networking {
         public readonly string typeParams;
         public readonly bool fromServer;
         public bool fromClient => !fromServer;
-
-        private readonly Regex r = new Regex(@"^(?:[:](\S+) )?(\S+)(?: (?!:)(.+?))?(?: [:](.+))[\r|\n]*$", RegexOptions.Compiled);
+        // {0,4}(?:\:(.*))?\n
+        // (?:\s\:(.*)?)?
+        private readonly Regex r = new Regex(@"^(?::(?<prefix>(?<user>[^@!\ ]*)(?:(?:\!(?<ident>[^@]*))?@(?<host>[^\ ]*))?)\ )?(?<type>[^\ ]+)(?<typeparameter>(?:\ [^:\ ][^\ ]*){0,14})(?:\ :?(?<message>.*))?(?:\r\n)?$", RegexOptions.Compiled);
 
         public NetworkMessage(string prefix, string type, string typeParams, string message, bool fromServer) {
             this.message = message;
@@ -26,10 +27,12 @@ namespace Rabscuttle.networking {
         public NetworkMessage(string raw, bool fromServer) {
             try {
                 var messageContent = r.Matches(raw)[0].Groups;
-                prefix = messageContent[1].Value;
-                type = messageContent[2].Value;
-                typeParams = messageContent[3].Value;
-                message = messageContent[4].Value.Replace("\r", "");
+                prefix = messageContent["prefix"].Value;
+                type = messageContent["type"].Value;
+                var x = messageContent["typeparameter"].Value;
+                typeParams = String.IsNullOrWhiteSpace(x) ? x : x.Substring(1, x.Length - 1); // x.Value.Substring(1, x.Length-1);
+                message = messageContent["message"].Value;
+                // message = messageContent[6].Value.Substring(1, messageContent[6].Value.Length).Replace("\r", "");
             } catch (ArgumentOutOfRangeException e) {
                 throw new ArgumentException("Misaligned Message: " + raw);
             }

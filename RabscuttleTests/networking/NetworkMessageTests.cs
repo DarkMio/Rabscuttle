@@ -14,19 +14,19 @@ namespace Rabscuttle.networking.Tests {
         public void NetworkMessageRawGeneration() {
             Assert.AreEqual(
                 new NetworkMessage(":m@m.net PRIVMSG #mychannel :Hiya, buddy.", false).ToString(),
-                "CLIENT> P: [ m@m.net ] | T:[ PRIVMSG ] | D: [ #mychannel ] | M: [ Hiya, buddy. ];"
+                "CLIENT> P: [ m@m.net ] | T:[ PRIVMSG ] | TP: [ #mychannel ] | M: [ Hiya, buddy. ];"
             );
             Assert.AreEqual(
                 new NetworkMessage("PING :server.net", false).ToString(),
-                "CLIENT> P: [  ] | T:[ PING ] | D: [  ] | M: [ server.net ];"
+                "CLIENT> P: [  ] | T:[ PING ] | TP: [  ] | M: [ server.net ];"
             );
         }
 
         [Test()]
         public void NetworkMessageMessageBuild() {
-            string message = ":m@m.net PRIVMSG #mychannel :Hiya, buddy.\r\n";
+            string message = ":m@m.net PRIVMSG #mychannel :Hiya, buddy.";
             NetworkMessage networkMessage = new NetworkMessage(message, true);
-            Assert.AreEqual(message, networkMessage.BuildMessage());
+            Assert.AreEqual(message + "\r\n", networkMessage.BuildMessage());
         }
     }
 }

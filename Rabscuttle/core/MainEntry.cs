@@ -15,11 +15,10 @@ namespace Rabscuttle {
             ConnectionManager cmgr = new ConnectionManager("irc.gamesurge.net", 6667);
             Console.WriteLine("!> Connected!");
             cmgr.ReceiveLast(true);
-            cmgr.Send(Join.Instance.Generate(false, null, null, "#w3x-to-vmf"));
-            cmgr.Send(PrivMsg.Instance.Generate(false, null, "#w3x-to-vmf", "Hello world!"));
 
-            cmgr.Send(Join.Instance.Generate(false, null, null, "#dota2mods"));
-            cmgr.Send(PrivMsg.Instance.Generate(false, null, "#dota2mods", "+markov SQL sucks dick."));
+
+
+
             /*
             for (int i = 0; i < 500; i++) {
                 cmgr.Send(PrivMsg.Instance.Generate(false, null, "#w3x-to-vmf", "Hello: " + i));
