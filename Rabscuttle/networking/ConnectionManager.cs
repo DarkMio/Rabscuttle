@@ -1,12 +1,15 @@
 ﻿using System.Diagnostics;
 using System.Threading;
+using Rabscuttle.networking.commands;
 
 namespace Rabscuttle.networking {
     public class ConnectionManager {
         public readonly BotClient client;
+        private readonly CommandSchedule scheduler;
 
         public ConnectionManager(string host, int port) {
             client = new BotClient(host, port);
+            scheduler = new CommandSchedule(client);
             Connect();
         }
         /*
@@ -18,11 +21,14 @@ namespace Rabscuttle.networking {
         */
 
         private void Connect() {
-            client.Send("Real Name", null, "USER sessionId irc.foobar.net irc.foobar.net", null);
-            client.Send(null, null, "NICK UncreativePersonName", null);
-            // client.ReceiveLast(true);
+            Send(User.Instance.Generate(false, null, "Gabe BotHost AnotherOne", "Rabscuttle"));
+            Send(Nick.Instance.Generate(false, null, "Rabscootle"));
             NetworkMessage msg = client.ReceiveUntil("PING"); // The last received message will be a ping.
-            client.Send(msg.message, null, "PONG", null); // And the message of the ping needs to be answered.
+            Send(Pong.Instance.Generate(false, null, msg.message)); // And the message of the ping needs to be answered.
+        }
+
+        public void Send(NetworkMessage message) {
+            scheduler.Add(message);
         }
     }
 }

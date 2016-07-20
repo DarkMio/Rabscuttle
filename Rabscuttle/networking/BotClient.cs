@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Configuration;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Rabscuttle.networking.commands;
 
 namespace Rabscuttle.networking {
     public class BotClient : ISender, IReceiver {
@@ -49,15 +51,14 @@ namespace Rabscuttle.networking {
         }
 
         public void Send(string message, string prefix, string type, string destination) {
-            NetworkMessage msg = new NetworkMessage(message, prefix, type, destination, false);
-            output.Write(msg.BuildMessage());
-            output.Flush();
-            Debug.WriteLine(msg);
-            // throw new System.NotImplementedException();
+            NetworkMessage msg = new NetworkMessage(prefix, type, destination, message, false);
+            Send(msg);
         }
 
         public void Send(NetworkMessage message) {
-            throw new System.NotImplementedException();
+            output.Write(message.BuildMessage());
+            output.Flush();
+            Debug.WriteLine(message);
         }
 
         /**
@@ -67,9 +68,13 @@ namespace Rabscuttle.networking {
         public NetworkMessage Receive(bool waitResponse=false) {
             if (dataStream.DataAvailable || waitResponse) {
                 string s = input.ReadLine();
-                var msg = new NetworkMessage(s, true);
-                Debug.WriteLine(msg);
-                return msg;
+                try {
+                    var msg = new NetworkMessage(s, true);
+                    Debug.WriteLine(msg);
+                    return msg;
+                } catch (ArgumentException e) {
+                    Debug.WriteLine(e);
+                }
             }
             return null;
         }
@@ -109,10 +114,14 @@ namespace Rabscuttle.networking {
         public NetworkMessage ReceiveUntil(string type) {
             while (true) {
                 var message = Receive(true);
-                if (message.type == type) {
+                if (type == message.type) {
                     return message;
                 }
             }
+        }
+
+        public NetworkMessage ReceiveUntil<T>(T command) where T: Command<T>, new(){
+            return ReceiveUntil(command.type);
         }
     }
 }
