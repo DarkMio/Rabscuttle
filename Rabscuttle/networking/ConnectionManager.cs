@@ -23,8 +23,7 @@ namespace Rabscuttle.networking {
         private void Connect() {
             Send(User.Instance.Generate(false, null, "Gabe BotHost AnotherOne", "Rabscuttle"));
             Send(Nick.Instance.Generate(false, null, "Rabscootle"));
-            NetworkMessage msg = client.ReceiveUntil("PING"); // The last received message will be a ping.
-            Send(Pong.Instance.Generate(false, null, msg.message)); // And the message of the ping needs to be answered.
+            ReceiveUntil(Ping.Instance); // The last received message will be a ping.
         }
 
         public void Send(NetworkMessage message) {
@@ -35,12 +34,29 @@ namespace Rabscuttle.networking {
             return client.Receive(waitResponse);
         }
 
-        public NetworkMessage ReceiveUntil<T>(T command) where T : RawCommand<T>, new() {
-            return client.ReceiveUntil(command);
+        /**
+         * Wait and receive until a certain message is found.
+         * This will, if poorly used, stay stuck, since it's waiting for a certain message.
+         */
+        public NetworkMessage ReceiveUntil<T>(T command, bool waitResponse = false) where T : RawCommand<T>, new() {
+            while (true) {
+                var message = Receive(true);
+                if (message != null && command.type == message.type) {
+                    return message;
+                }
+            }
         }
 
         public NetworkMessage ReceiveLast(bool waitResponse=false) {
-            return client.ReceiveLast(waitResponse);
+            NetworkMessage lastMessage = Receive(waitResponse);
+            while (true) {
+                var message = Receive();
+                if (message == null) {
+                    break;
+                }
+                lastMessage = message;
+            }
+            return lastMessage;
         }
     }
 }

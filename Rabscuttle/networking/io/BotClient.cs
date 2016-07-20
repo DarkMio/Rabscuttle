@@ -67,17 +67,23 @@ namespace Rabscuttle.networking {
          * @param waitResponse: waits for a message until there is one, if true yields null if there is no mesasge
          */
         public NetworkMessage Receive(bool waitResponse=false) {
-            if (dataStream.DataAvailable || waitResponse) {
-                string s = input.ReadLine();
-                try {
-                    var msg = new NetworkMessage(s, true);
-                    Debug.WriteLine(msg);
-                    return msg;
-                } catch (ArgumentException e) {
-                    Debug.WriteLine(e);
-                }
+            if (!dataStream.DataAvailable && !waitResponse) {
+                return null;
             }
-            return null;
+
+            string s = input.ReadLine();
+            try {
+                var msg = new NetworkMessage(s, true);
+                Debug.WriteLine(msg);
+                if (msg.type == Ping.Instance.type) { // auto-repeat 
+                    Send(Pong.Instance.Generate(false, null, msg.message));
+                }
+                Handle(msg);
+                return msg;
+            } catch (ArgumentException e) {
+                Debug.WriteLine(e);
+                return null;
+            }
         }
 
         /**
@@ -108,21 +114,16 @@ namespace Rabscuttle.networking {
             return lastMessage;
         }
 
-        /**
-         * Wait and receive until a certain message is found.
-         * This will, if poorly used, stay stuck, since it's waiting for a certain message.
-         */
-        public NetworkMessage ReceiveUntil(string type) {
-            while (true) {
-                var message = Receive(true);
-                if (message != null && type == message.type) {
-                    return message;
-                }
+        private void Handle(NetworkMessage message) {
+            /*
+            switch (message.type) {
+                case Commands.PING.ToString():
+                    Send(Pong.Instance.Generate(false, null, message.message));
+                    break;
+                default:
+                    return;
             }
-        }
-
-        public NetworkMessage ReceiveUntil<T>(T command) where T: RawCommand<T>, new(){
-            return ReceiveUntil(command.type);
+            */
         }
     }
 }

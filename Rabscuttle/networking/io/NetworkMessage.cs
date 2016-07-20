@@ -14,7 +14,11 @@ namespace Rabscuttle.networking {
         public bool fromClient => !fromServer;
         // {0,4}(?:\:(.*))?\n
         // (?:\s\:(.*)?)?
-        private readonly Regex r = new Regex(@"^(?::(?<prefix>(?<user>[^@!\ ]*)(?:(?:\!(?<ident>[^@]*))?@(?<host>[^\ ]*))?)\ )?(?<type>[^\ ]+)(?<typeparameter>(?:\ [^:\ ][^\ ]*){0,14})(?:\ :?(?<message>.*))?(?:\r\n)?$", RegexOptions.Compiled);
+        private readonly Regex r = new Regex(
+            @"^(?::(?<prefix>(?<user>[^@!\ ]*)(?:(?:\!(?<ident>[^@]*))?@(?<host>[^\ ]*))?)\ )?"+
+            @"(?<type>[^\ ]+)(?<typeparameter>(?:\ [^:\ ][^\ ]*){0,14})(?:\ :?(?<message>.*))?(?:\r\n)?$",
+            RegexOptions.Compiled
+        );
 
         public NetworkMessage(string prefix, string type, string typeParams, string message, bool fromServer) {
             this.message = message;

@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Rabscuttle.networking.commands {
     public abstract class RawCommand<T> where T : RawCommand<T>, new() {
 
-        public abstract string type { get; }
+        public virtual string type { get; }
         public abstract bool hasTypeParameter { get; }
         public abstract bool hasMessage { get; }
 
@@ -23,6 +24,9 @@ namespace Rabscuttle.networking.commands {
             return new NetworkMessage(prefix, type, typeParameter, message, fromServer);
         }
     }
+
+   
+    
 
     public class Join : RawCommand<Join> {
         public override string type => "JOIN";
