@@ -11,21 +11,30 @@ using Rabscuttle.networking.commands;
 namespace Rabscuttle {
     public class MainEntry {
         static void Main(string[] args) {
-            Debug.WriteLine("Connecting...");
-            ConnectionManager cmgr = new ConnectionManager("localhost", 6667);
-            Debug.WriteLine("Connected!");
-            cmgr.client.ReceiveLast(true);
-            Thread.Sleep(500);
-            cmgr.client.Send(Join.Instance.Generate(false, null, null, "#w3x-to-vmf"));
-            Thread.Sleep(500);
-            cmgr.client.Send(PrivMsg.Instance.Generate(false, null, "#w3x-to-vmf", "Hello world!"));
+            Console.WriteLine("!> Connecting...");
+            ConnectionManager cmgr = new ConnectionManager("irc.gamesurge.net", 6667);
+            Console.WriteLine("!> Connected!");
+            cmgr.ReceiveLast(true);
+            cmgr.Send(Join.Instance.Generate(false, null, null, "#w3x-to-vmf"));
+            cmgr.Send(PrivMsg.Instance.Generate(false, null, "#w3x-to-vmf", "Hello world!"));
+
+            cmgr.Send(Join.Instance.Generate(false, null, null, "#dota2mods"));
+            cmgr.Send(PrivMsg.Instance.Generate(false, null, "#dota2mods", "+markov SQL sucks dick."));
+            /*
             for (int i = 0; i < 500; i++) {
                 cmgr.Send(PrivMsg.Instance.Generate(false, null, "#w3x-to-vmf", "Hello: " + i));
             }
+            */
             while (true) {
-                var msg = cmgr.client.ReceiveUntil(Ping.Instance);
-                cmgr.client.Send(Pong.Instance.Generate(false, null, msg.message));
+                var msg = cmgr.ReceiveUntil(Ping.Instance);
+                cmgr.Send(Pong.Instance.Generate(false, null, msg.message));
             }
+        }
+
+        public class AuthServ : RawCommand<AuthServ> {
+            public override string type => "AUTHSERV";
+            public override bool hasTypeParameter => true;
+            public override bool hasMessage => false;
         }
     }
 }

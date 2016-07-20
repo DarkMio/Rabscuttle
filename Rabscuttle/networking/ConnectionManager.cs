@@ -4,7 +4,7 @@ using Rabscuttle.networking.commands;
 
 namespace Rabscuttle.networking {
     public class ConnectionManager {
-        public readonly BotClient client;
+        private readonly BotClient client;
         private readonly CommandSchedule scheduler;
 
         public ConnectionManager(string host, int port) {
@@ -29,6 +29,18 @@ namespace Rabscuttle.networking {
 
         public void Send(NetworkMessage message) {
             scheduler.Add(message);
+        }
+
+        public NetworkMessage Receive(bool waitResponse=false) {
+            return client.Receive(waitResponse);
+        }
+
+        public NetworkMessage ReceiveUntil<T>(T command) where T : RawCommand<T>, new() {
+            return client.ReceiveUntil(command);
+        }
+
+        public NetworkMessage ReceiveLast(bool waitResponse=false) {
+            return client.ReceiveLast(waitResponse);
         }
     }
 }

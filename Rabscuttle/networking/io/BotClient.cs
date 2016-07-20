@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 
 namespace Rabscuttle.networking {
     public class BotClient : ISender, IReceiver {
@@ -114,13 +115,13 @@ namespace Rabscuttle.networking {
         public NetworkMessage ReceiveUntil(string type) {
             while (true) {
                 var message = Receive(true);
-                if (type == message.type) {
+                if (message != null && type == message.type) {
                     return message;
                 }
             }
         }
 
-        public NetworkMessage ReceiveUntil<T>(T command) where T: Command<T>, new(){
+        public NetworkMessage ReceiveUntil<T>(T command) where T: RawCommand<T>, new(){
             return ReceiveUntil(command.type);
         }
     }

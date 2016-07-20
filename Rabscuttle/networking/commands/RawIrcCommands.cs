@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Rabscuttle.networking.commands {
-    public abstract class Command<T> where T : Command<T>, new() {
+    public abstract class RawCommand<T> where T : RawCommand<T>, new() {
 
         public abstract string type { get; }
         public abstract bool hasTypeParameter { get; }
@@ -24,37 +24,37 @@ namespace Rabscuttle.networking.commands {
         }
     }
 
-    public class Join : Command<Join> {
+    public class Join : RawCommand<Join> {
         public override string type => "JOIN";
         public override bool hasTypeParameter => false;
         public override bool hasMessage => true;
     }
 
-    public class Nick : Command<Nick> {
+    public class Nick : RawCommand<Nick> {
         public override string type => "NICK";
         public override bool hasTypeParameter => true;
         public override bool hasMessage => false;
     }
 
-    public class User : Command<User> {
+    public class User : RawCommand<User> {
         public override string type => "USER";
         public override bool hasTypeParameter => true;
         public override bool hasMessage => true;
     }
 
-    public class Ping : Command<Ping> {
+    public class Ping : RawCommand<Ping> {
         public override string type => "PING";
         public override bool hasTypeParameter => true;
         public override bool hasMessage => false;
     }
 
-    public class Pong : Command<Pong> {
+    public class Pong : RawCommand<Pong> {
         public override string type => "PONG";
         public override bool hasTypeParameter => true;
         public override bool hasMessage => false;
     }
 
-    public class PrivMsg : Command<PrivMsg> {
+    public class PrivMsg : RawCommand<PrivMsg> {
         public override string type => "PRIVMSG";
         public override bool hasTypeParameter => true;
         public override bool hasMessage => true;
