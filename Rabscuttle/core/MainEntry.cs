@@ -10,9 +10,5 @@ namespace Rabscuttle {
         static void Main(string[] args) {
             Debug.Print("Hello world.");
         }
-
-        public static bool True() {
-            return true;
-        }
     }
 }
