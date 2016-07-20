@@ -6,9 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Rabscuttle {
-    class Program {
+    public class Bot {
         static void Main(string[] args) {
             Debug.Print("Hello world.");
+        }
+
+        public static int Add(int x, int y) {
+            return x + y;
         }
     }
 }
