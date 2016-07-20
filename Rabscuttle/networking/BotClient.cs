@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Rabscuttle.networking {
-    public class Client : ISender, IReceiver {
+    public class BotClient : ISender, IReceiver {
         private string host;
         private int port;
         private TcpClient client;
@@ -24,7 +24,7 @@ namespace Rabscuttle.networking {
         public const int KeepAliveInterval = 5000; // 5s to send keep alive
         public const int KeepAliveTime = 300000; // 300s until timeout
 
-        public Client(string host, int port) {
+        public BotClient(string host, int port) {
             this.host = host;
             this.port = port;
 
@@ -60,19 +60,59 @@ namespace Rabscuttle.networking {
             throw new System.NotImplementedException();
         }
 
-        public NetworkMessage Receive() {
-            if (dataStream.DataAvailable) {
+        /**
+         * Receives a message
+         * @param waitResponse: waits for a message until there is one, if true yields null if there is no mesasge
+         */
+        public NetworkMessage Receive(bool waitResponse=false) {
+            if (dataStream.DataAvailable || waitResponse) {
                 string s = input.ReadLine();
-                return new NetworkMessage(s, true);
+                var msg = new NetworkMessage(s, true);
+                Debug.WriteLine(msg);
+                return msg;
             }
             return null;
         }
 
+        /**
+         * For debugging purposes, receives a single line of the network stack, no parsing.
+         */
         public string RawReceive() {
             if (dataStream.DataAvailable) {
                 return input.ReadLine();
             }
             return null;
+        }
+
+        /**
+         * Disposes all incoming messages until the most recent is reached,
+         * for example when the server sends multiple messages between receiving frames.
+         * @param waitResponse: waits for the FIRST message to appear and loads then everything.
+         * @return: null when nothing is there in the first place - like Receive does.
+         */
+        public NetworkMessage ReceiveLast(bool waitResponse=false) {
+            NetworkMessage lastMessage = Receive(waitResponse);
+            while (true) {
+                var message = Receive();
+                if (message == null) {
+                    break;
+                }
+                lastMessage = message;
+            }
+            return lastMessage;
+        }
+
+        /**
+         * Wait and receive until a certain message is found.
+         * This will, if poorly used, stay stuck, since it's waiting for a certain message.
+         */
+        public NetworkMessage ReceiveUntil(string type) {
+            while (true) {
+                var message = Receive(true);
+                if (message.type == type) {
+                    return message;
+                }
+            }
         }
     }
 }

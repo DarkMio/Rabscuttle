@@ -10,37 +10,14 @@ using Rabscuttle.networking;
 namespace Rabscuttle {
     public class MainEntry {
         static void Main(string[] args) {
-          
-            Client ss = new Client("localhost", 6667);
-            ReceiveEverything(ss);
-            ss.Send("Real Name", null, "USER sessionId irc.foobar.net irc.foobar.net", null);
+            Debug.WriteLine("Connecting...");
+            ConnectionManager cmgr = new ConnectionManager("localhost", 6667);
+            Debug.WriteLine("Connected!");
+            Thread.Sleep(4000);
+            cmgr.client.Send("#dota2mods", "source", "JOIN", null);
             Thread.Sleep(500);
-            ReceiveEverything(ss);
-            ss.Send(null, null, "NICK UncreativePersonName", null);
-            Thread.Sleep(500);
-            NetworkMessage msg = ss.Receive();
-            Debug.WriteLine(msg);
-            ss.Send(msg.message, null, "PONG", null);
-            Thread.Sleep(500);
-            ReceiveEverything(ss);
-            ss.Send("A bunch of text.", null, "PING", null);
-            Thread.Sleep(500);
-            ReceiveEverything(ss);
-            Debug.WriteLine("Done sending");
-        }
-
-        static void ReceiveEverything(Client client) {
-            while (true) {
-                try {
-                    var response = client.Receive();
-                    if (response == null) {
-                        break;
-                    }
-                    Debug.WriteLine(response);
-                } catch (ArgumentException e) {
-                    Debug.WriteLine(e.Message);
-                }
-            }
+            cmgr.client.Send("Hello world.", "source", "PRIVMSG #dota2mods", null);
+            Thread.Sleep(300000);
         }
     }
 }

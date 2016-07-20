@@ -5,6 +5,6 @@
     }
 
     public interface IReceiver {
-        NetworkMessage Receive();
+        NetworkMessage Receive(bool waitResponse=false);
     }
 }
