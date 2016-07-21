@@ -17,12 +17,6 @@ namespace Rabscuttle.networking {
         private StreamReader input;
         private StreamWriter output;
 
-        struct tcp_keepalive {
-	            ulong  onoff;
-	            ulong  keepalivetime;
-	            ulong  keepaliveinterval;
-		        };
-
         public const int Timeout = 300000; // 300s until timeout; normal IRC timeout
         public const int KeepAliveInterval = 5000; // 5s to send keep alive
         public const int KeepAliveTime = 300000; // 300s until timeout
@@ -62,6 +56,12 @@ namespace Rabscuttle.networking {
             Debug.WriteLine(message);
         }
 
+        public void RawSend(string message) {
+            output.Write(message);
+            output.Flush();
+            Debug.WriteLine("CLIENT> RAW: " + message);
+        }
+
         /**
          * Receives a message
          * @param waitResponse: waits for a message until there is one, if true yields null if there is no mesasge
@@ -74,11 +74,6 @@ namespace Rabscuttle.networking {
             string s = input.ReadLine();
             try {
                 var msg = new NetworkMessage(s, true);
-                Debug.WriteLine(msg);
-                if (msg.type == Ping.Instance.type) { // auto-repeat 
-                    Send(Pong.Instance.Generate(false, null, msg.message));
-                }
-                Handle(msg);
                 return msg;
             } catch (ArgumentException e) {
                 Debug.WriteLine(e);
@@ -112,18 +107,6 @@ namespace Rabscuttle.networking {
                 lastMessage = message;
             }
             return lastMessage;
-        }
-
-        private void Handle(NetworkMessage message) {
-            /*
-            switch (message.type) {
-                case Commands.PING.ToString():
-                    Send(Pong.Instance.Generate(false, null, message.message));
-                    break;
-                default:
-                    return;
-            }
-            */
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Rabscuttle.networking.commands;
 
@@ -31,7 +33,11 @@ namespace Rabscuttle.networking {
         }
 
         public NetworkMessage Receive(bool waitResponse=false) {
-            return client.Receive(waitResponse);
+            var msg = client.Receive(waitResponse);
+            if (msg != null) {
+                Handle(msg);
+            }
+            return msg;
         }
 
         /**
@@ -57,6 +63,30 @@ namespace Rabscuttle.networking {
                 lastMessage = message;
             }
             return lastMessage;
+        }
+
+        private void Handle(NetworkMessage message) {
+            if(Enum.IsDefined(typeof(ReplyCodes), message.type)) {
+                // We've received server info.
+                Debug.WriteLine("?" + message);
+            }
+
+            if (Enum.IsDefined(typeof(CommandCodes), message.type)) {
+                // We've received something to act upon.
+                Debug.WriteLine("!" + message);
+                CommandCodes thing = (CommandCodes) Enum.Parse(typeof(CommandCodes), message.type, true);
+                if (thing == CommandCodes.PING) {
+                    Send(Pong.Instance.Generate(false, null, message.message));
+                } else if (thing == CommandCodes.PRIVMSG && message.prefix =="DarkMio!~Mio@DarkMio.user.gamesurge") {
+                    if(message.message.StartsWith(">RAW")) {
+                        client.RawSend(message.message.Replace(">RAW ", "") + "\r\n");
+                    }
+                    if (message.message.StartsWith(">rejoin")) {
+                        Send(Part.Instance.Generate(false, null, "#w3x-to-vmf", "Cya"));
+                        Send(Join.Instance.Generate(false, null, null, "#w3x-to-vmf"));
+                    }
+                }
+            }
         }
     }
 }

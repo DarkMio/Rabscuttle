@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Rabscuttle.networking.commands;
 
 namespace Rabscuttle.networking {
     public class NetworkMessage {
@@ -32,9 +33,14 @@ namespace Rabscuttle.networking {
             try {
                 var messageContent = r.Matches(raw)[0].Groups;
                 prefix = messageContent["prefix"].Value;
-                type = messageContent["type"].Value;
-                var x = messageContent["typeparameter"].Value;
-                typeParams = String.IsNullOrWhiteSpace(x) ? x : x.Substring(1, x.Length - 1); // x.Value.Substring(1, x.Length-1);
+                { // some IRC commands come as reply number, some as actual command.
+                    var rawType = messageContent["type"].Value;
+                    int replyCode;
+                    bool isNumeric = int.TryParse(rawType, out replyCode);
+                    type = isNumeric ? ((ReplyCodes) replyCode).ToString() : rawType;
+                }
+                var typeParameter = messageContent["typeparameter"].Value;
+                typeParams = String.IsNullOrWhiteSpace(typeParameter) ? typeParameter : typeParameter.Substring(1, typeParameter.Length - 1); // x.Value.Substring(1, x.Length-1);
                 message = messageContent["message"].Value;
                 // message = messageContent[6].Value.Substring(1, messageContent[6].Value.Length).Replace("\r", "");
             } catch (ArgumentOutOfRangeException e) {

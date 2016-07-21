@@ -63,4 +63,10 @@ namespace Rabscuttle.networking.commands {
         public override bool hasTypeParameter => true;
         public override bool hasMessage => true;
     }
+
+    public class Part : RawCommand<Part> {
+        public override string type => CommandCodes.PART + "";
+        public override bool hasTypeParameter => true;
+        public override bool hasMessage => true;
+    }
 }

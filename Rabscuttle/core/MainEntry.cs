@@ -16,9 +16,7 @@ namespace Rabscuttle {
             Console.WriteLine("!> Connected!");
             cmgr.ReceiveLast(true);
 
-            // cmgr.Send(Join.Instance.Generate(false, null, null, "#w3x-to-vmf"));
-
-
+            cmgr.Send(Join.Instance.Generate(false, null, null, "#w3x-to-vmf"));
 
             /*
             for (int i = 0; i < 500; i++) {
