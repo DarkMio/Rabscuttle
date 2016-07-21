@@ -48,10 +48,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="core\MainEntry.cs" />
-    <Compile Include="networking\INetworking.cs" />
-    <Compile Include="networking\NetworkMessage.cs" />
-    <Compile Include="networking\Client.cs" />
-    <Compile Include="networking\StateObject.cs" />
+    <Compile Include="networking\CommandSchedule.cs" />
+    <Compile Include="networking\commands\IrcCommands.cs" />
+    <Compile Include="networking\commands\ProtocolDefinitions.cs" />
+    <Compile Include="networking\commands\RawIrcCommands.cs" />
+    <Compile Include="networking\ConnectionManager.cs" />
+    <Compile Include="networking\io\INetworking.cs" />
+    <Compile Include="networking\io\NetworkMessage.cs" />
+    <Compile Include="networking\io\BotClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
