@@ -37,7 +37,7 @@ namespace Rabscuttle.networking {
                     var rawType = messageContent["type"].Value;
                     int replyCode;
                     bool isNumeric = int.TryParse(rawType, out replyCode);
-                    type = isNumeric ? ((ReplyCodes) replyCode).ToString() : rawType;
+                    type = isNumeric ? ((ReplyCode) replyCode).ToString() : rawType;
                 }
                 var typeParameter = messageContent["typeparameter"].Value;
                 typeParams = String.IsNullOrWhiteSpace(typeParameter) ? typeParameter : typeParameter.Substring(1, typeParameter.Length - 1); // x.Value.Substring(1, x.Length-1);

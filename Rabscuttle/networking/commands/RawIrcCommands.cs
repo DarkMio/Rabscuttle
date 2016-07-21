@@ -1,19 +1,27 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 
 namespace Rabscuttle.networking.commands {
     public abstract class RawCommand<T> where T : RawCommand<T>, new() {
-
-        public virtual string type { get; }
+        public abstract CommandCode type { get; }
         public abstract bool hasTypeParameter { get; }
         public abstract bool hasMessage { get; }
-
         public static T Instance { get; } = new T();
 
-        public NetworkMessage Generate(bool fromServer, string prefix=null, string typeParameter = null, string message = null) {
-            if (type == null) {
-                throw new ArgumentException("Type cannot be null.");
+        protected NetworkMessage InstanceGenerate(bool fromServer, string prefix = null, string typeParameter = null,
+                                                  string message = null) {
+            if (type == CommandCode.DEFAULT) {
+                throw new ArgumentException("This method cannot be used by any implementation of CommandCode.DEFAULT!");
             }
+            return InstanceRawGenerate(fromServer, type + "", prefix, typeParameter, message);
+        }
+
+        protected NetworkMessage InstanceRawGenerate(bool fromServer, string type, string prefix = null,
+                                                  string typeParameter = null, string message = null) {
+            return new NetworkMessage(prefix, type, typeParameter, message, fromServer);
+        }
+
+        protected NetworkMessage Generate(bool fromServer, string prefix = null, string typeParameter = null,
+            string message = null) {
             if (hasTypeParameter && typeParameter == null) {
                 throw new ArgumentException("For this type [ " + type + " ] typeParameter cannot be null!");
             }
@@ -21,52 +29,70 @@ namespace Rabscuttle.networking.commands {
                 throw new ArgumentException("For this type [" + type + " ] message cannot be null!");
             }
 
-            return new NetworkMessage(prefix, type, typeParameter, message, fromServer);
+            return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
         }
     }
 
-   
-    
-
     public class Join : RawCommand<Join> {
-        public override string type => "JOIN";
+        public override CommandCode type => CommandCode.JOIN;
         public override bool hasTypeParameter => false;
         public override bool hasMessage => true;
+        public static NetworkMessage Generate(string message, bool fromServer = false, string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix, null, message);
+        }
     }
 
     public class Nick : RawCommand<Nick> {
-        public override string type => "NICK";
+        public override CommandCode type => CommandCode.NICK;
         public override bool hasTypeParameter => true;
         public override bool hasMessage => false;
+        public static NetworkMessage Generate(string typeParameter, bool fromServer = false, string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix, typeParameter);
+        }
     }
 
     public class User : RawCommand<User> {
-        public override string type => "USER";
+        public override CommandCode type => CommandCode.USER;
         public override bool hasTypeParameter => true;
         public override bool hasMessage => true;
+        public static NetworkMessage Generate(string typeParameter, string message, bool fromServer = false, string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
+        }
     }
 
     public class Ping : RawCommand<Ping> {
-        public override string type => "PING";
+        public override CommandCode type => CommandCode.PING;
         public override bool hasTypeParameter => true;
         public override bool hasMessage => false;
+        public static NetworkMessage Generate(string typeParameter, bool fromServer = false, string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix, typeParameter);
+        }
     }
 
     public class Pong : RawCommand<Pong> {
-        public override string type => "PONG";
+        public override CommandCode type => CommandCode.PONG;
         public override bool hasTypeParameter => true;
         public override bool hasMessage => false;
+        public static NetworkMessage Generate(string typeParameter, bool fromServer = false, string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix, typeParameter);
+        }
     }
 
     public class PrivMsg : RawCommand<PrivMsg> {
-        public override string type => "PRIVMSG";
+        public override CommandCode type => CommandCode.PRIVMSG;
         public override bool hasTypeParameter => true;
         public override bool hasMessage => true;
+        public static NetworkMessage Generate(string typeParameter, string message, bool fromServer = false, string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
+        }
     }
 
     public class Part : RawCommand<Part> {
-        public override string type => CommandCodes.PART + "";
+        public override CommandCode type => CommandCode.PART;
         public override bool hasTypeParameter => true;
         public override bool hasMessage => true;
+        public static NetworkMessage Generate(string typeParameter, string message, bool fromServer = false, string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
+        }
     }
 }

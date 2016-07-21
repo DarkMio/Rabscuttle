@@ -14,6 +14,7 @@ namespace Rabscuttle.networking {
             scheduler = new CommandSchedule(client);
             Connect();
         }
+
         /*
         public ConnectionManager ConnectionManagerFactory(string host, int port) {
             ConnectionManager cmgr = new ConnectionManager(host, port);
@@ -23,8 +24,8 @@ namespace Rabscuttle.networking {
         */
 
         private void Connect() {
-            Send(User.Instance.Generate(false, null, "Gabe BotHost AnotherOne", "Rabscuttle"));
-            Send(Nick.Instance.Generate(false, null, "Rabscootle"));
+            Send(User.Generate("Gabe BotHost AnotherOne", "Rabscuttle"));
+            Send(Nick.Generate("Rabscootle"));
             ReceiveUntil(Ping.Instance); // The last received message will be a ping.
         }
 
@@ -32,7 +33,7 @@ namespace Rabscuttle.networking {
             scheduler.Add(message);
         }
 
-        public NetworkMessage Receive(bool waitResponse=false) {
+        public NetworkMessage Receive(bool waitResponse = false) {
             var msg = client.Receive(waitResponse);
             if (msg != null) {
                 Handle(msg);
@@ -44,16 +45,17 @@ namespace Rabscuttle.networking {
          * Wait and receive until a certain message is found.
          * This will, if poorly used, stay stuck, since it's waiting for a certain message.
          */
+
         public NetworkMessage ReceiveUntil<T>(T command, bool waitResponse = false) where T : RawCommand<T>, new() {
             while (true) {
                 var message = Receive(true);
-                if (message != null && command.type == message.type) {
+                if (message != null && command.type + "" == message.type) {
                     return message;
                 }
             }
         }
 
-        public NetworkMessage ReceiveLast(bool waitResponse=false) {
+        public NetworkMessage ReceiveLast(bool waitResponse = false) {
             NetworkMessage lastMessage = Receive(waitResponse);
             while (true) {
                 var message = Receive();
@@ -65,28 +67,64 @@ namespace Rabscuttle.networking {
             return lastMessage;
         }
 
+        /**
+         * Handles an incoming message accordingly.
+         * I honestly think that it wouldn't be bad to have two subclasses for
+         * the two different kinds of messages, but then again this would either
+         * require to split up them here, which then is kinda late, or analyze
+         * the message beforehand, which doesn't seem nice either.
+         * Help is appreciated.
+         */
+
         private void Handle(NetworkMessage message) {
-            if(Enum.IsDefined(typeof(ReplyCodes), message.type)) {
+            if (Enum.IsDefined(typeof(ReplyCode), message.type)) {
                 // We've received server info.
                 Debug.WriteLine("?" + message);
+                ReplyCode replyCode = (ReplyCode) Enum.Parse(typeof(ReplyCode), message.type, true);
+                HandleReply(message, replyCode);
+
             }
 
-            if (Enum.IsDefined(typeof(CommandCodes), message.type)) {
+            if (Enum.IsDefined(typeof(CommandCode), message.type)) {
                 // We've received something to act upon.
                 Debug.WriteLine("!" + message);
-                CommandCodes thing = (CommandCodes) Enum.Parse(typeof(CommandCodes), message.type, true);
-                if (thing == CommandCodes.PING) {
-                    Send(Pong.Instance.Generate(false, null, message.message));
-                } else if (thing == CommandCodes.PRIVMSG && message.prefix =="DarkMio!~Mio@DarkMio.user.gamesurge") {
-                    if(message.message.StartsWith(">RAW")) {
-                        client.RawSend(message.message.Replace(">RAW ", "") + "\r\n");
-                    }
-                    if (message.message.StartsWith(">rejoin")) {
-                        Send(Part.Instance.Generate(false, null, "#w3x-to-vmf", "Cya"));
-                        Send(Join.Instance.Generate(false, null, null, "#w3x-to-vmf"));
-                    }
-                }
+                CommandCode commandCode = (CommandCode) Enum.Parse(typeof(CommandCode), message.type, true);
+                HandleCommand(message, commandCode);
+
             }
         }
+
+        private void HandleReply(NetworkMessage message, ReplyCode code) {
+
+        }
+
+        private void HandleCommand(NetworkMessage message, CommandCode code) {
+            switch (code) {
+                case CommandCode.PING:
+                    Send(Pong.Generate(message.message));
+                    break;
+                case CommandCode.PRIVMSG:
+                    OnPrivMsg(message);
+                    break;
+                default:
+                    return;
+            }
+
+            if (code == CommandCode.PING) {
+                Send(Pong.Generate(message.message));
+            }
+        }
+
+        private void OnPrivMsg(NetworkMessage message) {
+            if (message.prefix == "DarkMio!~Mio@DarkMio.user.gamesurge") {
+                if (message.message.StartsWith(">RAW")) {
+                    client.RawSend(message.message.Replace(">RAW ", "") + "\r\n");
+                }
+                else if (message.message.StartsWith(">rejoin")) {
+                    Send(Part.Generate("#w3x-to-vmf", "Cya"));
+                    Send(Join.Generate("#w3x-to-vmf"));
+                }
+            }
+        } // End OnPrivMsg
     }
 }

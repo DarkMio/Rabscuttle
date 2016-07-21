@@ -1,6 +1,6 @@
 ﻿namespace Rabscuttle.networking.commands {
 
-    public enum CommandCodes {
+    public enum CommandCode {
         ADMIN,
         AWAY,
         CONNECT,
@@ -49,13 +49,14 @@
         WHO,
         WHOIS,
         WHOWAS,
+        DEFAULT
     }
 
-    public enum ChannelModes {
+    public enum ChannelMode {
 
     }
 
-    public enum MemberCodes {
+    public enum MemberCode {
         DEFAULT,                  //   unvoiced;
         VOICED = 0x043,           // + voiced; RFC1459
         HALF_OPERATOR = 0x37,     // % half operator; hybrid
@@ -66,7 +67,7 @@
     }
 
     // taken from: https://raw.githubusercontent.com/ircdocs/irc-defs/gh-pages/_data/numerics.yaml
-    public enum ReplyCodes {
+    public enum ReplyCode {
         RPL_WELCOME = 001, // The first message sent after client registration. The text used varies widely
         RPL_YOURHOST = 002, // Part of the post-registration greeting. Text varies widely. Also known as RPL_YOURHOSTIS (InspIRCd)
         RPL_CREATED = 003, // Part of the post-registration greeting. Text varies widely and &lt;date&gt; is returned in a human-readable format. Also known as RPL_SERVERCREATED (InspIRCd)

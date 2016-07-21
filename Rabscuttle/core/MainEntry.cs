@@ -16,7 +16,9 @@ namespace Rabscuttle {
             Console.WriteLine("!> Connected!");
             cmgr.ReceiveLast(true);
 
-            cmgr.Send(Join.Instance.Generate(false, null, null, "#w3x-to-vmf"));
+            cmgr.Send(Join.Generate("#w3x-to-vmf"));
+            cmgr.Send(Join.Generate("#dota2mods"));
+
 
             /*
             for (int i = 0; i < 500; i++) {
@@ -29,9 +31,13 @@ namespace Rabscuttle {
         }
 
         public class AuthServ : RawCommand<AuthServ> {
-            public override string type => "AUTHSERV";
+            public override CommandCode type => CommandCode.DEFAULT;
             public override bool hasTypeParameter => true;
             public override bool hasMessage => false;
+
+            public static NetworkMessage Generate(string typeParameter, bool fromServer = false, string prefix = null) {
+                return Instance.InstanceRawGenerate(fromServer, "AUTHSERV", prefix, typeParameter);
+            }
         }
     }
 }
