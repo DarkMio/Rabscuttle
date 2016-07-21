@@ -17,9 +17,9 @@ namespace Rabscuttle {
             cmgr.ReceiveLast(true);
 
             cmgr.Send(Join.Generate("#w3x-to-vmf"));
-            cmgr.Send(Join.Generate("#dota2mods"));
-
-
+            // cmgr.Send(Join.Generate("#dota2mods"));
+            // cmgr.Send(Join.Generate("#steamdb"));
+            // cmgr.Send(Join.Generate("#trashtest"));
             /*
             for (int i = 0; i < 500; i++) {
                 cmgr.Send(PrivMsg.Instance.Generate(false, null, "#w3x-to-vmf", "Hello: " + i));

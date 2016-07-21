@@ -3,15 +3,19 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Rabscuttle.networking.commands;
+using Rabscuttle.networking.handler;
 
 namespace Rabscuttle.networking {
     public class ConnectionManager {
         private readonly BotClient client;
         private readonly CommandSchedule scheduler;
 
+        private readonly ChannelHandler channelHandler;
+
         public ConnectionManager(string host, int port) {
             client = new BotClient(host, port);
             scheduler = new CommandSchedule(client);
+            channelHandler = new ChannelHandler(this);
             Connect();
         }
 
@@ -26,10 +30,11 @@ namespace Rabscuttle.networking {
         private void Connect() {
             Send(User.Generate("Gabe BotHost AnotherOne", "Rabscuttle"));
             Send(Nick.Generate("Rabscootle"));
-            ReceiveUntil(Ping.Instance); // The last received message will be a ping.
+            ReceiveUntil(Mode.Instance); // The last received message will be a ping.
         }
 
         public void Send(NetworkMessage message) {
+            Handle(message);
             scheduler.Add(message);
         }
 
@@ -75,48 +80,54 @@ namespace Rabscuttle.networking {
          * the message beforehand, which doesn't seem nice either.
          * Help is appreciated.
          */
-
         private void Handle(NetworkMessage message) {
-            if (Enum.IsDefined(typeof(ReplyCode), message.type)) {
+            if (message.typeEnum is ReplyCode) {
                 // We've received server info.
-                Debug.WriteLine("?" + message);
-                ReplyCode replyCode = (ReplyCode) Enum.Parse(typeof(ReplyCode), message.type, true);
-                HandleReply(message, replyCode);
-
+                HandleReply(message);
+            } else if (message.typeEnum is CommandCode) {
+                HandleCommand(message);
             }
 
-            if (Enum.IsDefined(typeof(CommandCode), message.type)) {
-                // We've received something to act upon.
-                Debug.WriteLine("!" + message);
-                CommandCode commandCode = (CommandCode) Enum.Parse(typeof(CommandCode), message.type, true);
-                HandleCommand(message, commandCode);
-
-            }
-        }
-
-        private void HandleReply(NetworkMessage message, ReplyCode code) {
 
         }
 
-        private void HandleCommand(NetworkMessage message, CommandCode code) {
-            switch (code) {
+        private void HandleReply(NetworkMessage message) {
+            switch ((ReplyCode) message.typeEnum) {
+                case ReplyCode.RPL_NAMREPLY:
+                case ReplyCode.RPL_NAMREPLY_:
+                    channelHandler.HandleReply(message);
+                    break;
+            }
+            Debug.WriteLine(message);
+        }
+
+        /**
+         * If the message is a server command, we'll handle it here.
+         */
+        private void HandleCommand(NetworkMessage message) {
+            Debug.WriteLine("HANDLE> " + message);
+            switch ((CommandCode)message.typeEnum) {
                 case CommandCode.PING:
                     Send(Pong.Generate(message.message));
                     break;
                 case CommandCode.PRIVMSG:
+                case CommandCode.KICK:
+                case CommandCode.JOIN:
+                case CommandCode.PART:
+                case CommandCode.AWAY:
+                case CommandCode.NICK:
+                case CommandCode.QUIT:
                     OnPrivMsg(message);
                     break;
                 default:
                     return;
             }
-
-            if (code == CommandCode.PING) {
-                Send(Pong.Generate(message.message));
-            }
         }
 
         private void OnPrivMsg(NetworkMessage message) {
-            if (message.prefix == "DarkMio!~Mio@DarkMio.user.gamesurge") {
+            channelHandler.HandleCommand(message);
+            /*
+            if (message.prefix != null && message.prefix.StartsWith("DarkMio!~Mio@")) {
                 if (message.message.StartsWith(">RAW")) {
                     client.RawSend(message.message.Replace(">RAW ", "") + "\r\n");
                 }
@@ -125,6 +136,7 @@ namespace Rabscuttle.networking {
                     Send(Join.Generate("#w3x-to-vmf"));
                 }
             }
+            */
         } // End OnPrivMsg
     }
 }

@@ -12,14 +12,19 @@ namespace Rabscuttle.networking.commands {
             if (type == CommandCode.DEFAULT) {
                 throw new ArgumentException("This method cannot be used by any implementation of CommandCode.DEFAULT!");
             }
-            return InstanceRawGenerate(fromServer, type + "", prefix, typeParameter, message);
+            return InstanceRawGenerate(fromServer, type, prefix, typeParameter, message);
         }
+
+        protected NetworkMessage InstanceRawGenerate(bool fromServer, Enum type, string prefix = null,
+                                                  string typeParameter = null, string message = null) {
+            return new NetworkMessage(prefix, typeParameter, message, fromServer, type);
+        }
+
 
         protected NetworkMessage InstanceRawGenerate(bool fromServer, string type, string prefix = null,
                                                   string typeParameter = null, string message = null) {
             return new NetworkMessage(prefix, type, typeParameter, message, fromServer);
         }
-
         protected NetworkMessage Generate(bool fromServer, string prefix = null, string typeParameter = null,
             string message = null) {
             if (hasTypeParameter && typeParameter == null) {
@@ -89,6 +94,15 @@ namespace Rabscuttle.networking.commands {
 
     public class Part : RawCommand<Part> {
         public override CommandCode type => CommandCode.PART;
+        public override bool hasTypeParameter => true;
+        public override bool hasMessage => true;
+        public static NetworkMessage Generate(string typeParameter, string message, bool fromServer = false, string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
+        }
+    }
+
+    public class Mode : RawCommand<Mode> {
+        public override CommandCode type => CommandCode.MODE;
         public override bool hasTypeParameter => true;
         public override bool hasMessage => true;
         public static NetworkMessage Generate(string typeParameter, string message, bool fromServer = false, string prefix = null) {
