@@ -13,6 +13,16 @@ namespace Rabscuttle.core.channel {
         public string host;
         public string realname;
 
+
+        public string source {
+            get {
+                if (userName != null && ident != null && host != null) {
+                    return userName + "!" + ident + "@" + host;
+                }
+                return null;
+            }
+        }
+
         private static Regex identRegex = new Regex(@"(?<user>[^@!\ ]*)(?:(?:\!(?<ident>[^@]*))?@(?<host>[^\ ]*))?", RegexOptions.Compiled);
         private static Regex userRegex = new Regex(@"([^+%@! ]+)", RegexOptions.Compiled);
 
@@ -25,21 +35,19 @@ namespace Rabscuttle.core.channel {
         public ChannelUser(string identOrUser, bool isUserName=false) {
 
             if (!isUserName) {
-                var results = identRegex.Matches(identOrUser)[0].Groups;
-                userName = results["user"].Value;
-                ident = results["ident"].Value;
-                host = results["host"].Value;
+                SetUserdata(identOrUser);
             } else {
                 userName = userRegex.Match(identOrUser).Value;
             }
-
-            Debug.WriteLine("GENERATED> " + this);
         }
 
         public void SetUserdata(string dataString=null, string realname = null) {
             if (dataString != null) {
                 if (ident == null) {
-                    ident = "uh oh";
+                    var results = identRegex.Matches(dataString)[0].Groups;
+                    userName = results["user"].Value;
+                    ident = results["ident"].Value;
+                    host = results["host"].Value;
                 } else {
                     throw new ArgumentException("Userdata is already set.");
                 }
@@ -47,7 +55,7 @@ namespace Rabscuttle.core.channel {
 
             if (realname != null) {
                 if (this.realname == null) {
-                    realname = "John Doe";
+                    this.realname = realname;
                 } else {
                     throw new ArgumentException("Realname is already set");
                 }
@@ -60,7 +68,7 @@ namespace Rabscuttle.core.channel {
         }
 
         protected bool Equals(ChannelUser other) {
-            return string.Equals(userName, other.userName) && loggedIn == other.loggedIn && string.Equals(ident, other.ident) && string.Equals(name, other.name) && string.Equals(host, other.host) && string.Equals(realname, other.realname);
+            return string.Equals(userName, other.userName);
         }
 
         public override bool Equals(object obj) {
@@ -72,13 +80,7 @@ namespace Rabscuttle.core.channel {
 
         public override int GetHashCode() {
             unchecked {
-                var hashCode = (userName != null ? userName.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ loggedIn.GetHashCode();
-                hashCode = (hashCode * 397) ^ (ident != null ? ident.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (name != null ? name.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (host != null ? host.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (realname != null ? realname.GetHashCode() : 0);
-                return hashCode;
+                return (userName != null ? userName.GetHashCode() : 0);
             }
         }
 
@@ -88,18 +90,12 @@ namespace Rabscuttle.core.channel {
                 if (ReferenceEquals(x, null)) return false;
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
-                return string.Equals(x.userName, y.userName) && x.loggedIn == y.loggedIn && string.Equals(x.ident, y.ident) && string.Equals(x.name, y.name) && string.Equals(x.host, y.host) && string.Equals(x.realname, y.realname);
+                return string.Equals(x.userName, y.userName);
             }
 
             public int GetHashCode(ChannelUser obj) {
                 unchecked {
-                    var hashCode = (obj.userName != null ? obj.userName.GetHashCode() : 0);
-                    hashCode = (hashCode * 397) ^ obj.loggedIn.GetHashCode();
-                    hashCode = (hashCode * 397) ^ (obj.ident != null ? obj.ident.GetHashCode() : 0);
-                    hashCode = (hashCode * 397) ^ (obj.name != null ? obj.name.GetHashCode() : 0);
-                    hashCode = (hashCode * 397) ^ (obj.host != null ? obj.host.GetHashCode() : 0);
-                    hashCode = (hashCode * 397) ^ (obj.realname != null ? obj.realname.GetHashCode() : 0);
-                    return hashCode;
+                    return (obj.userName != null ? obj.userName.GetHashCode() : 0);
                 }
             }
         }

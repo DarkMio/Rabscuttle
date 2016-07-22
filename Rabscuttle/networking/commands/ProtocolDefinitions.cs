@@ -57,13 +57,13 @@
     }
 
     public enum MemberCode {
-        DEFAULT,                  //   unvoiced;
-        VOICED = 0x043,           // + voiced; RFC1459
-        HALF_OPERATOR = 0x37,     // % half operator; hybrid
-        OPERATOR = 0x64,          // @ operator; RFC1459
-        CREATOR = 0x64,           // @ creator; RFC2811
-        SERVICE = 0x33,           // ! service; KineIRCd
-        FOUNDER = 0x46            // . founder; tr-ircd
+        DEFAULT = 0x0,                        //   unvoiced;
+        VOICED = 0x1      ,   // + voiced; RFC1459
+        HALF_OPERATOR = 0x2,   // % half operator; hybrid
+        OPERATOR = 0x3     ,   // @ operator; RFC1459
+        CREATOR = 0x4      ,   // @ creator; RFC2811
+        SERVICE = 0x5      ,   // ! service; KineIRCd
+        FOUNDER = 0x6      ,   // . founder; tr-ircd
     }
 
     // taken from: https://raw.githubusercontent.com/ircdocs/irc-defs/gh-pages/_data/numerics.yaml

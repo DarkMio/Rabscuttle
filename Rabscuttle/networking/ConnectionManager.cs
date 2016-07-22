@@ -81,13 +81,18 @@ namespace Rabscuttle.networking {
          * Help is appreciated.
          */
         private void Handle(NetworkMessage message) {
-            if (message.typeEnum is ReplyCode) {
-                // We've received server info.
-                HandleReply(message);
-            } else if (message.typeEnum is CommandCode) {
-                HandleCommand(message);
+            try {
+                if (message.typeEnum is ReplyCode) {
+                    // We've received server info.
+                    HandleReply(message);
+                } else if (message.typeEnum is CommandCode) {
+                    HandleCommand(message);
+                }
+            } catch (Exception e) {
+                Debug.WriteLine("Exception: " + e);
+                Debug.WriteLine(e.Source);
+                Debug.WriteLine(e.StackTrace);
             }
-
 
         }
 
@@ -117,7 +122,8 @@ namespace Rabscuttle.networking {
                 case CommandCode.AWAY:
                 case CommandCode.NICK:
                 case CommandCode.QUIT:
-                    OnPrivMsg(message);
+                case CommandCode.MODE:
+                    channelHandler.HandleCommand(message);
                     break;
                 default:
                     return;

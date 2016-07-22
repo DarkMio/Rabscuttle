@@ -53,7 +53,6 @@ namespace Rabscuttle.networking {
         public void Send(NetworkMessage message) {
             output.Write(message.BuildMessage());
             output.Flush();
-            Debug.WriteLine(message);
         }
 
         public void RawSend(string message) {

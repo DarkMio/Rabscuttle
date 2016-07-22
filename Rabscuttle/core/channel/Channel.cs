@@ -36,7 +36,7 @@ namespace Rabscuttle.channel {
         public override string ToString() {
             string user = "";
             foreach (UserRelation userRelation in users) {
-                user += userRelation.user.userName + " ";
+                user += ((int)userRelation.permission).ToString("x") + userRelation.user.userName + " ";
             }
             return "CHANNEL> N: [ " + channelName + " ] | U: [ " + user + "]";
         }

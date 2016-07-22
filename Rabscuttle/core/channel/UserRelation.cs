@@ -25,7 +25,7 @@ namespace Rabscuttle.core.channel {
         }
 
         protected bool Equals(UserRelation other) {
-            return Equals(user, other.user) && permission == other.permission;
+            return Equals(user, other.user);
         }
 
         private sealed class UserPermissionEqualityComparer : IEqualityComparer<UserRelation> {
@@ -34,12 +34,12 @@ namespace Rabscuttle.core.channel {
                 if (ReferenceEquals(x, null)) return false;
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
-                return Equals(x.user, y.user) && x.permission == y.permission;
+                return Equals(x.user, y.user);
             }
 
         public int GetHashCode(UserRelation obj) {
                 unchecked {
-                    return ((obj.user != null ? obj.user.GetHashCode() : 0) * 397) ^ (int) obj.permission;
+                    return (obj.user != null ? obj.user.GetHashCode() : 0) * 397;
                 }
             }
         }
@@ -59,7 +59,7 @@ namespace Rabscuttle.core.channel {
 
         public override int GetHashCode() {
             unchecked {
-                return ((user != null ? user.GetHashCode() : 0) * 397) ^ (int) permission;
+                return (user != null ? user.GetHashCode() : 0) * 397;
             }
         }
     }
