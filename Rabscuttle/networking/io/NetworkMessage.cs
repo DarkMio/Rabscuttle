@@ -12,14 +12,24 @@ namespace Rabscuttle.networking {
         public readonly string type;
         public readonly string typeParams;
         public readonly bool fromServer;
+        public readonly Enum typeEnum;
+
         public bool fromClient => !fromServer;
-        // {0,4}(?:\:(.*))?\n
-        // (?:\s\:(.*)?)?
+
         private readonly Regex r = new Regex(
             @"^(?::(?<prefix>(?<user>[^@!\ ]*)(?:(?:\!(?<ident>[^@]*))?@(?<host>[^\ ]*))?)\ )?"+
             @"(?<type>[^\ ]+)(?<typeparameter>(?:\ [^:\ ][^\ ]*){0,14})(?:\ :?(?<message>.*))?(?:\r\n)?$",
             RegexOptions.Compiled
         );
+
+        public NetworkMessage(string prefix, string typeParams, string message, bool fromServer, Enum type) {
+            this.message = message;
+            this.prefix = prefix;
+            this.type = type + "";
+            this.typeParams = typeParams;
+            this.fromServer = fromServer;
+            this.typeEnum = type;
+        }
 
         public NetworkMessage(string prefix, string type, string typeParams, string message, bool fromServer) {
             this.message = message;
@@ -42,8 +52,16 @@ namespace Rabscuttle.networking {
                 var typeParameter = messageContent["typeparameter"].Value;
                 typeParams = String.IsNullOrWhiteSpace(typeParameter) ? typeParameter : typeParameter.Substring(1, typeParameter.Length - 1); // x.Value.Substring(1, x.Length-1);
                 message = messageContent["message"].Value;
+
+                if (Enum.IsDefined(typeof(ReplyCode), type)) {
+                    typeEnum = (ReplyCode) Enum.Parse(typeof(ReplyCode), type, true);
+                } else if (Enum.IsDefined(typeof(CommandCode), type)) {
+                    typeEnum = (CommandCode) Enum.Parse(typeof(CommandCode), type, true);
+                } else {
+                    Debug.WriteLine("!! Unrecorginzed method: " + raw);
+                }
                 // message = messageContent[6].Value.Substring(1, messageContent[6].Value.Length).Replace("\r", "");
-            } catch (ArgumentOutOfRangeException e) {
+            } catch (ArgumentOutOfRangeException) {
                 throw new ArgumentException("Misaligned Message: " + raw);
             }
             this.fromServer = fromServer;
@@ -53,7 +71,7 @@ namespace Rabscuttle.networking {
             string prefix = this.prefix != null ? ":" + this.prefix : "";
             string message = this.message != null ? " :" + this.message : "";
             return prefix + " " + type + " " + typeParams + message + "\r\n";
-    }
+        }
 
 
         public override string ToString() {

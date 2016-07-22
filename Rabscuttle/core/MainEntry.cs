@@ -16,17 +16,18 @@ namespace Rabscuttle {
             Console.WriteLine("!> Connected!");
             cmgr.ReceiveLast(true);
 
-            cmgr.Send(Join.Generate("#w3x-to-vmf"));
-            cmgr.Send(Join.Generate("#dota2mods"));
-
-
+            cmgr.Send(RawJoin.Generate("#w3x-to-vmf"));
+            cmgr.Send(RawJoin.Generate("#miomio"));
+            // cmgr.Send(RawJoin.Generate("#dota2mods"));
+            // cmgr.Send(RawJoin.Generate("#steamdb"));
+            // cmgr.Send(RawJoin.Generate("#trashtest"));
             /*
             for (int i = 0; i < 500; i++) {
-                cmgr.Send(PrivMsg.Instance.Generate(false, null, "#w3x-to-vmf", "Hello: " + i));
+                cmgr.Send(RawPrivMsg.Instance.Generate(false, null, "#w3x-to-vmf", "Hello: " + i));
             }
             */
             while (true) {
-                var msg = cmgr.ReceiveUntil(Ping.Instance);
+                var msg = cmgr.ReceiveUntil(RawPing.Instance);
             }
         }
 

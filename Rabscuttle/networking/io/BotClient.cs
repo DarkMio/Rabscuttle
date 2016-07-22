@@ -53,13 +53,13 @@ namespace Rabscuttle.networking {
         public void Send(NetworkMessage message) {
             output.Write(message.BuildMessage());
             output.Flush();
-            Debug.WriteLine(message);
         }
 
         public void RawSend(string message) {
-            output.Write(message);
+            message = message.Replace("\r", "").Replace("\n", ""); // in case you have gotten any linesbreaks from somewhere.
+            output.Write(message + "\r\n");
             output.Flush();
-            Debug.WriteLine("CLIENT> RAW: " + message);
+            Debug.WriteLine("CLIENT> RAW: [ " + message + " ];");
         }
 
         /**

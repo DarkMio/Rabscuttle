@@ -47,12 +47,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="core\channel\Channel.cs" />
+    <Compile Include="core\channel\User.cs" />
+    <Compile Include="core\channel\UserRelation.cs" />
     <Compile Include="core\MainEntry.cs" />
     <Compile Include="networking\CommandSchedule.cs" />
-    <Compile Include="networking\commands\IrcCommands.cs" />
+    <Compile Include="networking\commands\IrcReplies.cs" />
     <Compile Include="networking\commands\ProtocolDefinitions.cs" />
     <Compile Include="networking\commands\RawIrcCommands.cs" />
     <Compile Include="networking\ConnectionManager.cs" />
+    <Compile Include="networking\handler\ChannelHandler.cs" />
+    <Compile Include="networking\handler\ObservableHandler.cs" />
     <Compile Include="networking\io\INetworking.cs" />
     <Compile Include="networking\io\NetworkMessage.cs" />
     <Compile Include="networking\io\BotClient.cs" />
