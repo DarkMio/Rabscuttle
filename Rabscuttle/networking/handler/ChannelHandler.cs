@@ -144,7 +144,7 @@ namespace Rabscuttle.networking.handler {
         private void HandleQuit(NetworkMessage message) {
             Debug.WriteLine(message);
             if (message.fromServer) {
-                ChannelUser user = FindUser(message.typeParams);
+                ChannelUser user = FindUser(message.prefix);
                 if (user == null) {
                     Debug.WriteLine("!! Could not find specified user. " + message);
                     return;
