@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using Rabscuttle.channel;
 using Rabscuttle.core.channel;
 using Rabscuttle.networking.commands;
@@ -37,15 +38,23 @@ namespace Rabscuttle.networking.handler {
             if (user != null) {
                 return user;
             }
-            Debug.WriteLine("> Null? > " + user);
             user = new ChannelUser(source, isUserName);
-            Debug.WriteLine(">CREATING> " + user);
             users.Add(user);
             return user;
         }
 
         private Channel FindChannel(string channelName) {
             return channels.SingleOrDefault(s => s.channelName == channelName);
+        }
+
+        private Channel FindOrCreateChannel(string name) {
+            Channel channel = FindChannel(name);
+            if (channel != null) {
+                return channel;
+            }
+            channel = new Channel(name);
+            channels.Add(channel);
+            return channel;
         }
 
         public override void HandleCommand(NetworkMessage message) {
@@ -80,6 +89,9 @@ namespace Rabscuttle.networking.handler {
                 case ReplyCode.RPL_NAMREPLY_:
                     HandleUserlist(message);
                     break;
+                case ReplyCode.RPL_WHOREPLY:
+                    HandleWhoReply(message);
+                    break;
 
 
             }
@@ -87,10 +99,12 @@ namespace Rabscuttle.networking.handler {
 
         private void HandleJoin(NetworkMessage message) {
             if (!message.fromServer) {
-                channels.Add(new Channel(message.message));
+                // Debug.WriteLine("CREATING NEW CHANNEL: " + message.message);
+                var channelName = message.message ?? message.typeParams;
+                channels.Add(new Channel(channelName));
             } else {
-                Channel channel = FindChannel(message.typeParams);
-                ChannelUser user = FindOrCreateUser(message.prefix, true);
+                Channel channel = FindOrCreateChannel(message.typeParams);
+                ChannelUser user = FindOrCreateUser(message.prefix);
                 channel.AddUser(user, MemberCode.DEFAULT);
             }
         }
@@ -105,10 +119,26 @@ namespace Rabscuttle.networking.handler {
             if (message.fromServer) { // someone left the channel
                 ChannelUser user = FindUser(message.prefix);
                 channel.RemoveUser(user);
-
+                if (CheckIfLastUser(user)) {
+                    users.Remove(user);
+                }
             } else { // bot left the channel
+                var users = channel.users;
                 channels.Remove(channel);
+
+                foreach (UserRelation userRelation in users) {
+                    this.users.RemoveWhere(s => CheckIfLastUser(userRelation.user));
+                }
             }
+        }
+
+        private bool CheckIfLastUser(ChannelUser user) {
+            var notLast = false;
+            foreach (Channel channel in channels) {
+                var hasUsr = channel.users.SingleOrDefault(s => s.user == user);
+                notLast = hasUsr != null;
+            }
+            return !notLast;
         }
 
         private void HandleQuit(NetworkMessage message) {
@@ -133,6 +163,9 @@ namespace Rabscuttle.networking.handler {
         }
 
         private void HandlePrivMsg(NetworkMessage message) {
+            if (message.prefix.StartsWith("SQL")) {
+                return;
+            }
             if (message.message.StartsWith(">DUMPCHANS")) {
                 foreach (Channel channel in channels) {
                     Debug.WriteLine(channel);
@@ -147,7 +180,7 @@ namespace Rabscuttle.networking.handler {
                 var x = message.message.Split(new char[] {' '});
 
                 if(x.Length > 1)
-                    connection.Send(PrivMsg.Generate(message.typeParams, "Result: " + FindUser(x[1])));
+                    connection.Send(RawPrivMsg.Generate(message.typeParams, "Result: " + FindUser(x[1])));
             }
         }
 
@@ -160,7 +193,7 @@ namespace Rabscuttle.networking.handler {
         }
 
         private void HandleMode(NetworkMessage message) {
-            Debug.WriteLine("Handling Mode...");
+            Debug.WriteLine("Handling RawMode...");
             if (!message.fromServer) {
                 return;
             }
@@ -213,7 +246,7 @@ namespace Rabscuttle.networking.handler {
         private MemberCode ParseModePermission(char permission) {
             if(permission == 'v' || permission == '+') return MemberCode.VOICED;
             if(permission == 'o' || permission == '@') return MemberCode.OPERATOR;
-            Debug.WriteLine("CANNOT FIND PERMISSION: " + permission);
+            // Debug.WriteLine("CANNOT FIND PERMISSION: " + permission);
             return MemberCode.DEFAULT;
         }
 
@@ -233,6 +266,18 @@ namespace Rabscuttle.networking.handler {
                 ChannelUser user = FindOrCreateUser(username, true);
                 channel.AddUser(user, ParseModePermission(username[0]));
                 channel.AddRank(user, ParseModePermission(username[0]));
+            }
+
+            connection.Send(RawWho.Generate(channelName));
+        }
+
+        private void HandleWhoReply(NetworkMessage message) {
+            WhoReply data = new WhoReply(message);
+            ChannelUser user = FindUser(data.username);
+            user.TryAddData(data.ident, data.host, data.server, data.hops, data.realname);
+            Channel channel = FindChannel(data.channel);
+            foreach (char c in data.modes) {
+                channel.AddRank(user, ParseModePermission(c));
             }
         }
     }

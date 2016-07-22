@@ -20,7 +20,7 @@ namespace Rabscuttle.channel {
         }
 
         public void RemoveUser(ChannelUser user) {
-            users.Remove(users.Single(s => s.user == user));
+            users.Remove(users.SingleOrDefault(s => s.user == user));
         }
 
         public void RemoveRank(ChannelUser user, MemberCode permission) {

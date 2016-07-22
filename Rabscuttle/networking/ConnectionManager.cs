@@ -28,9 +28,9 @@ namespace Rabscuttle.networking {
         */
 
         private void Connect() {
-            Send(User.Generate("Gabe BotHost AnotherOne", "Rabscuttle"));
-            Send(Nick.Generate("Rabscootle"));
-            ReceiveUntil(Mode.Instance); // The last received message will be a ping.
+            Send(RawUser.Generate("Gabe BotHost AnotherOne", "Rabscuttle"));
+            Send(RawNick.Generate("Rabscootle"));
+            ReceiveUntil(RawMode.Instance); // The last received message will be a ping.
         }
 
         public void Send(NetworkMessage message) {
@@ -90,8 +90,8 @@ namespace Rabscuttle.networking {
                 }
             } catch (Exception e) {
                 Debug.WriteLine("Exception: " + e);
-                Debug.WriteLine(e.Source);
-                Debug.WriteLine(e.StackTrace);
+                // Debug.WriteLine(e.Source);
+                // Debug.WriteLine(e.StackTrace);
             }
 
         }
@@ -100,6 +100,7 @@ namespace Rabscuttle.networking {
             switch ((ReplyCode) message.typeEnum) {
                 case ReplyCode.RPL_NAMREPLY:
                 case ReplyCode.RPL_NAMREPLY_:
+                case ReplyCode.RPL_WHOREPLY:
                     channelHandler.HandleReply(message);
                     break;
             }
@@ -113,7 +114,7 @@ namespace Rabscuttle.networking {
             Debug.WriteLine("HANDLE> " + message);
             switch ((CommandCode)message.typeEnum) {
                 case CommandCode.PING:
-                    Send(Pong.Generate(message.message));
+                    Send(RawPong.Generate(message.message));
                     break;
                 case CommandCode.PRIVMSG:
                 case CommandCode.KICK:
@@ -138,8 +139,8 @@ namespace Rabscuttle.networking {
                     client.RawSend(message.message.Replace(">RAW ", "") + "\r\n");
                 }
                 else if (message.message.StartsWith(">rejoin")) {
-                    Send(Part.Generate("#w3x-to-vmf", "Cya"));
-                    Send(Join.Generate("#w3x-to-vmf"));
+                    Send(RawPart.Generate("#w3x-to-vmf", "Cya"));
+                    Send(RawJoin.Generate("#w3x-to-vmf"));
                 }
             }
             */

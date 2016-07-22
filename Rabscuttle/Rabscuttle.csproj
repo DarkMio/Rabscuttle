@@ -52,6 +52,7 @@
     <Compile Include="core\channel\UserRelation.cs" />
     <Compile Include="core\MainEntry.cs" />
     <Compile Include="networking\CommandSchedule.cs" />
+    <Compile Include="networking\commands\IrcReplies.cs" />
     <Compile Include="networking\commands\ProtocolDefinitions.cs" />
     <Compile Include="networking\commands\RawIrcCommands.cs" />
     <Compile Include="networking\ConnectionManager.cs" />

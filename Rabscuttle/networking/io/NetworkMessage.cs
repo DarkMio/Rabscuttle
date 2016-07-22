@@ -61,7 +61,7 @@ namespace Rabscuttle.networking {
                     Debug.WriteLine("!! Unrecorginzed method: " + raw);
                 }
                 // message = messageContent[6].Value.Substring(1, messageContent[6].Value.Length).Replace("\r", "");
-            } catch (ArgumentOutOfRangeException e) {
+            } catch (ArgumentOutOfRangeException) {
                 throw new ArgumentException("Misaligned Message: " + raw);
             }
             this.fromServer = fromServer;

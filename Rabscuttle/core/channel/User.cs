@@ -12,6 +12,8 @@ namespace Rabscuttle.core.channel {
         public string name;
         public string host;
         public string realname;
+        public string server;
+        public int hops;
 
 
         public string source {
@@ -60,7 +62,30 @@ namespace Rabscuttle.core.channel {
                     throw new ArgumentException("Realname is already set");
                 }
             }
+        }
 
+        public void TryAddData(string source) {
+            if (ident == null) {
+                SetUserdata(source);
+            }
+        }
+
+        public void TryAddData(string ident, string host, string server, int hops, string realname) {
+            if (this.ident == null) {
+                this.ident = ident;
+            }
+            if (this.host == null) {
+                this.host = host;
+            }
+            if (this.server == null) {
+                this.server = server;
+            }
+            if (this.hops == 0) {
+                this.hops = hops;
+            }
+            if (this.realname == null) {
+                this.realname = realname;
+            }
         }
 
         public override string ToString() {

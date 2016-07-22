@@ -69,9 +69,9 @@
     // taken from: https://raw.githubusercontent.com/ircdocs/irc-defs/gh-pages/_data/numerics.yaml
     public enum ReplyCode {
         RPL_WELCOME = 001, // The first message sent after client registration. The text used varies widely
-        RPL_YOURHOST = 002, // Part of the post-registration greeting. Text varies widely. Also known as RPL_YOURHOSTIS (InspIRCd)
-        RPL_CREATED = 003, // Part of the post-registration greeting. Text varies widely and &lt;date&gt; is returned in a human-readable format. Also known as RPL_SERVERCREATED (InspIRCd)
-        RPL_MYINFO = 004, // Part of the post-registration greeting. Also known as RPL_SERVERVERSION (InspIRCd)
+        RPL_YOURHOST = 002, // RawPart of the post-registration greeting. Text varies widely. Also known as RPL_YOURHOSTIS (InspIRCd)
+        RPL_CREATED = 003, // RawPart of the post-registration greeting. Text varies widely and &lt;date&gt; is returned in a human-readable format. Also known as RPL_SERVERCREATED (InspIRCd)
+        RPL_MYINFO = 004, // RawPart of the post-registration greeting. Also known as RPL_SERVERVERSION (InspIRCd)
         RPL_ISUPPORT = 005, // Advertises features, limits, and protocol options that clients should be aware of. Also known as RPL_PROTOCTL (Bahamut, Unreal, Ultimate)
         RPL_MAP = 006, // CONFLICT
         RPL_MAPEND = 007, // CONFLICT Also known as RPL_ENDMAP (InspIRCd)
@@ -196,7 +196,7 @@
         RPL_WHOISSVCMSG = 310, // CONFLICT
         RPL_WHOISUSER = 311, // Reply to WHOIS - Information about the user
         RPL_WHOISSERVER = 312, // Reply to WHOIS - What server they're on
-        RPL_WHOISOPERATOR = 313, // Reply to WHOIS - User has IRC Operator privileges
+        RPL_WHOISOPERATOR = 313, // Reply to WHOIS - RawUser has IRC Operator privileges
         RPL_WHOWASUSER = 314, // Reply to WHOWAS - Information about the user
         RPL_ENDOFWHO = 315, // Used to terminate a list of RPL_WHOREPLY replies
         RPL_WHOISPRIVDEAF = 316, //
