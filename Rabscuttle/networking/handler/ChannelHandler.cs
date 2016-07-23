@@ -152,6 +152,7 @@ namespace Rabscuttle.networking.handler {
                 foreach (Channel channel in channels) {
                     channel.RemoveUser(user);
                 }
+                users.Remove(user);
             } else { // we quit, which means that we can safely delete all.
                 Debug.WriteLine("CHOO CHOO. EMPTYING ALL CHANNEL INFOS");
                 channels.Clear();
@@ -163,7 +164,7 @@ namespace Rabscuttle.networking.handler {
         }
 
         private void HandlePrivMsg(NetworkMessage message) {
-            if (message.prefix.StartsWith("SQL")) {
+            if (message.prefix != null && message.prefix.StartsWith("SQL")) {
                 return;
             }
             if (message.message.StartsWith(">DUMPCHANS")) {
@@ -181,6 +182,8 @@ namespace Rabscuttle.networking.handler {
 
                 if(x.Length > 1)
                     connection.Send(RawPrivMsg.Generate(message.typeParams, "Result: " + FindUser(x[1])));
+            } else if (message.message.StartsWith("fuck sql")) {
+                connection.Send(RawPrivMsg.Generate(message.typeParams, "+fuck SQL"));
             }
         }
 

@@ -44,8 +44,7 @@ namespace Rabscuttle.networking {
             this.host = host;
             this.port = port;
             // @TODO: Maybe offload connection process with async
-            client = new TcpClient(host, port);
-            client.SendTimeout = Timeout;
+            client = new TcpClient(host, port) {SendTimeout = Timeout};
             dataStream = client.GetStream();
             input = new StreamReader(dataStream);
             output = new StreamWriter(dataStream);

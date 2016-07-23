@@ -41,7 +41,7 @@ namespace Rabscuttle.networking {
         private void Connect() {
             Send(RawUser.Generate("Gabe BotHost AnotherOne", "Rabscuttle"));
             Send(RawNick.Generate("Rabscootle"));
-            ReceiveUntil(CommandCode.MODE, ReplyCode.RPL_ENDOFMOTD, ReplyCode.ERR_NOMOTD); // The last received message will be a ping.
+            ReceiveUntil(CommandCode.MODE, ReplyCode.RPL_ENDOFMOTD, ReplyCode.ERR_NOMOTD); // The last received message will be any of those
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Rabscuttle.networking {
                 }
             }
         }
-        
+
         /// <summary>
         ///     Disposes all incoming messages until the most recent message is reached.
         ///     This is useful if there are multiple messages sent by the server in between of the client receiving frames.
