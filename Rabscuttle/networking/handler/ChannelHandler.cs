@@ -193,7 +193,6 @@ namespace Rabscuttle.networking.handler {
         }
 
         private void HandleMode(NetworkMessage message) {
-            Debug.WriteLine("Handling RawMode...");
             if (!message.fromServer) {
                 return;
             }
@@ -207,18 +206,15 @@ namespace Rabscuttle.networking.handler {
             // mode sets can only happen in one channel
             Channel channel = FindChannel(parameter[0]);
             var mode = permissionRegex.Matches(parameter[1])[0].Groups;
+            // Positive or Negative Group
             string firstGroup = mode[1].Value;
             var firstParameterGroup = parameter.Skip(2).Take(firstGroup.Length - 1);
-            Debug.WriteLine(firstParameterGroup);
             UserRanking(firstGroup, firstParameterGroup.ToArray(), channel);
 
+            // The reminder group - could be empty, which will be accounted for by UserRanking(...)
             string secondGroup = mode[2].Value;
             var secondParameterGroup = parameter.Skip(2 + firstGroup.Length);
-            Debug.WriteLine(secondParameterGroup);
             UserRanking(secondGroup, secondParameterGroup.ToArray(), channel);
-
-            Debug.WriteLine("Done Ranking.");
-
         }
 
         private void UserRanking(string rankString, string[] users, Channel channel) {

@@ -7,6 +7,7 @@ namespace Rabscuttle.core.channel {
         public readonly ChannelUser user;
         public MemberCode permission;
 
+        // @TODO: Permission parsing seems to be shit right now
         public UserRelation(ChannelUser user, MemberCode permission) {
             this.user = user;
             this.permission = permission;

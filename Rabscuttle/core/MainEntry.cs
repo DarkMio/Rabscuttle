@@ -27,7 +27,7 @@ namespace Rabscuttle {
             }
             */
             while (true) {
-                var msg = cmgr.ReceiveUntil(RawPing.Instance);
+                var msg = cmgr.ReceiveUntil(CommandCode.PING);
             }
         }
 
