@@ -8,7 +8,7 @@ namespace Rabscuttle.networking {
     /// Handles message sending based on timing. Currently sends every 1.5s, but will get burst-sendings.
     /// </summary>
     public class CommandSchedule {
-        private Stack<NetworkMessage> stack;
+        private Queue<NetworkMessage> queue;
         private ISender client;
         private Task currentTask;
 
@@ -17,7 +17,7 @@ namespace Rabscuttle.networking {
         /// </summary>
         /// <param name="client">Any kind of sender, hopefully connected to any endpoint.</param>
         public CommandSchedule(ISender client){
-            stack = new Stack<NetworkMessage>();
+            queue = new Queue<NetworkMessage>();
             this.client = client;
         }
 
@@ -26,7 +26,7 @@ namespace Rabscuttle.networking {
         /// </summary>
         /// <param name="item">Any <see cref="NetworkMessage"/> to be sent.</param>
         public void Add(NetworkMessage item) {
-           stack.Push(item);
+            queue.Enqueue(item);
             if (currentTask == null || currentTask.IsCompleted) {
                 currentTask = Send();
             }
@@ -34,12 +34,12 @@ namespace Rabscuttle.networking {
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         /// <summary>
-        /// Starts sending messages currently sitting on the stack.
+        /// Starts sending messages currently sitting on the queue.
         /// </summary>
         /// <returns>A receivable task, used to identify if the current sending-task is done or not.</returns>
         async Task Send() {
-            while (stack.Count > 0) {
-                client.Send(stack.Pop());
+            while (queue.Count > 0) {
+                client.Send(queue.Dequeue());
                 Thread.Sleep(1500); // this needs a strategy at some point.
             }
         }

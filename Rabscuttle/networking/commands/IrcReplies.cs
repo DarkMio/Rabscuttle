@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using Rabscuttle.networking.io;
 
 namespace Rabscuttle.networking.commands {
     public abstract class IrcReply {

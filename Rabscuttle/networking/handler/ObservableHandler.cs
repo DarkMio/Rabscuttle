@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Rabscuttle.networking.io;
 
 namespace Rabscuttle.networking.handler {
     public abstract class ObservableHandler : IObservable<NetworkMessage> {

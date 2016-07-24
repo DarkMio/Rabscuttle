@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Rabscuttle.networking;
 using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 
 namespace Rabscuttle {
     public class MainEntry {
@@ -18,7 +19,7 @@ namespace Rabscuttle {
 
             cmgr.Send(RawJoin.Generate("#w3x-to-vmf"));
             cmgr.Send(RawJoin.Generate("#miomio"));
-            cmgr.Send(RawJoin.Generate("#dota2mods"));
+            // cmgr.Send(RawJoin.Generate("#dota2mods"));
             // cmgr.Send(RawJoin.Generate("#dota2mods"));
             // cmgr.Send(RawJoin.Generate("#steamdb"));
             // cmgr.Send(RawJoin.Generate("#trashtest"));

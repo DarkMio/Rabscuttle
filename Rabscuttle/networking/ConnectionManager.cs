@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.handler;
+using Rabscuttle.networking.io;
 
 namespace Rabscuttle.networking {
     /// <summary>
@@ -11,7 +12,7 @@ namespace Rabscuttle.networking {
     /// Every to-be sent message and every received message gets filtered and dispatched into the public seend handlers.
     /// Each process and plugin can subscribe to these handlers and listen to the same messages.
     /// </summary>
-    public class ConnectionManager {
+    public class ConnectionManager : ISender, IReceiver {
         private readonly BotClient client;
         private readonly CommandSchedule scheduler;
 
@@ -42,6 +43,18 @@ namespace Rabscuttle.networking {
             Send(RawUser.Generate("Gabe BotHost AnotherOne", "Rabscuttle"));
             Send(RawNick.Generate("Rabscootle"));
             ReceiveUntil(CommandCode.MODE, ReplyCode.RPL_ENDOFMOTD, ReplyCode.ERR_NOMOTD); // The last received message will be any of those
+        }
+
+        /// <summary>
+        /// Sends a properly aligned plaintext message to the endpoint, alignment looks like:
+        /// <c>:source* type typeParam* :message*</c>
+        /// </summary>
+        /// <param name="message">Message contents, which are usually at the end of a string.</param>
+        /// <param name="prefix">The source prefix, client to server messages can have this missing.</param>
+        /// <param name="type">Message type, usually a <c>CommandCode</c> when sending from client to server.</param>
+        /// <param name="typeParams">Optional, additional parameter for a message type.</param>
+        public void Send(string message, string prefix, string type, string typeParams) {
+            Send(new NetworkMessage(prefix, type, typeParams, message, false));
         }
 
         /// <summary>

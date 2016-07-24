@@ -7,22 +7,23 @@ using System.Threading;
 using Rabscuttle.channel;
 using Rabscuttle.core.channel;
 using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 
 namespace Rabscuttle.networking.handler {
 
     /**
      * Creates its own observers to notify them individually.
      */
-    public class ChannelHandler : ObservableHandler {
-        private List<Channel> channels;
+    public class ChannelHandler  : ObservableHandler {
+        public List<Channel> channels;
         public HashSet<ChannelUser> users;
-        private ConnectionManager connection;
+        private ISender connection;
 
         private static Regex userRegex = new Regex(@"^[+%@!.:]?([^!@ ]*)", RegexOptions.Compiled);
         private static Regex permissionRegex = new Regex(@"([+|-][^+-]*)([+|-][^+-]*)?", RegexOptions.Compiled);
 
 
-        public ChannelHandler(ConnectionManager connection) {
+        public ChannelHandler(ISender connection){
             this.connection = connection;
             channels = new List<Channel>();
             users = new HashSet<ChannelUser>();

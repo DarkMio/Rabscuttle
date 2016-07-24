@@ -1,4 +1,5 @@
 ﻿using System;
+using Rabscuttle.networking.io;
 
 namespace Rabscuttle.networking.commands {
     public abstract class RawCommand<T> where T : RawCommand<T>, new() {
