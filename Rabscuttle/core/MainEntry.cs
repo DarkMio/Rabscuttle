@@ -7,11 +7,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Rabscuttle.networking;
 using Rabscuttle.networking.commands;
+using Rabscuttle.networking.handler;
 using Rabscuttle.networking.io;
 
 namespace Rabscuttle {
     public class MainEntry {
         static void Main(string[] args) {
+
+
+
+
             Console.WriteLine("!> Connecting...");
             ConnectionManager cmgr = new ConnectionManager("irc.gamesurge.net", 6667);
             Console.WriteLine("!> Connected!");
@@ -31,6 +36,8 @@ namespace Rabscuttle {
             while (true) {
                 var msg = cmgr.ReceiveUntil(CommandCode.PING);
             }
+
+
         }
 
         public class AuthServ : RawCommand<AuthServ> {

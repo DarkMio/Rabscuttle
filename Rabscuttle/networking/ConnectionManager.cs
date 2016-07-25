@@ -21,6 +21,8 @@ namespace Rabscuttle.networking {
         /// </summary>
         public readonly ChannelHandler channelHandler;
 
+        public readonly PluginHandler pluginHandler;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionManager"/> class, thereby initilizing <see cref="BotClient"/>, <see cref="CommandSchedule"/>, <see cref="ChannelHandler"/>.
         /// @TODO: Add missing handler into description.
@@ -31,6 +33,7 @@ namespace Rabscuttle.networking {
             client = new BotClient(host, port);
             scheduler = new CommandSchedule(client);
             channelHandler = new ChannelHandler(this);
+            pluginHandler = new PluginHandler(this);
             Connect();
         }
 
@@ -161,6 +164,9 @@ namespace Rabscuttle.networking {
         /// </summary>
         /// <param name="message">Incoming message with any command response.</param>
         private void HandleCommand(NetworkMessage message) {
+            if ((CommandCode) message.typeEnum == CommandCode.PRIVMSG) {
+                pluginHandler.HandleCommand(message);
+            }
             Debug.WriteLine("HANDLE> " + message);
             switch ((CommandCode)message.typeEnum) {
                 case CommandCode.PING:

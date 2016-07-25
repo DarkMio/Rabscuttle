@@ -38,6 +38,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -58,9 +59,11 @@
     <Compile Include="networking\ConnectionManager.cs" />
     <Compile Include="networking\handler\ChannelHandler.cs" />
     <Compile Include="networking\handler\ObservableHandler.cs" />
+    <Compile Include="networking\handler\PluginHandler.cs" />
     <Compile Include="networking\io\INetworking.cs" />
     <Compile Include="networking\io\NetworkMessage.cs" />
     <Compile Include="networking\io\BotClient.cs" />
+    <Compile Include="plugins\IPluginContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
