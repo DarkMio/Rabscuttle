@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rabscuttle", "Rabscuttle\Ra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabscuttleTests", "RabscuttleTests\RabscuttleTests.csproj", "{5514EDFC-6D25-4812-B487-4D6C9B596626}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginContract", "PluginContract\PluginContract.csproj", "{E58BF9B0-4E31-438A-A8CE-9779FFEA1072}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5514EDFC-6D25-4812-B487-4D6C9B596626}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5514EDFC-6D25-4812-B487-4D6C9B596626}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5514EDFC-6D25-4812-B487-4D6C9B596626}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E58BF9B0-4E31-438A-A8CE-9779FFEA1072}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E58BF9B0-4E31-438A-A8CE-9779FFEA1072}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E58BF9B0-4E31-438A-A8CE-9779FFEA1072}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E58BF9B0-4E31-438A-A8CE-9779FFEA1072}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
