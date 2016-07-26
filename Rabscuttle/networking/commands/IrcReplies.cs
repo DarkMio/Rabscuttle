@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using Rabscuttle.networking.io;
+using Rabscuttle.core.io;
 
-namespace Rabscuttle.networking.commands {
+namespace Rabscuttle.core.commands {
     public abstract class IrcReply {
         public abstract ReplyCode type { get; }
         public abstract bool hasTypeParameter { get; }

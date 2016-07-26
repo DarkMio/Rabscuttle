@@ -5,17 +5,17 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using Rabscuttle.networking.io;
+using Rabscuttle.core.io;
 
 #endregion
 
-namespace Rabscuttle.networking {
+namespace Rabscuttle.core {
     /// <summary>
     ///     The Bot Client is the bare TCP Connection from and to the server.
     ///     Contains no hard logic besides some helper methods. No history either.
     /// </summary>
-    /// <seealso cref="Rabscuttle.networking.io.ISender" />
-    /// <seealso cref="Rabscuttle.networking.io.IReceiver" />
+    /// <seealso cref="ISender" />
+    /// <seealso cref="IReceiver" />
     public class BotClient : ISender, IReceiver {
         /// <summary> TCP Timeout, 180s until timeout, which is the usual IRC timeout until disconnect.</summary>
         public const int Timeout = 180000; // 300s until timeout; normal IRC timeout

@@ -1,4 +1,4 @@
-﻿namespace Rabscuttle.networking.io {
+﻿namespace Rabscuttle.core.io {
     /// <summary>
     /// Sender Interface for sending any kind of IRC-related network messages in plaintext to any kind of endpoint.
     /// </summary>

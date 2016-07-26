@@ -1,4 +1,4 @@
-﻿namespace Rabscuttle.networking.commands {
+﻿namespace Rabscuttle.core.commands {
 
     public enum CommandCode {
         ADMIN,

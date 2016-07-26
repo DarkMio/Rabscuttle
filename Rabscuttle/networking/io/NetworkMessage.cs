@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using Rabscuttle.networking.commands;
+using Rabscuttle.core.commands;
 
-namespace Rabscuttle.networking.io {
+namespace Rabscuttle.core.io {
     public class NetworkMessage {
 
         public readonly string message;

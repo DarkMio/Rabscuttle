@@ -1,7 +1,7 @@
 ﻿using System;
-using Rabscuttle.networking.io;
+using Rabscuttle.core.io;
 
-namespace Rabscuttle.networking.commands {
+namespace Rabscuttle.core.commands {
     public abstract class RawCommand<T> where T : RawCommand<T>, new() {
         public abstract CommandCode type { get; }
         public abstract bool hasTypeParameter { get; }

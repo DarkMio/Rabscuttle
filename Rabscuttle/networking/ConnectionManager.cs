@@ -2,11 +2,11 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Rabscuttle.networking.commands;
-using Rabscuttle.networking.handler;
-using Rabscuttle.networking.io;
+using Rabscuttle.core.commands;
+using Rabscuttle.core.handler;
+using Rabscuttle.core.io;
 
-namespace Rabscuttle.networking {
+namespace Rabscuttle.core {
     /// <summary>
     /// Main connection class. It's main task is to send and receive.
     /// Every to-be sent message and every received message gets filtered and dispatched into the public seend handlers.
@@ -33,7 +33,11 @@ namespace Rabscuttle.networking {
             client = new BotClient(host, port);
             scheduler = new CommandSchedule(client);
             channelHandler = new ChannelHandler(this);
-            pluginHandler = new PluginHandler(this);
+            pluginHandler = new PluginHandler(this, channelHandler);
+            pluginHandler.ReleaseAll();
+            pluginHandler.LoadPlugins();
+            pluginHandler.LoadPlugins();
+            pluginHandler.LoadPlugins();
             Connect();
         }
 
@@ -164,9 +168,6 @@ namespace Rabscuttle.networking {
         /// </summary>
         /// <param name="message">Incoming message with any command response.</param>
         private void HandleCommand(NetworkMessage message) {
-            if ((CommandCode) message.typeEnum == CommandCode.PRIVMSG) {
-                pluginHandler.HandleCommand(message);
-            }
             Debug.WriteLine("HANDLE> " + message);
             switch ((CommandCode)message.typeEnum) {
                 case CommandCode.PING:

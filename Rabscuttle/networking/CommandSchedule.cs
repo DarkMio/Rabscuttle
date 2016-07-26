@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Rabscuttle.networking.io;
+using Rabscuttle.core.io;
 
-namespace Rabscuttle.networking {
+namespace Rabscuttle.core {
     /// <summary>
     /// Handles message sending based on timing. Currently sends every 1.5s, but will get burst-sendings.
     /// </summary>

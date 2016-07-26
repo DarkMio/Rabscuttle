@@ -6,10 +6,10 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Rabscuttle.channel;
 using Rabscuttle.core.channel;
-using Rabscuttle.networking.commands;
-using Rabscuttle.networking.io;
+using Rabscuttle.core.commands;
+using Rabscuttle.core.io;
 
-namespace Rabscuttle.networking.handler {
+namespace Rabscuttle.core.handler {
 
     /**
      * Creates its own observers to notify them individually.
@@ -165,9 +165,6 @@ namespace Rabscuttle.networking.handler {
         }
 
         private void HandlePrivMsg(NetworkMessage message) {
-            if (message.prefix != null && message.prefix.StartsWith("SQL")) {
-                return;
-            }
             if (message.message.StartsWith(">DUMPCHANS")) {
                 foreach (Channel channel in channels) {
                     Debug.WriteLine(channel);

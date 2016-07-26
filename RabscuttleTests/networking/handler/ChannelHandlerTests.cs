@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Rabscuttle.networking.handler;
+using Rabscuttle.core.handler;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,10 +8,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Rabscuttle.core.channel;
-using Rabscuttle.networking.commands;
-using Rabscuttle.networking.io;
+using Rabscuttle.core.commands;
+using Rabscuttle.core.io;
 
-namespace Rabscuttle.networking.handler.Tests {
+namespace Rabscuttle.core.handler.Tests {
     [TestFixture()]
     public class ChannelHandlerTests {
 

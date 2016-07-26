@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Rabscuttle.core.channel;
-using Rabscuttle.networking.commands;
+using Rabscuttle.core.commands;
 
 namespace Rabscuttle.core.channel {
     public class UserRelation {

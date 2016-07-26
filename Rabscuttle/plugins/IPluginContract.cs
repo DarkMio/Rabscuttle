@@ -4,9 +4,9 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using Rabscuttle.networking.commands;
-using Rabscuttle.networking.handler;
-using Rabscuttle.networking.io;
+using Rabscuttle.core.commands;
+using Rabscuttle.core.handler;
+using Rabscuttle.core.io;
 
 namespace PluginContract {
     public interface IPluginContract {
@@ -30,9 +30,9 @@ namespace PluginContract {
         void SubscribeTo(ObservableHandler handler);
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
-        void OnPrivMsg(NetworkMessage message);
+        void OnPrivMsg(CommandMessage message);
         /// <summary> Called when a notice message was received by the bot. </summary>
         /// <param name="message">The network message received.</param>
-        void OnNotice(NetworkMessage message);
+        void OnNotice(CommandMessage message);
     }
 }
