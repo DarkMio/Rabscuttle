@@ -30,9 +30,9 @@ namespace PluginContract {
         void SubscribeTo(ObservableHandler handler);
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
-        void OnPrivMsg(CommandMessage message);
+        NetworkMessage OnPrivMsg(CommandMessage message);
         /// <summary> Called when a notice message was received by the bot. </summary>
         /// <param name="message">The network message received.</param>
-        void OnNotice(CommandMessage message);
+        NetworkMessage OnNotice(CommandMessage message);
     }
 }

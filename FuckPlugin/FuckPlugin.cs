@@ -73,22 +73,22 @@ namespace FuckPlugin {
 
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
-        public void OnPrivMsg(CommandMessage message) {
+        public NetworkMessage OnPrivMsg(CommandMessage message) {
             if (String.IsNullOrEmpty(message.parameters)) {
-                return;
+                return null;
             }
             var split = message.parameters.Split(new [] {' '}, 2)[0];
 
             var f = message.user.userName;
             var name = split;
             int num = new Random().Next(0, phrases.Length);
-            Sender.Send(RawPrivMsg.Generate(message.origin, String.Format(phrases[num], name, f)));
+            return RawPrivMsg.Generate(message.origin, String.Format(phrases[num], name, f));
         }
 
         /// <summary> Called when a notice message was received by the bot. </summary>
         /// <param name="message">The network message received.</param>
-        public void OnNotice(CommandMessage message) {
-
+        public NetworkMessage OnNotice(CommandMessage message) {
+            return null;
         }
     }
 }

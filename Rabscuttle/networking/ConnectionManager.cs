@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using PluginContract;
 using Rabscuttle.core.commands;
 using Rabscuttle.core.handler;
 using Rabscuttle.core.io;
@@ -34,10 +35,6 @@ namespace Rabscuttle.core {
             scheduler = new CommandSchedule(client);
             channelHandler = new ChannelHandler(this);
             pluginHandler = new PluginHandler(this, channelHandler);
-            pluginHandler.ReleaseAll();
-            pluginHandler.LoadPlugins();
-            pluginHandler.LoadPlugins();
-            pluginHandler.LoadPlugins();
             Connect();
         }
 
@@ -169,6 +166,10 @@ namespace Rabscuttle.core {
         /// <param name="message">Incoming message with any command response.</param>
         private void HandleCommand(NetworkMessage message) {
             Debug.WriteLine("HANDLE> " + message);
+            if ((CommandCode) message.typeEnum == CommandCode.PRIVMSG) {
+                Debug.WriteLine("Here:");
+                pluginHandler.HandleCommand(message);
+            }
             switch ((CommandCode)message.typeEnum) {
                 case CommandCode.PING:
                     Send(RawPong.Generate(message.message));

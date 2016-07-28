@@ -39,14 +39,15 @@ namespace ExamplePlugin {
 
         /// <summary> Called when a notice message was received by the bot. </summary>
         /// <param name="message">The network message received.</param>
-        public void OnNotice(CommandMessage message) {
+        public NetworkMessage OnNotice(CommandMessage message) {
             Console.WriteLine($"Hello, I'm {CommandName}.");
+            return null;
         }
 
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
-        public void OnPrivMsg(CommandMessage message) {
-            Sender.Send(RawPrivMsg.Generate(message.origin, $"Hello {message.user.userName}, this is the example plugin."));
+        public NetworkMessage OnPrivMsg(CommandMessage message) {
+            return RawPrivMsg.Generate(message.origin, $"Hello {message.user.userName}, this is the example plugin.");
         }
 
         /// <summary> Let the plugin subscribe to any of these Handlers - totally optional. </summary>

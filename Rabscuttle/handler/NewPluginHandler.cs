@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
 using NUnit.Framework.Api;
+using PluginContract;
+using Rabscuttle.channel;
+using Rabscuttle.core.channel;
+using Rabscuttle.core.commands;
 using Rabscuttle.core.io;
 
 namespace Rabscuttle.core.handler {
@@ -14,69 +19,50 @@ namespace Rabscuttle.core.handler {
 
         private readonly string shadowCopyPath;
         private readonly string pluginPath;
+        private readonly List<NewPluginProvider> pluginStorages;
+        private readonly FileSystemWatcher watcher;
+        private readonly string _prefix;
+        private readonly ISender _sender;
+        private readonly ChannelHandler _channelHandler;
 
-        static void Main(string[] args) {
-            for (int i = 0; i < 5; i++) {
-                Thread.Sleep(1500);
+        class PluginStorage {
+            public readonly AppDomain pluginDomain;
+            public readonly NewPluginProvider provider;
+            public readonly IPluginContract plugin;
+
+            public PluginStorage(AppDomain pluginDomain, IPluginContract plugin, NewPluginProvider provider) {
+                this.pluginDomain = pluginDomain;
+                this.plugin = plugin;
+                this.provider = provider;
             }
-            /*
-            ReadDLL(@"E:\Projects\c#\Rabscuttle\Rabscuttle\bin\Debug\Plugins\FuckPlugin.dll");
-            ReadDLL(@"E:\Projects\c#\Rabscuttle\Rabscuttle\bin\Debug\Plugins\ExamplePlugin.dll");
-
-            Console.WriteLine("Done.");
-
-            while (true) {
-                Thread.Sleep(1500);
-            }
-            */
-
-            Debug.WriteLine("First fucking loading.");
-            Thread.Sleep(5000);
-
-            List<AppDomain> list = new List<AppDomain>();
-            for(int i = 0; i < 150; i++) {
-                list.Add(PluginDomainFactory());
-
-            }
-
-
-            Debug.WriteLine("All loaded u bitch.");
-            Thread.Sleep(5000);
-
-            foreach (AppDomain a in list) {
-                AppDomain.Unload(a);
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
-            }
-
-
-
-            Debug.WriteLine("D O N E .");
-
-            while (true) {
-                Thread.Sleep(1500);
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
-            }
-
         }
 
-        public NewPluginHandler(string shadowCopyPath = "./_cache/", string pluginPath = "./../Plugins") {
+        public static void Main(string[] args) {
+            new NewPluginHandler(">", null, null);
+        }
+
+        public NewPluginHandler(string prefix, ISender sender, ChannelHandler channelHandler, string shadowCopyPath = "./_cache/", string pluginPath = "./../Plugins") {
+            _channelHandler = channelHandler;
+            _prefix = prefix;
+            _sender = sender;
             this.shadowCopyPath = shadowCopyPath;
             this.pluginPath = pluginPath;
+            pluginStorages = new List<NewPluginProvider>();
+            GenerateFolders();
+            watcher = new FileSystemWatcher(pluginPath, "*.dll");
+            // watch for: Changes in write-time / creation-time, in size or if the filename has changed
+            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.CreationTime;
+            watcher.Changed += OnChanged;
+            watcher.EnableRaisingEvents = true;
+
+            InitializePlugins();
         }
 
-        public static void ReadDLL(string filePath) {
-            byte[] b = File.ReadAllBytes(filePath);
-            var assembly = Assembly.Load(b);
+        private void OnChanged(object source, FileSystemEventArgs e) {
 
         }
 
-        public static AppDomain PluginDomainFactory() {
-            string shadowCopyPath = "./_cache/";
-            string pluginPath = "./../Plugins";
+        private void GenerateFolders() {
             if (!Directory.Exists(shadowCopyPath)) {
                 Directory.CreateDirectory(shadowCopyPath);
             }
@@ -84,33 +70,116 @@ namespace Rabscuttle.core.handler {
             if (!Directory.Exists(pluginPath)) {
                 Directory.CreateDirectory(pluginPath);
             }
+        }
 
+        private void InitializePlugins() {
+            var files = Directory.EnumerateFiles(pluginPath, "*.dll");
+            foreach (string filePath in files) {
+                Debug.WriteLine(filePath);
+                ComposePlugin(filePath);
+            }
+        }
+
+
+        private void ComposePlugin(string filePath) {
             var setup = new AppDomainSetup {
                 CachePath = shadowCopyPath,
                 ShadowCopyFiles = "true",
-                LoaderOptimization = LoaderOptimization.MultiDomainHost,
+                LoaderOptimization = LoaderOptimization.MultiDomain,
                 ShadowCopyDirectories = pluginPath // minimize the hdd overhead by just copying the important stuff
             };
 
-            var newDomain = AppDomain.CreateDomain("Host_AppDomain", AppDomain.CurrentDomain.Evidence, setup);
+            var newDomain = AppDomain.CreateDomain(System.Guid.NewGuid().ToString(), AppDomain.CurrentDomain.Evidence, setup);
             var runner =
-                (NewPluginRunner)
-                    newDomain.CreateInstanceAndUnwrap(typeof(NewPluginRunner).Assembly.FullName,
-                        typeof(NewPluginRunner).FullName
+                (NewPluginProvider)
+                    newDomain.CreateInstanceAndUnwrap(typeof(NewPluginProvider).Assembly.FullName,
+                        typeof(NewPluginProvider).FullName
                     );
 
-            Console.WriteLine("The main AppDomain is: {0}", AppDomain.CurrentDomain.FriendlyName);
+            Debug.WriteLine("PLUGIN> The main AppDomain is: {0}", AppDomain.CurrentDomain.FriendlyName);
+            byte[] b = File.ReadAllBytes(filePath);
+            runner.Compose(filePath, _prefix);
 
-            runner.DoSomething(newDomain.FriendlyName);
-            return newDomain;
+
+            // PluginStorage ps = new PluginStorage(newDomain, runner.plugin, runner);
+            pluginStorages.Add(runner);
         }
 
         public override void HandleCommand(NetworkMessage message) {
-            throw new System.NotImplementedException();
+            //@TODO: Does not take care about bot operators.
+            if ((CommandCode) message.typeEnum != CommandCode.PRIVMSG) {
+                return;
+            }
+
+            if (!message.message.StartsWith(">")) {
+                Debug.WriteLine("PLUGIN> Not for any plugin: " + message.message);
+                return;
+            }
+
+            Debug.WriteLine("PLUGIN> Received: " + message.message);
+
+
+            CommandMessage cmsg = PrepareCommand(message);
+            Channel chan = _channelHandler.FindChannel(cmsg.origin);
+            if (chan == null) { // so the origin is a user
+                HandleCommand(cmsg, MemberCode.DEFAULT);
+                return;
+            }
+
+            UserRelation relation = chan.users.SingleOrDefault(s => s.user == cmsg.user);
+            if (relation == null) {
+                Debug.WriteLine("PLUGIN> WARNING: User not found.");
+                HandleCommand(cmsg, MemberCode.DEFAULT);
+                return;
+            }
+
+            HandleCommand(cmsg, relation.permission);
+        }
+
+        public void HandleCommand(CommandMessage message, MemberCode rank) {
+            /*if (!message.command.StartsWith(">")) {
+                return;
+            }
+            */
+            Debug.WriteLine("PLUGIN> Received:" + message);
+            // CommandMessage cmm = PrepareCommand(message);
+
+            foreach (NewPluginProvider pp in pluginStorages) {
+
+                if (pp.plugin.CommandName == message.command && pp.plugin.Rank <= rank) {
+                    Debug.WriteLine("Fuck this.");
+                    NetworkMessage nm = pp.plugin.OnPrivMsg(message);
+                    if (nm == null) {
+                        continue;
+                    }
+                    _sender.Send(nm);
+
+                }
+            }
         }
 
         public override void HandleReply(NetworkMessage message) {
             throw new System.NotImplementedException();
+        }
+
+
+        public CommandMessage PrepareCommand(NetworkMessage message) {
+            string[] split = message.message.Split(new[] {' '}, 2);
+            string args = "";
+            string command = split[0].Substring(_prefix.Length);
+            if (split.Length > 1) {
+                args = split[1];
+            }
+
+            CommandMessage cmm = new CommandMessage() {
+                message = message,
+                parameters = args,
+                command = command,
+                origin = message.typeParams,
+                user = new ChannelUser(message.prefix)
+            };
+
+            return cmm;
         }
     }
 }

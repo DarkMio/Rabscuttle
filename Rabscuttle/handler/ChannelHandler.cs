@@ -29,7 +29,7 @@ namespace Rabscuttle.core.handler {
             users = new HashSet<ChannelUser>();
         }
 
-        private ChannelUser FindUser(string source) {
+        public ChannelUser FindUser(string source) {
             var userName = userRegex.Matches(source)[0].Groups[1].Value;
             return users.SingleOrDefault(s => s.userName == userName);
         }
@@ -44,7 +44,7 @@ namespace Rabscuttle.core.handler {
             return user;
         }
 
-        private Channel FindChannel(string channelName) {
+        public Channel FindChannel(string channelName) {
             return channels.SingleOrDefault(s => s.channelName == channelName);
         }
 
