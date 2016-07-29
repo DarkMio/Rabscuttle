@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Rabscuttle.networking.handler;
+using Rabscuttle.core.handler;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,53 +8,60 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Rabscuttle.core.channel;
+using Rabscuttle.core.commands;
+using Rabscuttle.core.io;
 
-namespace Rabscuttle.networking.handler.Tests {
+namespace Rabscuttle.core.handler.Tests {
     [TestFixture()]
     public class ChannelHandlerTests {
-        [Test()]
-        public void ChannelHandlerSearchTest() {
-            /*
-            HashSet<ChannelUser> users = new HashSet<ChannelUser>();
-            var created = new ChannelUser("Rabscootle", true);
-            users.Add(created);
-            Assert.AreSame(created, users.SingleOrDefault(s => s.userName == "Rabscootle"));
-            var newCreated = new ChannelUser("Rabscootle", true);
-            Assert.AreEqual(newCreated, users.SingleOrDefault(s => s.userName == "Rabscootle"));
-            users.Add(newCreated);
-            Assert.AreNotSame(newCreated, users.SingleOrDefault(s => s.userName == "Rabscootle"));
-            Assert.AreSame(created, users.SingleOrDefault(s => s.userName == "Rabscootle"));
-            */
-            ChannelHandler co = new ChannelHandler(new ConnectionManager("localhost", 6667));
-            var x = GetMethod("FindOrCreateUser", co);
-            var created = x.Invoke(co, new object[] {"Rabscuttle", false});
-            // var retrieved = x.Invoke(co, new object[] {"Rabscuttle", false});
-            // Assert.AreEqual(created, retrieved);
-            // Assert.AreSame(created, retrieved);
-            Console.WriteLine(created);
-            ChannelUser cu = new ChannelUser("Rabscootle", true);
-            var get = co.users.SingleOrDefault(s => s == cu);
-            var arr = co.users.ToArray();
-            string y = "";
-            foreach (ChannelUser channelUser in arr) {
-                y += " " + channelUser.userName;
+
+        private class MockSenderReceiver : ISender, IReceiver {
+            private readonly Queue<string> messages = new Queue<string>(new [] {
+                ":Rabscootle!~Gabe@Somehost.com JOIN #w3x-to-vmf",
+                ":TAL.DE.EU.GameSurge.net RPL_NAMREPLY Rabscootle @ #w3x-to-vmf :Rabscootle +Perry Yoshi2 +DarkMio @SinZ Not-efb8 @penguinwizzard Rabscuttle Renol @ChanServ",
+                ":Rabscootle!~Gabe@Somehost.com JOIN #miomio",
+                ":TAL.DE.EU.GameSurge.net RPL_NAMREPLY Rabscootle = #miomio @Rabscootle",
+                ":TAL.DE.EU.GameSurge.net RPL_WHOREPLY Rabscootle #w3x-to-vmf ~Gabe Somehost.com *.GameSurge.net Rabscootle Hx :0 Rabscuttle",
+                ":TAL.DE.EU.GameSurge.net RPL_WHOREPLY Rabscootle #w3x-to-vmf ~Perry Perry.user.gamesurge *.GameSurge.net Perry H+x :3 realname",
+                ":TAL.DE.EU.GameSurge.net RPL_WHOREPLY Rabscootle #w3x-to-vmf ~Yoshi2 gamesurge.com *.GameSurge.net Yoshi2 Hx :3 realname",
+                ":TAL.DE.EU.GameSurge.net RPL_WHOREPLY Rabscootle #w3x-to-vmf ~Mio DarkMio.user.gamesurge *.GameSurge.net DarkMio H+x :3 realname",
+                ":TAL.DE.EU.GameSurge.net RPL_WHOREPLY Rabscootle #w3x-to-vmf ~SinZ SinZ.user.gamesurge *.GameSurge.net SinZ H@x :3 SinZ",
+                ":TAL.DE.EU.GameSurge.net RPL_WHOREPLY Rabscootle #w3x-to-vmf ~Gabe Somehost.com *.GameSurge.net Rabscootle H@x :0 Rabscuttle",
+                ":DarkMio!~Mio@DarkMio.user.gamesurge JOIN #miomio",
+                ":DarkMio!~Mio@DarkMio.user.gamesurge PART #miomio :Leaving"
+            });
+            public void Send(string message, string prefix, string type, string typeParams) {
+
             }
 
-            Assert.AreSame(created, get, y);
+            public void Send(NetworkMessage message) {
 
+            }
+
+            public NetworkMessage Receive(bool waitResponse = false) {
+                if (messages.Count > 0) {
+                    return new NetworkMessage(messages.Dequeue(), true);
+                } else {
+                    return null;
+                }
+            }
         }
 
-        private MethodInfo GetMethod(string methodName, Object o) {
-            if (string.IsNullOrWhiteSpace(methodName))
-                Assert.Fail("methodName cannot be null or whitespace");
+        [Test()]
+        public void HandlerTest() {
+            var mock = new MockSenderReceiver();
+            ChannelHandler ch = new ChannelHandler(mock);
+            var nm = mock.Receive();
+            while (nm != null) {
+                if (nm.typeEnum is CommandCode) {
+                    ch.HandleCommand(nm);
+                } else {
+                    ch.HandleReply(nm);
+                }
+                nm = mock.Receive();
+            }
 
-            var method = o.GetType()
-                .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-
-            if (method == null)
-                Assert.Fail($"{methodName} method not found");
-
-            return method;
-         }
+            Console.WriteLine(ch.users);
+        }
     }
 }

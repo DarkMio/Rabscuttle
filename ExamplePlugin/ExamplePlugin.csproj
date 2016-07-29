@@ -4,45 +4,34 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{718159E3-8A0B-41B8-ABDB-B35C43538697}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{14606E2E-A5B9-49BE-9211-05DB99684B0C}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Rabscuttle</RootNamespace>
-    <AssemblyName>Rabscuttle</AssemblyName>
+    <RootNamespace>ExamplePlugin</RootNamespace>
+    <AssemblyName>ExamplePlugin</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Rabscuttle\bin\Plugins\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Rabscuttle\bin\Plugins\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>Rabscuttle.MainEntry</StartupObject>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -52,31 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="channel\Channel.cs" />
-    <Compile Include="channel\User.cs" />
-    <Compile Include="channel\UserRelation.cs" />
-    <Compile Include="MainEntry.cs" />
-    <Compile Include="networking\CommandSchedule.cs" />
-    <Compile Include="networking\commands\IrcReplies.cs" />
-    <Compile Include="networking\commands\ProtocolDefinitions.cs" />
-    <Compile Include="networking\commands\RawIrcCommands.cs" />
-    <Compile Include="networking\ConnectionManager.cs" />
-    <Compile Include="handler\ChannelHandler.cs" />
-    <Compile Include="handler\ObservableHandler.cs" />
-    <Compile Include="handler\PluginHandler.cs" />
-    <Compile Include="networking\io\INetworking.cs" />
-    <Compile Include="networking\io\NetworkMessage.cs" />
-    <Compile Include="networking\io\BotClient.cs" />
-    <Compile Include="plugins\CommandMessage.cs" />
-    <Compile Include="plugins\IPluginContract.cs" />
+    <Compile Include="ExamplePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="stuff\ConfigurationProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Rabscuttle\Rabscuttle.csproj">
+      <Project>{718159e3-8a0b-41b8-abdb-b35c43538697}</Project>
+      <Name>Rabscuttle</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

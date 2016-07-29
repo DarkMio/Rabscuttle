@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using Rabscuttle.core.channel;
-using Rabscuttle.networking.commands;
+using Rabscuttle.core.commands;
 
 namespace Rabscuttle.core.channel {
     public class UserRelation {
         public readonly ChannelUser user;
         public MemberCode permission;
 
+        // @TODO: Permission parsing seems to be shit right now
         public UserRelation(ChannelUser user, MemberCode permission) {
             this.user = user;
             this.permission = permission;

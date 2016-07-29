@@ -6,29 +6,30 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Rabscuttle.channel;
 using Rabscuttle.core.channel;
-using Rabscuttle.networking.commands;
+using Rabscuttle.core.commands;
+using Rabscuttle.core.io;
 
-namespace Rabscuttle.networking.handler {
+namespace Rabscuttle.core.handler {
 
     /**
      * Creates its own observers to notify them individually.
      */
-    public class ChannelHandler : ObservableHandler {
-        private List<Channel> channels;
+    public class ChannelHandler  : ObservableHandler {
+        public List<Channel> channels;
         public HashSet<ChannelUser> users;
-        private ConnectionManager connection;
+        private ISender connection;
 
         private static Regex userRegex = new Regex(@"^[+%@!.:]?([^!@ ]*)", RegexOptions.Compiled);
         private static Regex permissionRegex = new Regex(@"([+|-][^+-]*)([+|-][^+-]*)?", RegexOptions.Compiled);
 
 
-        public ChannelHandler(ConnectionManager connection) {
+        public ChannelHandler(ISender connection){
             this.connection = connection;
             channels = new List<Channel>();
             users = new HashSet<ChannelUser>();
         }
 
-        private ChannelUser FindUser(string source) {
+        public ChannelUser FindUser(string source) {
             var userName = userRegex.Matches(source)[0].Groups[1].Value;
             return users.SingleOrDefault(s => s.userName == userName);
         }
@@ -43,7 +44,7 @@ namespace Rabscuttle.networking.handler {
             return user;
         }
 
-        private Channel FindChannel(string channelName) {
+        public Channel FindChannel(string channelName) {
             return channels.SingleOrDefault(s => s.channelName == channelName);
         }
 
@@ -152,6 +153,7 @@ namespace Rabscuttle.networking.handler {
                 foreach (Channel channel in channels) {
                     channel.RemoveUser(user);
                 }
+                users.Remove(user);
             } else { // we quit, which means that we can safely delete all.
                 Debug.WriteLine("CHOO CHOO. EMPTYING ALL CHANNEL INFOS");
                 channels.Clear();
@@ -163,9 +165,6 @@ namespace Rabscuttle.networking.handler {
         }
 
         private void HandlePrivMsg(NetworkMessage message) {
-            if (message.prefix.StartsWith("SQL")) {
-                return;
-            }
             if (message.message.StartsWith(">DUMPCHANS")) {
                 foreach (Channel channel in channels) {
                     Debug.WriteLine(channel);
@@ -181,6 +180,8 @@ namespace Rabscuttle.networking.handler {
 
                 if(x.Length > 1)
                     connection.Send(RawPrivMsg.Generate(message.typeParams, "Result: " + FindUser(x[1])));
+            } else if (message.message.StartsWith("fuck sql")) {
+                connection.Send(RawPrivMsg.Generate(message.typeParams, "+fuck SQL"));
             }
         }
 
@@ -193,7 +194,6 @@ namespace Rabscuttle.networking.handler {
         }
 
         private void HandleMode(NetworkMessage message) {
-            Debug.WriteLine("Handling RawMode...");
             if (!message.fromServer) {
                 return;
             }
@@ -207,18 +207,15 @@ namespace Rabscuttle.networking.handler {
             // mode sets can only happen in one channel
             Channel channel = FindChannel(parameter[0]);
             var mode = permissionRegex.Matches(parameter[1])[0].Groups;
+            // Positive or Negative Group
             string firstGroup = mode[1].Value;
             var firstParameterGroup = parameter.Skip(2).Take(firstGroup.Length - 1);
-            Debug.WriteLine(firstParameterGroup);
             UserRanking(firstGroup, firstParameterGroup.ToArray(), channel);
 
+            // The reminder group - could be empty, which will be accounted for by UserRanking(...)
             string secondGroup = mode[2].Value;
             var secondParameterGroup = parameter.Skip(2 + firstGroup.Length);
-            Debug.WriteLine(secondParameterGroup);
             UserRanking(secondGroup, secondParameterGroup.ToArray(), channel);
-
-            Debug.WriteLine("Done Ranking.");
-
         }
 
         private void UserRanking(string rankString, string[] users, Channel channel) {

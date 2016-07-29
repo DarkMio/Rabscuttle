@@ -1,4 +1,4 @@
-﻿namespace Rabscuttle.networking.commands {
+﻿namespace Rabscuttle.core.commands {
 
     public enum CommandCode {
         ADMIN,
@@ -57,13 +57,14 @@
     }
 
     public enum MemberCode {
-        DEFAULT = 0x0,                        //   unvoiced;
-        VOICED = 0x1      ,   // + voiced; RFC1459
-        HALF_OPERATOR = 0x2,   // % half operator; hybrid
-        OPERATOR = 0x3     ,   // @ operator; RFC1459
-        CREATOR = 0x4      ,   // @ creator; RFC2811
-        SERVICE = 0x5      ,   // ! service; KineIRCd
-        FOUNDER = 0x6      ,   // . founder; tr-ircd
+        DEFAULT = 0x0,               //   unvoiced;
+        VOICED = 0x1,                // + voiced; RFC1459
+        HALF_OPERATOR = 0x1 << 1,    // % half operator; hybrid
+        OPERATOR = 0x1 << 2,         // @ operator; RFC1459
+        CREATOR = 0x4 << 3,          // @ creator; RFC2811
+        SERVICE = 0x5 << 4,          // ! service; KineIRCd
+        FOUNDER = 0x6 << 5,          // . founder; tr-ircd
+        BOTOPERATOR = 0x7 << 6,      // bot operator always has maximum rights
     }
 
     // taken from: https://raw.githubusercontent.com/ircdocs/irc-defs/gh-pages/_data/numerics.yaml
@@ -212,7 +213,7 @@
         RPL_CHPASSUNKNOWN = 327, // CONFLICT
         RPL_CHANNEL_URL = 328, // Also known as RPL_CHANNELURL in charybdis
         RPL_CREATIONTIME = 329, // Also known as RPL_CHANNELCREATED (InspIRCd)
-        RPL_WHOWAS_TIME = 330, // CONFLICT
+        RPL_WHOISACCOUNT = 330, // CONFLICT
         RPL_NOTOPIC = 331, // Response to TOPIC when no topic is set. Also known as RPL_NOTOPICSET (InspIRCd)
         RPL_TOPIC = 332, // Response to TOPIC with the set topic. Also known as RPL_TOPICSET (InspIRCd)
         RPL_TOPICWHOTIME = 333, //

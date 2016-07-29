@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Rabscuttle.core.io;
 
-namespace Rabscuttle.networking.handler {
+namespace Rabscuttle.core.handler {
     public abstract class ObservableHandler : IObservable<NetworkMessage> {
         protected List<IObserver<NetworkMessage>> observers;
 

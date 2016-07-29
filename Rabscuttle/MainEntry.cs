@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Rabscuttle.networking;
-using Rabscuttle.networking.commands;
+using Rabscuttle.core;
+using Rabscuttle.core.commands;
+using Rabscuttle.core.handler;
+using Rabscuttle.core.io;
 
 namespace Rabscuttle {
     public class MainEntry {
         static void Main(string[] args) {
+
             Console.WriteLine("!> Connecting...");
             ConnectionManager cmgr = new ConnectionManager("irc.gamesurge.net", 6667);
             Console.WriteLine("!> Connected!");
@@ -18,6 +22,7 @@ namespace Rabscuttle {
 
             cmgr.Send(RawJoin.Generate("#w3x-to-vmf"));
             cmgr.Send(RawJoin.Generate("#miomio"));
+            // cmgr.Send(RawJoin.Generate("#dota2mods"));
             // cmgr.Send(RawJoin.Generate("#dota2mods"));
             // cmgr.Send(RawJoin.Generate("#steamdb"));
             // cmgr.Send(RawJoin.Generate("#trashtest"));
@@ -27,8 +32,9 @@ namespace Rabscuttle {
             }
             */
             while (true) {
-                var msg = cmgr.ReceiveUntil(RawPing.Instance);
+                var msg = cmgr.ReceiveUntil(CommandCode.PING);
             }
+
         }
 
         public class AuthServ : RawCommand<AuthServ> {

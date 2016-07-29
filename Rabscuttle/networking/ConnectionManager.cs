@@ -2,42 +2,81 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Rabscuttle.networking.commands;
-using Rabscuttle.networking.handler;
+using PluginContract;
+using Rabscuttle.core.commands;
+using Rabscuttle.core.handler;
+using Rabscuttle.core.io;
 
-namespace Rabscuttle.networking {
-    public class ConnectionManager {
+namespace Rabscuttle.core {
+    /// <summary>
+    /// Main connection class. It's main task is to send and receive.
+    /// Every to-be sent message and every received message gets filtered and dispatched into the public seend handlers.
+    /// Each process and plugin can subscribe to these handlers and listen to the same messages.
+    /// </summary>
+    public class ConnectionManager : ISender, IReceiver {
         private readonly BotClient client;
         private readonly CommandSchedule scheduler;
 
-        private readonly ChannelHandler channelHandler;
+        /// <summary>
+        /// The channel handler processes all channel-related messages, like JOIN, PART, MODE and so on.
+        /// </summary>
+        public readonly ChannelHandler channelHandler;
 
-        public ConnectionManager(string host, int port) {
+        public readonly PluginHandler pluginHandler;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConnectionManager"/> class, thereby initilizing <see cref="BotClient"/>, <see cref="CommandSchedule"/>, <see cref="ChannelHandler"/>.
+        /// @TODO: Add missing handler into description.
+        /// </summary>
+        /// <param name="host">Hostname, may be a domain or IP as string</param>
+        /// <param name="port">Server port, standard is 6667</param>
+        public ConnectionManager(string host, int port = 6667) {
             client = new BotClient(host, port);
             scheduler = new CommandSchedule(client);
             channelHandler = new ChannelHandler(this);
+            pluginHandler = new PluginHandler(this, channelHandler);
             Connect();
         }
 
-        /*
-        public ConnectionManager ConnectionManagerFactory(string host, int port) {
-            ConnectionManager cmgr = new ConnectionManager(host, port);
-            cmgr.Connect();
-            return cmgr;
-        }
-        */
 
+        /// <summary>
+        /// Connects to a server and waits until any of the connection-related server message is reached.
+        /// Server-Related messages are <c>MODE</c>, <c>RPL_ENDOFMOTD</c>, <c>ERR_NOMOTD</c>
+        /// </summary>
         private void Connect() {
             Send(RawUser.Generate("Gabe BotHost AnotherOne", "Rabscuttle"));
             Send(RawNick.Generate("Rabscootle"));
-            ReceiveUntil(RawMode.Instance); // The last received message will be a ping.
+            ReceiveUntil(CommandCode.MODE, ReplyCode.RPL_ENDOFMOTD, ReplyCode.ERR_NOMOTD); // The last received message will be any of those
         }
 
+        /// <summary>
+        /// Sends a properly aligned plaintext message to the endpoint, alignment looks like:
+        /// <c>:source* type typeParam* :message*</c>
+        /// </summary>
+        /// <param name="message">Message contents, which are usually at the end of a string.</param>
+        /// <param name="prefix">The source prefix, client to server messages can have this missing.</param>
+        /// <param name="type">Message type, usually a <c>CommandCode</c> when sending from client to server.</param>
+        /// <param name="typeParams">Optional, additional parameter for a message type.</param>
+        public void Send(string message, string prefix, string type, string typeParams) {
+            Send(new NetworkMessage(prefix, type, typeParams, message, false));
+        }
+
+        /// <summary>
+        /// Sends the specified message as soon as possible, which is managed by <see cref="CommandSchedule"/>
+        /// </summary>
+        /// <param name="message">Any instance of NetworkMessage.</param>
         public void Send(NetworkMessage message) {
             Handle(message);
             scheduler.Add(message);
         }
 
+        /// <summary>
+        /// Receives a message instantaneously unless <paramref name="waitResponse"/> is set to <c>true</c>.
+        /// <param name="waitResponse">if set to <c>true</c> method waits until there is a message to receive.</param>
+        /// <returns>
+        ///     Most recent NetworkMessage if there is any data, or <c>null</c> if <paramref name="waitResponse" /> is
+        ///     <c>false</c>.
+        /// </returns>
         public NetworkMessage Receive(bool waitResponse = false) {
             var msg = client.Receive(waitResponse);
             if (msg != null) {
@@ -46,20 +85,34 @@ namespace Rabscuttle.networking {
             return msg;
         }
 
-        /**
-         * Wait and receive until a certain message is found.
-         * This will, if poorly used, stay stuck, since it's waiting for a certain message.
-         */
-
-        public NetworkMessage ReceiveUntil<T>(T command, bool waitResponse = false) where T : RawCommand<T>, new() {
+        /// <summary>
+        /// Receives messages until a certain message type is found.
+        /// This will, if poorly used, stay stuck since it's waiting for certain messages.
+        /// Receives a message instantaneously unless <paramref name="waitResponse"/> is set to <c>true</c>.
+        /// <param name="waitResponse">if set to <c>true</c> method waits until there is a message to receive.</param>
+        /// <returns>
+        ///     The most recent NetworkMessage with any or the types awaiting.
+        /// </returns>
+        public NetworkMessage ReceiveUntil(params Enum[] replyOrCommand) {
             while (true) {
                 var message = Receive(true);
-                if (message != null && command.type + "" == message.type) {
-                    return message;
+                foreach (var type in replyOrCommand) {
+                    if (message != null && type + "" == message.type) {
+                        return message;
+                    }
                 }
             }
         }
 
+        /// <summary>
+        ///     Disposes all incoming messages until the most recent message is reached.
+        ///     This is useful if there are multiple messages sent by the server in between of the client receiving frames.
+        /// </summary>
+        /// <param name="waitResponse">if set to <c>true</c> method waits until there is a message to receive.</param>
+        /// <returns>
+        ///     Most recent NetworkMessage if there is any data, or <c>null</c> if <paramref name="waitResponse" /> is
+        ///     <c>false</c>.
+        /// </returns>
         public NetworkMessage ReceiveLast(bool waitResponse = false) {
             NetworkMessage lastMessage = Receive(waitResponse);
             while (true) {
@@ -72,14 +125,10 @@ namespace Rabscuttle.networking {
             return lastMessage;
         }
 
-        /**
-         * Handles an incoming message accordingly.
-         * I honestly think that it wouldn't be bad to have two subclasses for
-         * the two different kinds of messages, but then again this would either
-         * require to split up them here, which then is kinda late, or analyze
-         * the message beforehand, which doesn't seem nice either.
-         * Help is appreciated.
-         */
+        /// <summary>
+        /// Handles an incoming message accordingly.
+        /// </summary>
+        /// <param name="message">Incoming network message.</param>
         private void Handle(NetworkMessage message) {
             try {
                 if (message.typeEnum is ReplyCode) {
@@ -96,6 +145,10 @@ namespace Rabscuttle.networking {
 
         }
 
+        /// <summary>
+        /// Handles a reply by sorting it and sending it to the appropiate handler.
+        /// </summary>
+        /// <param name="message">Incoming message with any reply response.</param>
         private void HandleReply(NetworkMessage message) {
             switch ((ReplyCode) message.typeEnum) {
                 case ReplyCode.RPL_NAMREPLY:
@@ -107,11 +160,16 @@ namespace Rabscuttle.networking {
             Debug.WriteLine(message);
         }
 
-        /**
-         * If the message is a server command, we'll handle it here.
-         */
+        /// <summary>
+        /// Handles a command by sorting it and sending it to the appropiate handler.
+        /// </summary>
+        /// <param name="message">Incoming message with any command response.</param>
         private void HandleCommand(NetworkMessage message) {
             Debug.WriteLine("HANDLE> " + message);
+            if ((CommandCode) message.typeEnum == CommandCode.PRIVMSG) {
+                Debug.WriteLine("Here:");
+                pluginHandler.HandleCommand(message);
+            }
             switch ((CommandCode)message.typeEnum) {
                 case CommandCode.PING:
                     Send(RawPong.Generate(message.message));
@@ -130,20 +188,5 @@ namespace Rabscuttle.networking {
                     return;
             }
         }
-
-        private void OnPrivMsg(NetworkMessage message) {
-            channelHandler.HandleCommand(message);
-            /*
-            if (message.prefix != null && message.prefix.StartsWith("DarkMio!~Mio@")) {
-                if (message.message.StartsWith(">RAW")) {
-                    client.RawSend(message.message.Replace(">RAW ", "") + "\r\n");
-                }
-                else if (message.message.StartsWith(">rejoin")) {
-                    Send(RawPart.Generate("#w3x-to-vmf", "Cya"));
-                    Send(RawJoin.Generate("#w3x-to-vmf"));
-                }
-            }
-            */
-        } // End OnPrivMsg
     }
 }
