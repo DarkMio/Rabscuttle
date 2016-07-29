@@ -6,6 +6,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Rabscuttle.core.io;
+using Rabscuttle.stuff;
 
 #endregion
 
@@ -115,7 +116,7 @@ namespace Rabscuttle.core {
             // in case you have gotten any linesbreaks from somewhere.
             output.Write(message + "\r\n");
             output.Flush();
-            Debug.WriteLine("CLIENT> RAW: [ " + message + " ];");
+            Logger.WriteWarn("Bot Client", "Sending raw message: [ {0} ]", message);
         }
 
         /// <summary>

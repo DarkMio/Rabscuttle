@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Rabscuttle.core;
+﻿using Rabscuttle.core;
 using Rabscuttle.core.commands;
-using Rabscuttle.core.handler;
 using Rabscuttle.core.io;
+using Logger = Rabscuttle.stuff.Logger;
 
 namespace Rabscuttle {
     public class MainEntry {
         static void Main(string[] args) {
-
-            Console.WriteLine("!> Connecting...");
+            // Logger.Setup();
+            Logger.WriteInfo("Main", "Connecting...");
             ConnectionManager cmgr = new ConnectionManager("irc.gamesurge.net", 6667);
-            Console.WriteLine("!> Connected!");
+            Logger.WriteInfo("Main", "Connected!");
             cmgr.ReceiveLast(true);
 
             cmgr.Send(RawJoin.Generate("#w3x-to-vmf"));

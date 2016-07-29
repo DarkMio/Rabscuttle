@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Rabscuttle.core.commands;
+using Rabscuttle.stuff;
 
 namespace Rabscuttle.core.io {
     public class NetworkMessage {
@@ -71,7 +72,7 @@ namespace Rabscuttle.core.io {
             this.fromServer = fromServer;
         }
         */
-        
+
         public NetworkMessage(string raw, bool fromServer) {
             this.fromServer = fromServer;
             // Split the message for " :", since it would be only the message itself
@@ -87,7 +88,7 @@ namespace Rabscuttle.core.io {
                 commandStack = commandStack.Skip(1).ToArray();
             }
 
-            // following after is the type, which is either plaintext or a reply-number. 
+            // following after is the type, which is either plaintext or a reply-number.
             var rawType = commandStack[0];
             int replyCode;
             bool isNumeric = int.TryParse(rawType, out replyCode);
@@ -98,17 +99,17 @@ namespace Rabscuttle.core.io {
 
             // if now anything is left, it should be type-parameter.
             typeParams = commandStack.Length > 0 ? string.Join(" ", commandStack) : null;
-            
+
             // and finally write out the type-params.
             if (Enum.IsDefined(typeof(ReplyCode), type)) {
                 typeEnum = (ReplyCode) replyCode;
             } else if (Enum.IsDefined(typeof(CommandCode), type)) {
                 typeEnum = (CommandCode) Enum.Parse(typeof(CommandCode), type, true);
             } else {
-                Debug.WriteLine("!! Unrecorginzed method: [ " + type + " ] in " + raw);
+                Logger.WriteWarn("Unrecorgnized method: [ {0} ] in: [ {1} ]", type, raw);
             }
         }
-        
+
         public string BuildMessage() {
             string msgPrefix = prefix != null ? ":" + prefix : "";
             string msgMessage = message != null ? " :" + message : "";
@@ -122,8 +123,8 @@ namespace Rabscuttle.core.io {
         }
 
         protected bool Equals(NetworkMessage other) {
-            return string.Equals(message, other.message) && string.Equals(prefix, other.prefix) 
-                && string.Equals(type, other.type) && string.Equals(typeParams, other.typeParams) 
+            return string.Equals(message, other.message) && string.Equals(prefix, other.prefix)
+                && string.Equals(type, other.type) && string.Equals(typeParams, other.typeParams)
                 && fromServer == other.fromServer && Equals(typeEnum, other.typeEnum);
         }
 

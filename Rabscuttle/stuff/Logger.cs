@@ -14,7 +14,7 @@ namespace Rabscuttle.stuff {
             FATAL
         }
 
-        public void Setup() {
+        public static void Setup() {
             string logLevel = ConfigurationManager.AppSettings["loglevel"];
             Enum.TryParse(logLevel, true, out loggingLevel);
         }
@@ -24,9 +24,9 @@ namespace Rabscuttle.stuff {
                 return;
             }
 
-            string categoryString = category.ToString().PadRight(5);
+            string categoryString = ("[" + category.ToString() + "]").PadRight(7);
             string logLine = string.Format(
-                "{0} [{1:G5}] {2}: {3}",
+                "{0} {1} {2}: {3}",
                 DateTime.Now.ToLongTimeString(),
                 categoryString,
                 component,
@@ -34,10 +34,28 @@ namespace Rabscuttle.stuff {
             );
 
             lock (logLock) {
+                switch (category) {
+                    case Category.DEBUG:
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        break;
+                    case Category.WARN:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        break;
+                    case Category.ERROR:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
+                    case Category.FATAL:
+                        Console.BackgroundColor = ConsoleColor.DarkRed;
+                        break;
+                }
+
+
                 if (category == Category.ERROR) {
                     Console.ForegroundColor = ConsoleColor.Red;
                 } else if (category == Category.DEBUG) {
                     Console.ForegroundColor = ConsoleColor.Green;
+                } else if (category == Category.FATAL) {
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
                 }
                 Console.WriteLine(logLine);
                 Console.ResetColor();

@@ -8,6 +8,7 @@ using Rabscuttle.channel;
 using Rabscuttle.core.channel;
 using Rabscuttle.core.commands;
 using Rabscuttle.core.io;
+using Rabscuttle.stuff;
 
 namespace Rabscuttle.core.handler {
 
@@ -147,7 +148,7 @@ namespace Rabscuttle.core.handler {
             if (message.fromServer) {
                 ChannelUser user = FindUser(message.prefix);
                 if (user == null) {
-                    Debug.WriteLine("!! Could not find specified user. " + message);
+                    Logger.WriteWarn("Channel Handler", "Could not find the specified user: {0}", message.prefix);
                     return;
                 }
                 foreach (Channel channel in channels) {
@@ -155,7 +156,7 @@ namespace Rabscuttle.core.handler {
                 }
                 users.Remove(user);
             } else { // we quit, which means that we can safely delete all.
-                Debug.WriteLine("CHOO CHOO. EMPTYING ALL CHANNEL INFOS");
+                Logger.WriteInfo("Channel Handler", "Emptying all channel infos.");
                 channels.Clear();
                 users.Clear();
                 foreach (IObserver<NetworkMessage> observer in observers) { // and notify all event listener
@@ -200,7 +201,7 @@ namespace Rabscuttle.core.handler {
 
             string[] parameter = message.typeParams.Split(new char[] {' '});
             if (parameter.Length < 3) {
-                Debug.WriteLine("There was no mode parameter info: " + message);
+                Logger.WriteWarn("Channel Handler", "No valid parameter info: {0} {1} :{2}", message.type, message.typeParams, message.message);
                 return;
             }
 
@@ -229,7 +230,7 @@ namespace Rabscuttle.core.handler {
                 MemberCode permission = ParseModePermission(permissionChar);
                 ChannelUser user = FindUser(users[i]);
                 if (user == null) {
-                    Debug.WriteLine("Cannot find user of modeset: " + user + " in Channel: " + channel.channelName);
+                    Logger.WriteWarn("Channel Handler", "Cannot find user of modeset: {0} in channel: {1}", user, channel.channelName);
                     continue;
                 }
                 if (upranking) {
@@ -254,7 +255,7 @@ namespace Rabscuttle.core.handler {
             if (param.Length > 1) {
                 channelName = param[1];
             } else {
-                Debug.WriteLine("!! Could not handle (ChannelHandler): " + message);
+                Logger.WriteWarn("Channel Handler", "Could not handle: {0}", message);
                 return;
             }
 

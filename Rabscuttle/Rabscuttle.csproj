@@ -71,6 +71,7 @@
     <Compile Include="plugins\IPluginContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="stuff\ConfigurationProvider.cs" />
+    <Compile Include="stuff\Logger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

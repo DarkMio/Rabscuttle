@@ -11,6 +11,7 @@ using Rabscuttle.channel;
 using Rabscuttle.core.channel;
 using Rabscuttle.core.io;
 using Rabscuttle.core.commands;
+using Rabscuttle.stuff;
 
 namespace Rabscuttle.core.handler {
     public class PluginHandler : ObservableHandler {
@@ -41,12 +42,12 @@ namespace Rabscuttle.core.handler {
             _container = new CompositionContainer(_catalog);
             //plugins = _container.GetExportedValues<IPluginContract>();
             _container.ComposeParts(this);
-            Console.WriteLine($"PLUGIN> Loaded a total of {plugins.Length} plugins.");
+            Logger.WriteInfo("Plugin Handler", "Loaded a total of {0} plugins.", plugins.Length);
 
             foreach (IPluginContract plugin in plugins) {
                 plugin.Sender = _sender;
-                plugin.MessagePrefix = ">";
-                Debug.WriteLine($"PLUGIN> Loaded '{plugin.CommandName}'");
+                plugin.MessagePrefix = prefix;
+                Logger.WriteDebug("Plugin Handler", "Loaded {0}", plugin.CommandName);
             }
 
         }
@@ -59,13 +60,9 @@ namespace Rabscuttle.core.handler {
                 return;
             }
 
-            if (!message.message.StartsWith(">")) {
-                Debug.WriteLine("PLUGIN> Not for any plugin: " + message.message);
+            if (!message.message.StartsWith(prefix)) {
                 return;
             }
-
-            Debug.WriteLine("PLUGIN> Received: " + message.message);
-
 
             CommandMessage cmsg = PrepareCommand(message);
             Channel chan = _channelHandler.FindChannel(cmsg.origin);
@@ -76,7 +73,7 @@ namespace Rabscuttle.core.handler {
 
             UserRelation relation = chan.users.SingleOrDefault(s => s.user == cmsg.user);
             if (relation == null) {
-                Debug.WriteLine("PLUGIN> WARNING: User not found.");
+                Logger.WriteWarn("Plugin Handler", "No viable user found.");
                 HandleCommand(cmsg, MemberCode.DEFAULT);
                 return;
             }
@@ -85,24 +82,19 @@ namespace Rabscuttle.core.handler {
         }
 
         public void HandleCommand(CommandMessage message, MemberCode rank) {
-            /*if (!message.command.StartsWith(">")) {
-                return;
-            }
-            */
-            Debug.WriteLine("PLUGIN> Received:" + message);
+            // Debug.WriteLine("PLUGIN> Received:" + message);
             // CommandMessage cmm = PrepareCommand(message);
 
             foreach (IPluginContract plugin in plugins) {
-
-                if (plugin.CommandName == message.command && plugin.Rank <= rank) {
-                    Debug.WriteLine("Fuck this.");
-                    NetworkMessage nm = plugin.OnPrivMsg(message);
-                    if (nm == null) {
-                        continue;
-                    }
-                    _sender.Send(nm);
-
+                if (plugin.CommandName != message.command || plugin.Rank > rank) {
+                    continue;
                 }
+                Logger.WriteDebug("Plugin Handler", "Handling message: {0}", message.message);
+                NetworkMessage nm = plugin.OnPrivMsg(message);
+                if (nm == null) {
+                    continue;
+                }
+                _sender.Send(nm);
             }
         }
 
@@ -147,26 +139,6 @@ namespace Rabscuttle.core.handler {
             };
 
             return cmm;
-        }
-    }
-
-    [Serializable]
-    public class PluginLoader {
-
-        [ImportMany(typeof(IPluginContract))]
-        private IPluginContract[] plugins = null;
-
-
-        public void LoadPlugins() {
-            var aggregateCatalog = new AggregateCatalog();
-            aggregateCatalog.Catalogs.Add(new DirectoryCatalog(@"E:\Projects\c#\Rabscuttle\Rabscuttle\bin\Plugins"));
-            var container = new CompositionContainer(aggregateCatalog);
-            container.ComposeParts(this);
-            foreach (IPluginContract plugin in plugins) {
-                // plugin.Sender = _sender;
-                plugin.MessagePrefix = ">";
-                Console.WriteLine($"PLUGIN> Loaded '{plugin.CommandName}'");
-            }
         }
     }
 }
