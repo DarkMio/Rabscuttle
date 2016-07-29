@@ -42,6 +42,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -51,12 +52,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="core\channel\Channel.cs" />
-    <Compile Include="core\channel\User.cs" />
-    <Compile Include="core\channel\UserRelation.cs" />
+    <Compile Include="channel\Channel.cs" />
+    <Compile Include="channel\User.cs" />
+    <Compile Include="channel\UserRelation.cs" />
     <Compile Include="MainEntry.cs" />
-    <Compile Include="handler\NewPluginHandler.cs" />
-    <Compile Include="handler\NewPluginProvider.cs" />
     <Compile Include="networking\CommandSchedule.cs" />
     <Compile Include="networking\commands\IrcReplies.cs" />
     <Compile Include="networking\commands\ProtocolDefinitions.cs" />
@@ -71,6 +70,7 @@
     <Compile Include="plugins\CommandMessage.cs" />
     <Compile Include="plugins\IPluginContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="stuff\ConfigurationProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
