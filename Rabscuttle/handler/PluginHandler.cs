@@ -17,12 +17,12 @@ using Rabscuttle.stuff;
 namespace Rabscuttle.core.handler {
     public class PluginHandler : ObservableHandler {
         [ImportMany(typeof(IPluginContract), AllowRecomposition = true)]
-        private IPluginContract[] plugins = null;
+        public IPluginContract[] plugins = null;
         private readonly ISender _sender;
         private readonly DirectoryCatalog _catalog;
         private CompositionContainer _container;
         private readonly string prefix = ">";
-        private readonly ChannelHandler _channelHandler;
+        public readonly ChannelHandler channelHandler;
         private readonly string path;
         private readonly string[] operators;
 
@@ -31,7 +31,7 @@ namespace Rabscuttle.core.handler {
             path = pathToPlugins;
             _catalog = new DirectoryCatalog(pathToPlugins);
 
-            _channelHandler = channelHandler;
+            this.channelHandler = channelHandler;
 
             var opList = ConfigurationProvider.Get("operators").Split(',');
             for (int index = 0; index < opList.Length; index++) {
@@ -42,7 +42,7 @@ namespace Rabscuttle.core.handler {
             LoadPlugins();
         }
 
-        public void LoadPlugins() {
+        private void LoadPlugins() {
             _container = new CompositionContainer(_catalog);
             //plugins = _container.GetExportedValues<IPluginContract>();
             _container.ComposeParts(this);
@@ -51,6 +51,7 @@ namespace Rabscuttle.core.handler {
             foreach (IPluginContract plugin in plugins) {
                 plugin.Sender = _sender;
                 plugin.MessagePrefix = prefix;
+                plugin.BackReference = this;
                 Logger.WriteDebug("Plugin Handler", "Loaded {0}", plugin.CommandName);
             }
         }
@@ -68,7 +69,7 @@ namespace Rabscuttle.core.handler {
             }
 
             CommandMessage cmsg = PrepareCommand(message);
-            Channel chan = _channelHandler.FindChannel(cmsg.origin);
+            Channel chan = channelHandler.FindChannel(cmsg.origin);
             if (chan == null) { // so the origin is a user
                 HandleCommand(cmsg, MemberCode.DEFAULT);
                 return;
@@ -138,7 +139,7 @@ namespace Rabscuttle.core.handler {
 
         private bool CheckForBotoperator(ChannelUser user) {
             if (operators.Any(s => s.Trim() == user.userName)) {
-                Task<bool> task = _channelHandler.IsLoggedIn(user.userName);
+                Task<bool> task = channelHandler.IsLoggedIn(user.userName);
                 Logger.WriteInfo("Plugin Handler", "Searching for bot operator rights on {0}", user.userName);
                 task.Wait();
                 Logger.WriteDebug("Plugin Handler", "Operator Rights are: {0}", task.Result);
@@ -159,13 +160,26 @@ namespace Rabscuttle.core.handler {
             if (split.Length > 1) {
                 args = split[1];
             }
+            ChannelUser user = new ChannelUser(message.prefix);
+            Channel chan = channelHandler.FindChannel(message.typeParams);
+            UserRelation relation = null;
+            MemberCode permission = MemberCode.DEFAULT;
+
+            if (operators.Any(s => user.userName == s) && CheckForBotoperator(user)) {
+                permission = MemberCode.BOTOPERATOR;
+            } else if (chan != null) {
+                relation = chan.users.SingleOrDefault(s => s.user.userName == message.prefix.Split(new[] {'!'}, 2)[0]);
+                permission = relation.permission;
+            }
+
 
             CommandMessage cmm = new CommandMessage() {
                 message = message,
                 parameters = args,
                 command = command,
                 origin = message.typeParams,
-                user = new ChannelUser(message.prefix)
+                user = user,
+                permission = permission
             };
 
             return cmm;

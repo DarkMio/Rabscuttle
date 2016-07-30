@@ -139,4 +139,15 @@ namespace Rabscuttle.core.commands {
             return Instance.InstanceGenerate(fromServer, prefix, null, message);
         }
     }
+
+    public class RawNotice : RawCommand<RawNotice> {
+        public override CommandCode type => CommandCode.NOTICE;
+        public override bool hasTypeParameter => true;
+        public override bool hasMessage => true;
+
+        public static NetworkMessage Generate(string typeParameter, string message, bool fromServer = false,
+            string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
+        }
+    }
 }
