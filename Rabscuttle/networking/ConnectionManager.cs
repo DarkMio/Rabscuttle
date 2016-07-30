@@ -2,10 +2,12 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using NUnit.Framework.Internal;
 using PluginContract;
 using Rabscuttle.core.commands;
 using Rabscuttle.core.handler;
 using Rabscuttle.core.io;
+using Logger = Rabscuttle.stuff.Logger;
 
 namespace Rabscuttle.core {
     /// <summary>
@@ -138,11 +140,8 @@ namespace Rabscuttle.core {
                     HandleCommand(message);
                 }
             } catch (Exception e) {
-                Debug.WriteLine("Exception: " + e);
-                // Debug.WriteLine(e.Source);
-                // Debug.WriteLine(e.StackTrace);
+                Logger.WriteError("Connection Manager", "Exception catched, thrown by handlers: {0}", e);
             }
-
         }
 
         /// <summary>
@@ -157,7 +156,6 @@ namespace Rabscuttle.core {
                     channelHandler.HandleReply(message);
                     break;
             }
-            Debug.WriteLine(message);
         }
 
         /// <summary>
@@ -165,9 +163,7 @@ namespace Rabscuttle.core {
         /// </summary>
         /// <param name="message">Incoming message with any command response.</param>
         private void HandleCommand(NetworkMessage message) {
-            Debug.WriteLine("HANDLE> " + message);
             if ((CommandCode) message.typeEnum == CommandCode.PRIVMSG) {
-                Debug.WriteLine("Here:");
                 pluginHandler.HandleCommand(message);
             }
             switch ((CommandCode)message.typeEnum) {

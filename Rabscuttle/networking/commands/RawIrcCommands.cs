@@ -119,4 +119,14 @@ namespace Rabscuttle.core.commands {
             return Instance.InstanceGenerate(fromServer, prefix, typeParameter);
         }
     }
+
+    public class AuthServ : RawCommand<AuthServ> {
+        public override CommandCode type => CommandCode.DEFAULT;
+        public override bool hasTypeParameter => true;
+        public override bool hasMessage => false;
+
+        public static NetworkMessage Generate(string typeParameter, bool fromServer = false, string prefix = null) {
+            return Instance.InstanceRawGenerate(fromServer, "AUTHSERV", prefix, typeParameter);
+        }
+    }
 }
