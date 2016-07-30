@@ -65,6 +65,7 @@ namespace Rabscuttle.core {
             var s = input.ReadLine();
             try {
                 var msg = new NetworkMessage(s, true);
+                Debug.WriteLine("Client>{0}{1}{2}{3}", " :" + msg.prefix, " " + msg.type, " " + msg.typeParams, " :" + msg.message);
                 return msg;
             } catch (ArgumentException e) {
                 Debug.WriteLine(e);
@@ -87,6 +88,7 @@ namespace Rabscuttle.core {
         /// <summary> Sends the network message and flushes the socket. </summary>
         /// <param name="message">Pre-assembled network message</param>
         public void Send(NetworkMessage message) {
+            Debug.WriteLine("Client>{0}{1}{2}{3}", " :" + message.prefix, " " + message.type, " " + message.typeParams, " :" + message.message);
             output.Write(message.BuildMessage());
             output.Flush();
         }

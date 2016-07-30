@@ -153,6 +153,7 @@ namespace Rabscuttle.core {
                 case ReplyCode.RPL_NAMREPLY:
                 case ReplyCode.RPL_NAMREPLY_:
                 case ReplyCode.RPL_WHOREPLY:
+                case ReplyCode.RPL_WHOISACCOUNT:
                     channelHandler.HandleReply(message);
                     break;
             }

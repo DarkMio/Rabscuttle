@@ -21,6 +21,14 @@ namespace ExamplePlugin {
             get { return "ExamplePlugin"; }
         }
 
+        /// <summary> Gets or sets the back reference. </summary>
+        /// <value> The back reference is a the plugin handler reference, to search for other plugins, for example. </value>
+        public PluginHandler BackReference { get; set; }
+
+        /// <summary> Gets the command layer. </summary>
+        /// <value> The command layer represents the order of which are plugins invoked. Number has not be unique, but reserve the first 25 layer for system operations. </value>
+        public uint CommandLayer => 50;
+
         /// <summary> Gets or sets the rank. </summary>
         /// <value> The rank is the least amount of channel rights he has to have, otherwise the command execute will be ignored. </value>
         public MemberCode Rank { get { return MemberCode.VOICED; } }
@@ -39,15 +47,14 @@ namespace ExamplePlugin {
 
         /// <summary> Called when a notice message was received by the bot. </summary>
         /// <param name="message">The network message received.</param>
-        public NetworkMessage OnNotice(CommandMessage message) {
+        public void OnNotice(CommandMessage message) {
             Console.WriteLine($"Hello, I'm {CommandName}.");
-            return null;
         }
 
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
-        public NetworkMessage OnPrivMsg(CommandMessage message) {
-            return RawPrivMsg.Generate(message.origin, $"Hello {message.user.userName}, this is the example plugin.");
+        public void OnPrivMsg(CommandMessage message) {
+            Sender.Send(RawPrivMsg.Generate(message.origin, $"Hello {message.user.userName}, this is the example plugin."));
         }
 
         /// <summary> Let the plugin subscribe to any of these Handlers - totally optional. </summary>

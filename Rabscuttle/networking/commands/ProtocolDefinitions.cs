@@ -61,10 +61,10 @@
         VOICED = 0x1,                // + voiced; RFC1459
         HALF_OPERATOR = 0x1 << 1,    // % half operator; hybrid
         OPERATOR = 0x1 << 2,         // @ operator; RFC1459
-        CREATOR = 0x4 << 3,          // @ creator; RFC2811
-        SERVICE = 0x5 << 4,          // ! service; KineIRCd
-        FOUNDER = 0x6 << 5,          // . founder; tr-ircd
-        BOTOPERATOR = 0x7 << 6,      // bot operator always has maximum rights
+        CREATOR = 0x1 << 3,          // @ creator; RFC2811
+        SERVICE = 0x1 << 4,          // ! service; KineIRCd
+        FOUNDER = 0x1 << 5,          // . founder; tr-ircd
+        BOTOPERATOR = 0x1 << 6,      // bot operator always has maximum rights
     }
 
     // taken from: https://raw.githubusercontent.com/ircdocs/irc-defs/gh-pages/_data/numerics.yaml

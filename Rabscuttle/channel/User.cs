@@ -3,17 +3,24 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Rabscuttle.core.commands;
+using Rabscuttle.core.io;
 
 namespace Rabscuttle.core.channel {
     public class ChannelUser {
         public string userName;
-        public bool loggedIn;
+        // public bool loggedIn;
         public string ident;
         public string name;
         public string host;
         public string realname;
         public string server;
         public int hops;
+
+        public enum LoginStatus {Default, LoggedOut, LoggedIn }
+
+        public LoginStatus loggedIn;
+        public string loginUserName; // This is maybe short thought - maybe needs an instance of User
 
 
         public string source {
@@ -41,6 +48,14 @@ namespace Rabscuttle.core.channel {
             } else {
                 userName = userRegex.Match(identOrUser).Value;
             }
+        }
+
+        public void ParseLoginMessage(NetworkMessage message) {
+            if ((ReplyCode) message.typeEnum != ReplyCode.RPL_WHOISACCOUNT) {
+                return;
+            }
+
+
         }
 
         public void SetUserdata(string dataString=null, string realname = null) {
@@ -89,7 +104,7 @@ namespace Rabscuttle.core.channel {
         }
 
         public override string ToString() {
-            return "USER  > UN: [ " + userName + " ] | I: [ " + ident + " ] | H: [ " + host + " ];";
+            return "USER  > UN: [ " + userName + " ] | I: [ " + ident + " ] | H: [ " + host + " ] | L: [ " + loggedIn + " ];";
         }
 
         protected bool Equals(ChannelUser other) {

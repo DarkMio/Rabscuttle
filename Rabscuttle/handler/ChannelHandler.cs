@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using Rabscuttle.channel;
 using Rabscuttle.core.channel;
 using Rabscuttle.core.commands;
@@ -59,6 +60,27 @@ namespace Rabscuttle.core.handler {
             return channel;
         }
 
+        public async Task<bool> IsLoggedIn(string userName) {
+            var user = FindUser(userName);
+            if (user == null) {
+                Logger.WriteWarn("Channel Handler", "Searched login-status for unknown user: {0}", userName);
+                return false;
+            }
+
+            if (user.loggedIn != ChannelUser.LoginStatus.Default) {
+                return user.loggedIn == ChannelUser.LoginStatus.LoggedIn;
+            }
+
+            connection.Send(RawWhois.Generate(userName));
+            var receiver = connection as ConnectionManager;
+            if (receiver == null) {
+                return false;
+            }
+
+            receiver.ReceiveUntil(ReplyCode.RPL_ENDOFWHOIS);
+            return user.loggedIn == ChannelUser.LoginStatus.LoggedIn;
+        }
+
         public override void HandleCommand(NetworkMessage message) {
             switch ((CommandCode) message.typeEnum) {
                 case CommandCode.JOIN:
@@ -94,8 +116,9 @@ namespace Rabscuttle.core.handler {
                 case ReplyCode.RPL_WHOREPLY:
                     HandleWhoReply(message);
                     break;
-
-
+                case ReplyCode.RPL_WHOISACCOUNT:
+                    HandleWhoIsAccount(message);
+                    break;
             }
         }
 
@@ -166,24 +189,7 @@ namespace Rabscuttle.core.handler {
         }
 
         private void HandlePrivMsg(NetworkMessage message) {
-            if (message.message.StartsWith(">DUMPCHANS")) {
-                foreach (Channel channel in channels) {
-                    Debug.WriteLine(channel);
-                }
-            } else if (message.message.StartsWith(">RAW ")) {
-                connection.Send(new NetworkMessage(message.message.Replace(">RAW ", ""), false));
-            } else if (message.message.StartsWith(">DUMPUSRS")) {
-                foreach (ChannelUser user in users) {
-                    Debug.WriteLine(user);
-                }
-            } else if (message.message.StartsWith(">FINDUSR ")) {
-                var x = message.message.Split(new char[] {' '});
 
-                if(x.Length > 1)
-                    connection.Send(RawPrivMsg.Generate(message.typeParams, "Result: " + FindUser(x[1])));
-            } else if (message.message.StartsWith("fuck sql")) {
-                connection.Send(RawPrivMsg.Generate(message.typeParams, "+fuck SQL"));
-            }
         }
 
         private void HandleNick(NetworkMessage message) {
@@ -260,10 +266,14 @@ namespace Rabscuttle.core.handler {
             }
 
             Channel channel = FindChannel(channelName);
+            string[] operators = ConfigurationProvider.Get("operators").Split(new []{", "}, StringSplitOptions.None);
             foreach (var username in usernames) {
                 ChannelUser user = FindOrCreateUser(username, true);
                 channel.AddUser(user, ParseModePermission(username[0]));
                 channel.AddRank(user, ParseModePermission(username[0]));
+                if (operators.SingleOrDefault(s => s == user.userName) != null) {
+                    IsLoggedIn(user.userName);
+                }
             }
 
             connection.Send(RawWho.Generate(channelName));
@@ -277,6 +287,19 @@ namespace Rabscuttle.core.handler {
             foreach (char c in data.modes) {
                 channel.AddRank(user, ParseModePermission(c));
             }
+        }
+
+        private void HandleWhoIsAccount(NetworkMessage message) {
+            string[] parameters = message.typeParams.Split(' ');
+            if (parameters.Length < 3) {
+                Logger.WriteWarn("Channel Handler",
+                    "Misaligned RPL_WHOISACCOUNT message: Not enough type parameters. Message: {0}", message);
+                return;
+            }
+
+            var user = FindUser(parameters[1]);
+            user.loggedIn = ChannelUser.LoginStatus.LoggedIn;
+            user.loginUserName = parameters[2];
         }
     }
 }

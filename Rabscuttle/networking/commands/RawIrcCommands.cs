@@ -129,4 +129,14 @@ namespace Rabscuttle.core.commands {
             return Instance.InstanceRawGenerate(fromServer, "AUTHSERV", prefix, typeParameter);
         }
     }
+
+    public class RawWhois : RawCommand<RawWhois> {
+        public override CommandCode type => CommandCode.WHOIS;
+        public override bool hasTypeParameter => false;
+        public override bool hasMessage => false;
+
+        public static NetworkMessage Generate(string message, bool fromServer = false, string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix, null, message);
+        }
+    }
 }

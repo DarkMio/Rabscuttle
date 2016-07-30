@@ -17,6 +17,10 @@ namespace FuckPlugin {
         /// <value> The name of the command should be short and descriptive, usually a single word. </value>
         public string CommandName => "fuck";
 
+        /// <summary> Gets or sets the back reference. </summary>
+        /// <value> The back reference is a the plugin handler reference, to search for other plugins, for example. </value>
+        public PluginHandler BackReference { get; set; }
+
         /// <summary> Gets or sets the rank. </summary>
         /// <value> The rank is the least amount of channel rights he has to have, otherwise the command execute will be ignored. </value>
         public MemberCode Rank => MemberCode.DEFAULT;
@@ -73,22 +77,21 @@ namespace FuckPlugin {
 
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
-        public NetworkMessage OnPrivMsg(CommandMessage message) {
+        public void OnPrivMsg(CommandMessage message) {
             if (String.IsNullOrEmpty(message.parameters)) {
-                return null;
+                return;
             }
             var split = message.parameters.Split(new [] {' '}, 2)[0];
 
             var f = message.user.userName;
             var name = split;
             int num = new Random().Next(0, phrases.Length);
-            return RawPrivMsg.Generate(message.origin, String.Format(phrases[num], name, f));
+            Sender.Send(RawPrivMsg.Generate(message.origin, String.Format(phrases[num], name, f)));
         }
 
         /// <summary> Called when a notice message was received by the bot. </summary>
         /// <param name="message">The network message received.</param>
-        public NetworkMessage OnNotice(CommandMessage message) {
-            return null;
+        public void OnNotice(CommandMessage message) {
         }
     }
 }

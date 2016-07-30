@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using PluginContract;
 using Rabscuttle.channel;
 using Rabscuttle.core.channel;
@@ -15,18 +16,15 @@ using Rabscuttle.stuff;
 
 namespace Rabscuttle.core.handler {
     public class PluginHandler : ObservableHandler {
-
         [ImportMany(typeof(IPluginContract), AllowRecomposition = true)]
         private IPluginContract[] plugins = null;
-
         private readonly ISender _sender;
         private readonly DirectoryCatalog _catalog;
         private CompositionContainer _container;
         private readonly string prefix = ">";
-
-
         private readonly ChannelHandler _channelHandler;
         private readonly string path;
+        private readonly string[] operators;
 
         public PluginHandler(ISender sender, ChannelHandler channelHandler, string pathToPlugins = "./../Plugins/") {
             this._sender = sender;
@@ -34,11 +32,17 @@ namespace Rabscuttle.core.handler {
             _catalog = new DirectoryCatalog(pathToPlugins);
 
             _channelHandler = channelHandler;
+
+            var opList = ConfigurationProvider.Get("operators").Split(',');
+            for (int index = 0; index < opList.Length; index++) {
+                opList[index] = opList[index].Trim();
+            }
+            operators = opList;
+
             LoadPlugins();
         }
 
         public void LoadPlugins() {
-
             _container = new CompositionContainer(_catalog);
             //plugins = _container.GetExportedValues<IPluginContract>();
             _container.ComposeParts(this);
@@ -49,7 +53,6 @@ namespace Rabscuttle.core.handler {
                 plugin.MessagePrefix = prefix;
                 Logger.WriteDebug("Plugin Handler", "Loaded {0}", plugin.CommandName);
             }
-
         }
 
 
@@ -84,17 +87,15 @@ namespace Rabscuttle.core.handler {
         public void HandleCommand(CommandMessage message, MemberCode rank) {
             // Debug.WriteLine("PLUGIN> Received:" + message);
             // CommandMessage cmm = PrepareCommand(message);
-
             foreach (IPluginContract plugin in plugins) {
-                if (plugin.CommandName != message.command || plugin.Rank > rank) {
+                if (plugin.Rank == MemberCode.BOTOPERATOR && CheckForBotoperator(message.user)) {
+
+                } else if (plugin.CommandName != message.command || plugin.Rank > rank) {
                     continue;
                 }
+
                 Logger.WriteDebug("Plugin Handler", "Handling message: {0}", message.message);
-                NetworkMessage nm = plugin.OnPrivMsg(message);
-                if (nm == null) {
-                    continue;
-                }
-                _sender.Send(nm);
+                plugin.OnPrivMsg(message);
             }
         }
 
@@ -103,18 +104,27 @@ namespace Rabscuttle.core.handler {
                 return;
             }
 
+            if (SortOutMessage(message, relation)) {
+                return;
+            }
+
+
             Debug.WriteLine("PLUGIN> Received:" + message);
             CommandMessage cmm = PrepareCommand(message);
 
             foreach (IPluginContract plugin in plugins) {
+                if (CheckForBotoperator(relation.user)) {
+                    plugin.OnPrivMsg(cmm);
+                    continue;
+                }
+                if (CheckForBotoperator(relation.user)) {
+                    plugin.OnPrivMsg(cmm);
+                    continue;
+                }
                 if (plugin.CommandName != cmm.command || plugin.Rank > relation.permission) {
                     continue;
                 }
-                NetworkMessage nm = plugin.OnPrivMsg(cmm);
-                if (nm == null) {
-                    continue;
-                }
-                _sender.Send(nm);
+                plugin.OnPrivMsg(cmm);
             }
         }
 
@@ -122,7 +132,27 @@ namespace Rabscuttle.core.handler {
             throw new System.NotImplementedException();
         }
 
-        public CommandMessage PrepareCommand(NetworkMessage message) {
+        public IPluginContract FindPlugin(string name) {
+            return plugins.SingleOrDefault(s => s.CommandName == name);
+        }
+
+        private bool CheckForBotoperator(ChannelUser user) {
+            if (operators.Any(s => s.Trim() == user.userName)) {
+                Task<bool> task = _channelHandler.IsLoggedIn(user.userName);
+                Logger.WriteInfo("Plugin Handler", "Searching for bot operator rights on {0}", user.userName);
+                task.Wait();
+                Logger.WriteDebug("Plugin Handler", "Operator Rights are: {0}", task.Result);
+                return task.Result;
+            }
+            return false;
+        }
+
+        private bool SortOutMessage(NetworkMessage message, UserRelation relation) {
+            //@TODO: Once I've come around to write the ban plugin, this will be checking for it
+            return false;
+        }
+
+        private CommandMessage PrepareCommand(NetworkMessage message) {
             string[] split = message.message.Split(new[] {' '}, 2);
             string args = "";
             string command = split[0].Substring(prefix.Length);
