@@ -71,7 +71,7 @@ namespace Rabscuttle.core.handler {
                 return;
             }
 
-            UserRelation relation = chan.users.SingleOrDefault(s => s.user == cmsg.user);
+            UserRelation relation = chan.users.SingleOrDefault(s => s.user.userName == cmsg.user.userName);
             if (relation == null) {
                 Logger.WriteWarn("Plugin Handler", "No viable user found.");
                 HandleCommand(cmsg, MemberCode.DEFAULT);

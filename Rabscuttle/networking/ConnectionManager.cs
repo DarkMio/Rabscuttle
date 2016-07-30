@@ -140,7 +140,7 @@ namespace Rabscuttle.core {
                     HandleCommand(message);
                 }
             } catch (Exception e) {
-                Logger.WriteError("Connection Manager", "Exception: {0}", e);
+                Logger.WriteError("Connection Manager", "Exception catched, thrown by handlers: {0}", e);
             }
         }
 

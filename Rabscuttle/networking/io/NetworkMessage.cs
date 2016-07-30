@@ -106,7 +106,7 @@ namespace Rabscuttle.core.io {
             } else if (Enum.IsDefined(typeof(CommandCode), type)) {
                 typeEnum = (CommandCode) Enum.Parse(typeof(CommandCode), type, true);
             } else {
-                Logger.WriteWarn("Unrecorgnized method: [ {0} ] in: [ {1} ]", type, raw);
+                Logger.WriteWarn("NetworkMessage", "Unrecorgnized method: [ {0} ] in: [ {1} ]", type, raw);
             }
         }
 
