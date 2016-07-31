@@ -1,4 +1,4 @@
-﻿namespace Rabscuttle.core.commands {
+﻿namespace Rabscuttle.networking.commands {
 
     public enum CommandCode {
         ADMIN,
@@ -434,7 +434,7 @@
         RPL_HELPSTART = 704, // Start of HELP command output
         RPL_HELPTXT = 705, // Output from HELP command
         RPL_ENDOFHELP = 706, // End of HELP command output
-        ERR_TARGCHANGE = 707, // See doc/tgchange.txt in the charybdis source.
+        ERR_TARGCHANGE = 707, // See doc/tgchange.txt in the charybdis Source.
         RPL_ETRACEFULL = 708, // Output from 'extended' trace
         RPL_ETRACE = 709, // Output from 'extended' trace
         RPL_KNOCK = 710, // Message delivered using KNOCK command
@@ -465,7 +465,7 @@
         RPL_ENDOFRSACHALLENGE2 = 741, // From the ratbox m_challenge module, to auth opers.
         ERR_MLOCKRESTRICTED = 742, //
         ERR_INVALIDBAN = 743, //
-        ERR_TOPICLOCK = 744, // Defined in the Charybdis source code with the comment <code>/* inspircd */</code>
+        ERR_TOPICLOCK = 744, // Defined in the Charybdis Source code with the comment <code>/* inspircd */</code>
         RPL_SCANMATCHED = 750, // From the ratbox m_scan module.
         RPL_SCANUMODES = 751, // From the ratbox m_scan module.
         RPL_WHOISKEYVALUE = 760, // Reply to WHOIS - Metadata key/value associated with the target

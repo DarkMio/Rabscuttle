@@ -1,23 +1,18 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using NUnit.Framework.Internal;
-using PluginContract;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.handler;
-using Rabscuttle.core.io;
+using Rabscuttle.handler;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 using Logger = Rabscuttle.stuff.Logger;
 
-namespace Rabscuttle.core {
+namespace Rabscuttle.networking {
     /// <summary>
     /// Main connection class. It's main task is to send and receive.
     /// Every to-be sent message and every received message gets filtered and dispatched into the public seend handlers.
     /// Each process and plugin can subscribe to these handlers and listen to the same messages.
     /// </summary>
-    public class ConnectionManager : ISender, IReceiver {
-        private readonly BotClient client;
-        private readonly CommandSchedule scheduler;
+    public class ConnectionManager : ISender, IReceiver, IDisposable {
+        private readonly BotClient _client;
+        private readonly CommandSchedule _scheduler;
 
         /// <summary>
         /// The channel handler processes all channel-related messages, like JOIN, PART, MODE and so on.
@@ -33,8 +28,8 @@ namespace Rabscuttle.core {
         /// <param name="host">Hostname, may be a domain or IP as string</param>
         /// <param name="port">Server port, standard is 6667</param>
         public ConnectionManager(string host, int port = 6667) {
-            client = new BotClient(host, port);
-            scheduler = new CommandSchedule(client);
+            _client = new BotClient(host, port);
+            _scheduler = new CommandSchedule(_client);
             channelHandler = new ChannelHandler(this);
             pluginHandler = new PluginHandler(this, channelHandler);
             Connect();
@@ -53,12 +48,12 @@ namespace Rabscuttle.core {
 
         /// <summary>
         /// Sends a properly aligned plaintext message to the endpoint, alignment looks like:
-        /// <c>:source* type typeParam* :message*</c>
+        /// <c>:Source* Type typeParam* :message*</c>
         /// </summary>
         /// <param name="message">Message contents, which are usually at the end of a string.</param>
-        /// <param name="prefix">The source prefix, client to server messages can have this missing.</param>
-        /// <param name="type">Message type, usually a <c>CommandCode</c> when sending from client to server.</param>
-        /// <param name="typeParams">Optional, additional parameter for a message type.</param>
+        /// <param name="prefix">The Source prefix, _client to server messages can have this missing.</param>
+        /// <param name="type">Message Type, usually a <c>CommandCode</c> when sending from _client to server.</param>
+        /// <param name="typeParams">Optional, additional parameter for a message Type.</param>
         public void Send(string message, string prefix, string type, string typeParams) {
             Send(new NetworkMessage(prefix, type, typeParams, message, false));
         }
@@ -69,18 +64,19 @@ namespace Rabscuttle.core {
         /// <param name="message">Any instance of NetworkMessage.</param>
         public void Send(NetworkMessage message) {
             Handle(message);
-            scheduler.Add(message);
+            _scheduler.Add(message);
         }
 
         /// <summary>
         /// Receives a message instantaneously unless <paramref name="waitResponse"/> is set to <c>true</c>.
+        /// </summary>
         /// <param name="waitResponse">if set to <c>true</c> method waits until there is a message to receive.</param>
         /// <returns>
         ///     Most recent NetworkMessage if there is any data, or <c>null</c> if <paramref name="waitResponse" /> is
         ///     <c>false</c>.
         /// </returns>
         public NetworkMessage Receive(bool waitResponse = false) {
-            var msg = client.Receive(waitResponse);
+            var msg = _client.Receive(waitResponse);
             if (msg != null) {
                 Handle(msg);
             }
@@ -88,10 +84,10 @@ namespace Rabscuttle.core {
         }
 
         /// <summary>
-        /// Receives messages until a certain message type is found.
+        /// Receives messages until a certain message Type is found.
         /// This will, if poorly used, stay stuck since it's waiting for certain messages.
-        /// Receives a message instantaneously unless <paramref name="waitResponse"/> is set to <c>true</c>.
-        /// <param name="waitResponse">if set to <c>true</c> method waits until there is a message to receive.</param>
+        /// Receives a message instantaneously.
+        /// </summary>
         /// <returns>
         ///     The most recent NetworkMessage with any or the types awaiting.
         /// </returns>
@@ -108,7 +104,7 @@ namespace Rabscuttle.core {
 
         /// <summary>
         ///     Disposes all incoming messages until the most recent message is reached.
-        ///     This is useful if there are multiple messages sent by the server in between of the client receiving frames.
+        ///     This is useful if there are multiple messages sent by the server in between of the _client receiving frames.
         /// </summary>
         /// <param name="waitResponse">if set to <c>true</c> method waits until there is a message to receive.</param>
         /// <returns>
@@ -184,6 +180,20 @@ namespace Rabscuttle.core {
                 default:
                     return;
             }
+        }
+
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            if (!disposing) {
+                return;
+            }
+            _client?.Dispose();
+            pluginHandler?.Dispose();
         }
     }
 }

@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using Rabscuttle.core.io;
+using Rabscuttle.networking.io;
 
-namespace Rabscuttle.core.commands {
+namespace Rabscuttle.networking.commands {
     public abstract class IrcReply {
-        public abstract ReplyCode type { get; }
-        public abstract bool hasTypeParameter { get; }
-        public abstract bool hasMessage { get; }
+        public abstract ReplyCode Type { get; }
+        public abstract bool HasTypeParameter { get; }
+        public abstract bool HasMessage { get; }
     }
 
     public class WhoReply : IrcReply {
-        public override ReplyCode type => ReplyCode.RPL_WHOREPLY;
-        public override bool hasTypeParameter => true;
-        public override bool hasMessage => false;
+        public override ReplyCode Type => ReplyCode.RPL_WHOREPLY;
+        public override bool HasTypeParameter => true;
+        public override bool HasMessage => false;
 
         public string channel;
         public string ident;
@@ -25,7 +25,7 @@ namespace Rabscuttle.core.commands {
         public int hops;
         public string realname;
 
-        private static Regex s = new Regex(@"^([H|G])([*@%+.!]+)?.*$", RegexOptions.None);
+        private static readonly Regex MODES_REGEX = new Regex(@"^([H|G])([*@%+.!]+)?.*$", RegexOptions.None);
 
         public WhoReply(NetworkMessage message) {
             var parameter = message.typeParams.Split(new char[] {' '});
@@ -40,7 +40,7 @@ namespace Rabscuttle.core.commands {
             server = parameter[4];
             username = parameter[5];
 
-            var matches = s.Matches(parameter[6]);
+            var matches = MODES_REGEX.Matches(parameter[6]);
             var options = matches[0].Groups;
             gone = String.Equals(options[1].Value, "h", StringComparison.CurrentCultureIgnoreCase);
             modes = options[2].Value;

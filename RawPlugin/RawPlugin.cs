@@ -4,10 +4,10 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PluginContract;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.handler;
-using Rabscuttle.core.io;
+using Rabscuttle.handler;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
+using Rabscuttle.plugins;
 
 namespace RawPlugin {
     [Export(typeof(IPluginContract))]

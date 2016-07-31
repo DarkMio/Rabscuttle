@@ -4,10 +4,10 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PluginContract;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.handler;
-using Rabscuttle.core.io;
+using Rabscuttle.handler;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
+using Rabscuttle.plugins;
 
 namespace CommandsPlugin {
     [Export(typeof(IPluginContract))]
@@ -55,7 +55,8 @@ namespace CommandsPlugin {
                 }
             }
             commands = commands.Substring(0, commands.Length - 2);
-            Sender.Send(RawNotice.Generate(message.user.userName, String.Format("Following commands are available for you: {0}", commands)));
+            Sender.Send(RawNotice.Generate(message.user.userName,
+                $"Following commands are available for you: {commands}"));
         }
 
         /// <summary> Called when a notice message was received by the bot. </summary>

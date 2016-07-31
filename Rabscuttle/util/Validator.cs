@@ -2,10 +2,10 @@
 
 namespace Rabscuttle.util {
     public class Validator {
-        private static Regex channelRegex = new Regex(@"^\#[\w-]*$", RegexOptions.None);
+        private static readonly Regex CHANNEL_REGEX = new Regex(@"^\#[\w-]*$", RegexOptions.None);
 
         public static bool IsValidChannelName(string channel) {
-            return channelRegex.IsMatch(channel);
+            return CHANNEL_REGEX.IsMatch(channel);
         }
     }
 }

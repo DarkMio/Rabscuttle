@@ -6,10 +6,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using PluginContract;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.handler;
-using Rabscuttle.core.io;
+using Rabscuttle.handler;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
+using Rabscuttle.plugins;
 
 namespace ExamplePlugin {
     [Export(typeof(IPluginContract))]
@@ -17,9 +17,7 @@ namespace ExamplePlugin {
 
         /// <summary> Gets or sets the name of the command. </summary>
         /// <value> The name of the command should be short and descriptive, usually a single word. </value>
-        public string CommandName {
-            get { return "ExamplePlugin"; }
-        }
+        public string CommandName => "ExamplePlugin";
 
         /// <summary> Gets or sets the back reference. </summary>
         /// <value> The back reference is a the plugin handler reference, to search for other plugins, for example. </value>
@@ -31,7 +29,7 @@ namespace ExamplePlugin {
 
         /// <summary> Gets or sets the rank. </summary>
         /// <value> The rank is the least amount of channel rights he has to have, otherwise the command execute will be ignored. </value>
-        public MemberCode Rank { get { return MemberCode.VOICED; } }
+        public MemberCode Rank => MemberCode.VOICED;
 
         /// <summary> Gets or sets the message prefix, which will be given by the bot. </summary>
         /// <value> The prefix is the kind of message prefix the bot usually listens to. </value>
@@ -39,7 +37,7 @@ namespace ExamplePlugin {
 
         /// <summary> Get or sets the help file, which the bot will use on request. </summary>
         /// <value> A helpfile, describing the plugins function, which might be sent by the bot on request. </value>
-        public string HelpFile { get { return CommandName + " has no help file."; } }
+        public string HelpFile => CommandName + " has no help file.";
 
         /// <summary> Gets or sets the sender, which will be given by the bot. </summary>
         /// <value> A sender, which the plugin can send NetworkMessage to. </value>

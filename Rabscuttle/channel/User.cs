@@ -1,12 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.io;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 
-namespace Rabscuttle.core.channel {
+namespace Rabscuttle.channel {
     public class ChannelUser {
         public string userName;
         // public bool loggedIn;
@@ -17,13 +15,13 @@ namespace Rabscuttle.core.channel {
         public string server;
         public int hops;
 
-        public enum LoginStatus {Default, LoggedOut, LoggedIn }
+        public enum LoginStatus {DEFAULT, LOGGED_OUT, LOGGED_IN }
 
         public LoginStatus loggedIn;
         public string loginUserName; // This is maybe short thought - maybe needs an instance of User
 
 
-        public string source {
+        public string Source {
             get {
                 if (userName != null && ident != null && host != null) {
                     return userName + "!" + ident + "@" + host;
@@ -32,8 +30,8 @@ namespace Rabscuttle.core.channel {
             }
         }
 
-        private static Regex identRegex = new Regex(@"(?<user>[^@!\ ]*)(?:(?:\!(?<ident>[^@]*))?@(?<host>[^\ ]*))?", RegexOptions.Compiled);
-        private static Regex userRegex = new Regex(@"([^+%@! ]+)", RegexOptions.Compiled);
+        private static readonly Regex IDENT_REGEX = new Regex(@"(?<user>[^@!\ ]*)(?:(?:\!(?<ident>[^@]*))?@(?<host>[^\ ]*))?", RegexOptions.Compiled);
+        private static readonly Regex USER_REGEX = new Regex(@"([^+%@! ]+)", RegexOptions.Compiled);
 
         /*
         public ChannelUser(string userName, bool loggedIn) {
@@ -46,7 +44,7 @@ namespace Rabscuttle.core.channel {
             if (!isUserName) {
                 SetUserdata(identOrUser);
             } else {
-                userName = userRegex.Match(identOrUser).Value;
+                userName = USER_REGEX.Match(identOrUser).Value;
             }
         }
 
@@ -61,7 +59,7 @@ namespace Rabscuttle.core.channel {
         public void SetUserdata(string dataString=null, string realname = null) {
             if (dataString != null) {
                 if (ident == null) {
-                    var results = identRegex.Matches(dataString)[0].Groups;
+                    var results = IDENT_REGEX.Matches(dataString)[0].Groups;
                     userName = results["user"].Value;
                     ident = results["ident"].Value;
                     host = results["host"].Value;
@@ -114,13 +112,13 @@ namespace Rabscuttle.core.channel {
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((ChannelUser) obj);
         }
 
         public override int GetHashCode() {
             unchecked {
-                return (userName != null ? userName.GetHashCode() : 0);
+                return userName?.GetHashCode() ?? 0;
             }
         }
 
@@ -135,15 +133,11 @@ namespace Rabscuttle.core.channel {
 
             public int GetHashCode(ChannelUser obj) {
                 unchecked {
-                    return (obj.userName != null ? obj.userName.GetHashCode() : 0);
+                    return obj.userName?.GetHashCode() ?? 0;
                 }
             }
         }
 
-        private static readonly IEqualityComparer<ChannelUser> ChannelUserComparerInstance = new ChannelUserEqualityComparer();
-
-        public static IEqualityComparer<ChannelUser> ChannelUserComparer {
-            get { return ChannelUserComparerInstance; }
-        }
+        public static IEqualityComparer<ChannelUser> ChannelUserComparer { get; } = new ChannelUserEqualityComparer();
     }
 }

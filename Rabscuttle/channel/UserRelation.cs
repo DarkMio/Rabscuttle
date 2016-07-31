@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Rabscuttle.core.channel;
-using Rabscuttle.core.commands;
+using Rabscuttle.networking.commands;
 
-namespace Rabscuttle.core.channel {
+namespace Rabscuttle.channel {
     public class UserRelation {
         public readonly ChannelUser user;
         public MemberCode permission;
@@ -40,27 +39,23 @@ namespace Rabscuttle.core.channel {
 
         public int GetHashCode(UserRelation obj) {
                 unchecked {
-                    return (obj.user != null ? obj.user.GetHashCode() : 0) * 397;
+                    return (obj.user?.GetHashCode() ?? 0) * 397;
                 }
             }
         }
 
-        private static readonly IEqualityComparer<UserRelation> UserPermissionComparerInstance = new UserPermissionEqualityComparer();
-
-        public static IEqualityComparer<UserRelation> UserPermissionComparer {
-            get { return UserPermissionComparerInstance; }
-        }
+        public static IEqualityComparer<UserRelation> UserPermissionComparer { get; } = new UserPermissionEqualityComparer();
 
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((UserRelation) obj);
         }
 
         public override int GetHashCode() {
             unchecked {
-                return (user != null ? user.GetHashCode() : 0) * 397;
+                return (user?.GetHashCode() ?? 0) * 397;
             }
         }
     }

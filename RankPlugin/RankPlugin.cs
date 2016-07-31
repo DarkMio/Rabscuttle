@@ -4,10 +4,10 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PluginContract;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.handler;
-using Rabscuttle.core.io;
+using Rabscuttle.handler;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
+using Rabscuttle.plugins;
 
 namespace RankPlugin {
     [Export(typeof(IPluginContract))]
@@ -45,7 +45,7 @@ namespace RankPlugin {
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
         public void OnPrivMsg(CommandMessage message) {
-            Sender.Send(RawNotice.Generate(message.user.userName, String.Format("You are {0}", message.permission)));
+            Sender.Send(RawNotice.Generate(message.user.userName, $"You are {message.permission}"));
         }
 
         /// <summary> Called when a notice message was received by the bot. </summary>

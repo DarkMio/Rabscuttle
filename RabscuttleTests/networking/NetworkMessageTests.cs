@@ -1,15 +1,8 @@
 ﻿using NUnit.Framework;
-using Rabscuttle.core;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.io;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 
-namespace Rabscuttle.core.Tests {
+namespace RabscuttleTests.networking {
     [TestFixture()]
     public class NetworkMessageTests {
 

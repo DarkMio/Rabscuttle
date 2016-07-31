@@ -1,24 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Rabscuttle.core.io;
+using Rabscuttle.networking.io;
 
-namespace Rabscuttle.core {
+namespace Rabscuttle.networking {
     /// <summary>
     /// Handles message sending based on timing. Currently sends every 1.5s, but will get burst-sendings.
     /// </summary>
     public class CommandSchedule {
-        private Queue<NetworkMessage> queue;
-        private ISender client;
-        private Task currentTask;
+        private readonly Queue<NetworkMessage> _queue;
+        private readonly ISender _client;
+        private Task _currentTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandSchedule"/> class and initiliazes a new instance of Stack.
         /// </summary>
         /// <param name="client">Any kind of sender, hopefully connected to any endpoint.</param>
         public CommandSchedule(ISender client){
-            queue = new Queue<NetworkMessage>();
-            this.client = client;
+            _queue = new Queue<NetworkMessage>();
+            _client = client;
         }
 
         /// <summary>
@@ -26,9 +26,9 @@ namespace Rabscuttle.core {
         /// </summary>
         /// <param name="item">Any <see cref="NetworkMessage"/> to be sent.</param>
         public void Add(NetworkMessage item) {
-            queue.Enqueue(item);
-            if (currentTask == null || currentTask.IsCompleted) {
-                currentTask = Send();
+            _queue.Enqueue(item);
+            if (_currentTask == null || _currentTask.IsCompleted) {
+                _currentTask = Send();
             }
         }
 
@@ -38,8 +38,8 @@ namespace Rabscuttle.core {
         /// </summary>
         /// <returns>A receivable task, used to identify if the current sending-task is done or not.</returns>
         async Task Send() {
-            while (queue.Count > 0) {
-                client.Send(queue.Dequeue());
+            while (_queue.Count > 0) {
+                _client.Send(_queue.Dequeue());
                 Thread.Sleep(1500); // this needs a strategy at some point.
             }
         }

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
-using Rabscuttle.core;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.io;
+using Rabscuttle.networking;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 using Rabscuttle.stuff;
 using Rabscuttle.util;
 
 namespace Rabscuttle {
-    public class Rabscuttle {
-        private readonly ConnectionManager cmngr;
+    public class Rabscuttle : IDisposable {
+        private readonly ConnectionManager _connectionManager;
 
 
         public static void Main(string[] args) {
@@ -24,7 +24,6 @@ namespace Rabscuttle {
             string network = ConfigurationProvider.Get("network");
             string port = ConfigurationProvider.Get("port");
             if (String.IsNullOrEmpty(network)) {
-                Logger.WriteFatal("NETWORK>", network);
                 Logger.WriteFatal("Rabscuttle", "No network in configuration, please consult Rabscuttle.exe.config");
                 throw new ArgumentException("No network in configuration, please consult Rabscuttle.exe.config");
             }
@@ -35,7 +34,7 @@ namespace Rabscuttle {
                 portNr = 6667;
             }
 
-            cmngr = new ConnectionManager(network, portNr);
+            _connectionManager = new ConnectionManager(network, portNr);
             Logger.WriteInfo("Rabscuttle", "Connection ready.");
         }
 
@@ -43,7 +42,7 @@ namespace Rabscuttle {
             BootCommands();
             Join();
             while (true) {
-                cmngr.ReceiveUntil(CommandCode.PING);
+                _connectionManager.ReceiveUntil(CommandCode.PING);
             }
         }
 
@@ -56,7 +55,7 @@ namespace Rabscuttle {
                     continue;
                 }
                 NetworkMessage nmsg = new NetworkMessage(rawCommand, false);
-                cmngr.Send(nmsg);
+                _connectionManager.Send(nmsg);
             }
         }
 
@@ -66,11 +65,24 @@ namespace Rabscuttle {
             foreach (string channel in channels) {
                 string qualifier = channel.Trim();
                 if (Validator.IsValidChannelName(qualifier)) {
-                    cmngr.Send(RawJoin.Generate(qualifier));
+                    _connectionManager.Send(RawJoin.Generate(qualifier));
                 } else {
                     Logger.WriteWarn("Rabscuttle", "Channel in configuration does not appear to be valid: {0}", qualifier);
                 }
             }
+        }
+
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposable) {
+            if (!disposable) {
+                return;
+            }
+            _connectionManager?.Dispose();
         }
     }
 }

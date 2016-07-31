@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.handler;
-using Rabscuttle.core.io;
+﻿using Rabscuttle.handler;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 
-namespace PluginContract {
+namespace Rabscuttle.plugins {
     public interface IPluginContract {
         /// <summary> Gets or sets the name of the command. </summary>
         /// <value> The name of the command should be short and descriptive, usually a single word. </value>

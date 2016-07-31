@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using Rabscuttle.channel;
-using Rabscuttle.core.channel;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.io;
+using Rabscuttle.networking;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 using Rabscuttle.stuff;
 
-namespace Rabscuttle.core.handler {
+namespace Rabscuttle.handler {
 
     /**
      * Creates its own observers to notify them individually.
@@ -19,20 +18,20 @@ namespace Rabscuttle.core.handler {
     public class ChannelHandler  : ObservableHandler {
         public List<Channel> channels;
         public HashSet<ChannelUser> users;
-        private ISender connection;
+        private readonly ISender _connection;
 
-        private static Regex userRegex = new Regex(@"^[+%@!.:]?([^!@ ]*)", RegexOptions.Compiled);
-        private static Regex permissionRegex = new Regex(@"([+|-][^+-]*)([+|-][^+-]*)?", RegexOptions.Compiled);
+        private static readonly Regex USER_REGEX = new Regex(@"^[+%@!.:]?([^!@ ]*)", RegexOptions.Compiled);
+        private static readonly Regex PERMISSION_REGEX = new Regex(@"([+|-][^+-]*)([+|-][^+-]*)?", RegexOptions.Compiled);
 
 
         public ChannelHandler(ISender connection){
-            this.connection = connection;
+            _connection = connection;
             channels = new List<Channel>();
             users = new HashSet<ChannelUser>();
         }
 
         public ChannelUser FindUser(string source) {
-            var userName = userRegex.Matches(source)[0].Groups[1].Value;
+            var userName = USER_REGEX.Matches(source)[0].Groups[1].Value;
             return users.SingleOrDefault(s => s.userName == userName);
         }
 
@@ -60,6 +59,7 @@ namespace Rabscuttle.core.handler {
             return channel;
         }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<bool> IsLoggedIn(string userName) {
             var user = FindUser(userName);
             if (user == null) {
@@ -67,19 +67,20 @@ namespace Rabscuttle.core.handler {
                 return false;
             }
 
-            if (user.loggedIn != ChannelUser.LoginStatus.Default) {
-                return user.loggedIn == ChannelUser.LoginStatus.LoggedIn;
+            if (user.loggedIn != ChannelUser.LoginStatus.DEFAULT) {
+                return user.loggedIn == ChannelUser.LoginStatus.LOGGED_IN;
             }
 
-            connection.Send(RawWhois.Generate(userName));
-            var receiver = connection as ConnectionManager;
+            _connection.Send(RawWhois.Generate(userName));
+            var receiver = _connection as ConnectionManager;
             if (receiver == null) {
                 return false;
             }
 
             receiver.ReceiveUntil(ReplyCode.RPL_ENDOFWHOIS);
-            return user.loggedIn == ChannelUser.LoginStatus.LoggedIn;
+            return user.loggedIn == ChannelUser.LoginStatus.LOGGED_IN;
         }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
         public override void HandleCommand(NetworkMessage message) {
             switch ((CommandCode) message.typeEnum) {
@@ -213,7 +214,7 @@ namespace Rabscuttle.core.handler {
 
             // mode sets can only happen in one channel
             Channel channel = FindChannel(parameter[0]);
-            var mode = permissionRegex.Matches(parameter[1])[0].Groups;
+            var mode = PERMISSION_REGEX.Matches(parameter[1])[0].Groups;
             // Positive or Negative Group
             string firstGroup = mode[1].Value;
             var firstParameterGroup = parameter.Skip(2).Take(firstGroup.Length - 1);
@@ -272,11 +273,11 @@ namespace Rabscuttle.core.handler {
                 channel.AddUser(user, ParseModePermission(username[0]));
                 channel.AddRank(user, ParseModePermission(username[0]));
                 if (operators.SingleOrDefault(s => s == user.userName) != null) {
-                    IsLoggedIn(user.userName);
+                    var isLoggedIn = IsLoggedIn(user.userName);
                 }
             }
 
-            connection.Send(RawWho.Generate(channelName));
+            _connection.Send(RawWho.Generate(channelName));
         }
 
         private void HandleWhoReply(NetworkMessage message) {
@@ -293,12 +294,12 @@ namespace Rabscuttle.core.handler {
             string[] parameters = message.typeParams.Split(' ');
             if (parameters.Length < 3) {
                 Logger.WriteWarn("Channel Handler",
-                    "Misaligned RPL_WHOISACCOUNT message: Not enough type parameters. Message: {0}", message);
+                    "Misaligned RPL_WHOISACCOUNT message: Not enough Type parameters. Message: {0}", message);
                 return;
             }
 
             var user = FindUser(parameters[1]);
-            user.loggedIn = ChannelUser.LoginStatus.LoggedIn;
+            user.loggedIn = ChannelUser.LoginStatus.LOGGED_IN;
             user.loginUserName = parameters[2];
         }
     }

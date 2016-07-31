@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using NUnit.Framework;
-using Rabscuttle.core.io;
+using Rabscuttle.networking.io;
 
-namespace Rabscuttle.core.handler {
+namespace Rabscuttle.handler {
     public abstract class ObservableHandler : IObservable<NetworkMessage> {
         protected List<IObserver<NetworkMessage>> observers;
 
@@ -28,18 +27,21 @@ namespace Rabscuttle.core.handler {
 
     }
 
-    public class Unsubscriber : IDisposable {
+    public sealed class Unsubscriber : IDisposable {
           private readonly List<IObserver<NetworkMessage>>_observers;
           private readonly IObserver<NetworkMessage> _observer;
 
           public Unsubscriber(List<IObserver<NetworkMessage>> observers, IObserver<NetworkMessage> observer) {
-             this._observers = observers;
-             this._observer = observer;
+             _observers = observers;
+             _observer = observer;
           }
 
           public void Dispose() {
-             if (_observer != null && _observers.Contains(_observer))
-                _observers.Remove(_observer);
+
+              if (_observer != null && _observers.Contains(_observer)) {
+                  _observers.Remove(_observer);
+              }
+              GC.SuppressFinalize(this);
           }
     }
 }

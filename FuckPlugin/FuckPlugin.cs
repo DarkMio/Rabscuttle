@@ -5,10 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using PluginContract;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.handler;
-using Rabscuttle.core.io;
+using Rabscuttle.handler;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
+using Rabscuttle.plugins;
 
 namespace FuckPlugin {
     [Export(typeof(IPluginContract))]
@@ -43,7 +43,7 @@ namespace FuckPlugin {
             //
         }
 
-        private string[] phrases = {
+        private readonly string[] _phrases = {
             "Fuck off, {0} - {1}",
             "Fuck you, {0} - {1}",
             "{0} can go and fuck off. - {1}",
@@ -63,7 +63,7 @@ namespace FuckPlugin {
             "Well {0}, aren't you a shining example of a rancid fuck-nugget. - {1}",
             "Fuck off, you must, {0}. - {1}",
             "Fucking {0} is a fucking pussy. I'm going to fucking bury that guy, I have done it before, and I will do it again. I'm going to fucking kill Arc Warden. - {1}",
-            "I'd love to stop and chat to you but I'd rather have type 2 diabetes. - {1}",
+            "I'd love to stop and chat to you but I'd rather have Type 2 diabetes. - {1}",
             "Christ on a bendy-bus, {0}, don't be such a fucking faff-arse. - {1}",
             "Merry Fucking Christmas, {0}. - {1}",
             "Happy Fucking Birthday, {0}. - {1}",
@@ -85,8 +85,8 @@ namespace FuckPlugin {
 
             var f = message.user.userName;
             var name = split;
-            int num = new Random().Next(0, phrases.Length);
-            Sender.Send(RawPrivMsg.Generate(message.origin, String.Format(phrases[num], name, f)));
+            int num = new Random().Next(0, _phrases.Length);
+            Sender.Send(RawPrivMsg.Generate(message.origin, String.Format(_phrases[num], name, f)));
         }
 
         /// <summary> Called when a notice message was received by the bot. </summary>

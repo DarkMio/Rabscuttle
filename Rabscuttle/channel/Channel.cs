@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Rabscuttle.core.channel;
-using Rabscuttle.core;
-using Rabscuttle.core.commands;
+using Rabscuttle.networking.commands;
 
 namespace Rabscuttle.channel {
     public class Channel{
