@@ -24,6 +24,8 @@ namespace Rabscuttle.stuff {
         }
 
         public static string Get(string key) {
+            var c = COLLECTION;
+            var conf = CONFIG;
             return COLLECTION[key].Value;
         }
 

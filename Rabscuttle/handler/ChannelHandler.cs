@@ -272,9 +272,15 @@ namespace Rabscuttle.handler {
                 ChannelUser user = FindOrCreateUser(username, true);
                 channel.AddUser(user, ParseModePermission(username[0]));
                 channel.AddRank(user, ParseModePermission(username[0]));
+                /*
                 if (operators.SingleOrDefault(s => s == user.userName) != null) {
-                    var isLoggedIn = IsLoggedIn(user.userName);
+                    var loggedIn = IsLoggedIn(user.userName);
+                    loggedIn.Wait();
+                    if (loggedIn.Result) {
+                        channel.AddRank(user, MemberCode.BOTOPERATOR);
+                    }
                 }
+                */
             }
 
             _connection.Send(RawWho.Generate(channelName));
@@ -283,6 +289,7 @@ namespace Rabscuttle.handler {
         private void HandleWhoReply(NetworkMessage message) {
             WhoReply data = new WhoReply(message);
             ChannelUser user = FindUser(data.username);
+            // if(user)
             user.TryAddData(data.ident, data.host, data.server, data.hops, data.realname);
             Channel channel = FindChannel(data.channel);
             foreach (char c in data.modes) {

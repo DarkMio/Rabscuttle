@@ -28,7 +28,7 @@ namespace Rabscuttle.handler {
 
             this.channelHandler = channelHandler;
 
-            var opList = ConfigurationProvider.Get("_operators").Split(',');
+            var opList = ConfigurationProvider.Get("operators").Split(',');
             for (int index = 0; index < opList.Length; index++) {
                 opList[index] = opList[index].Trim();
             }
