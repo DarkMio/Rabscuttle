@@ -59,18 +59,29 @@ namespace Rabscuttle.handler {
             return channel;
         }
 
+        private bool CheckIfLastUser(ChannelUser user) {
+            foreach (Channel channel in channels) {
+                var hasUsr = channel.users.SingleOrDefault(s => s.user == user);
+                if(hasUsr != null) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<bool> IsLoggedIn(string userName) {
             var user = FindUser(userName);
             if (user == null) {
-                Logger.WriteWarn("Channel Handler", "Searched login-status for unknown user: {0}", userName);
+                Logger.WriteWarn("Channel Handler", "Tried to search login-status for unknown user: {0}", userName);
                 return false;
             }
 
+            // if the login token was already set, we know his login status already
             if (user.loggedIn != ChannelUser.LoginStatus.DEFAULT) {
                 return user.loggedIn == ChannelUser.LoginStatus.LOGGED_IN;
             }
-
+            // otherwise we search for it, and wait until we got the response.
             _connection.Send(RawWhois.Generate(userName));
             var receiver = _connection as ConnectionManager;
             if (receiver == null) {
@@ -84,25 +95,25 @@ namespace Rabscuttle.handler {
 
         public override void HandleCommand(NetworkMessage message) {
             switch ((CommandCode) message.typeEnum) {
-                case CommandCode.JOIN:
+                case CommandCode.JOIN: // someone joinimg
                     HandleJoin(message);
                     break;
-                case CommandCode.PRIVMSG:
+                case CommandCode.PRIVMSG: // not sure if we need this one 
                     HandlePrivMsg(message);
                     break;
-                case CommandCode.PART:
-                case CommandCode.KICK:
+                case CommandCode.PART: // leaving
+                case CommandCode.KICK: // forcefully leaving
                     HandlePart(message);
                     break;
-                case CommandCode.QUIT:
+                case CommandCode.QUIT: // someone disconnecting
                     HandleQuit(message);
                     break;
                 case CommandCode.AWAY: // not sure if I need to handle it at all.
                     break;
-                case CommandCode.NICK:
+                case CommandCode.NICK: // renaming itself
                     HandleNick(message);
                     break;
-                case CommandCode.MODE:
+                case CommandCode.MODE: // gaining / losing rights
                     HandleMode(message);
                     break;
             }
@@ -110,14 +121,14 @@ namespace Rabscuttle.handler {
 
         public override void HandleReply(NetworkMessage message) {
             switch ((ReplyCode) message.typeEnum) {
-                case ReplyCode.RPL_NAMREPLY:
+                case ReplyCode.RPL_NAMREPLY: // a list of users + rights per channel
                 case ReplyCode.RPL_NAMREPLY_:
                     HandleUserlist(message);
                     break;
-                case ReplyCode.RPL_WHOREPLY:
+                case ReplyCode.RPL_WHOREPLY: // a full dataset of a single user in a channel
                     HandleWhoReply(message);
                     break;
-                case ReplyCode.RPL_WHOISACCOUNT:
+                case ReplyCode.RPL_WHOISACCOUNT: // login information
                     HandleWhoIsAccount(message);
                     break;
             }
@@ -136,9 +147,9 @@ namespace Rabscuttle.handler {
         }
 
         private void HandlePart(NetworkMessage message) {
-            Debug.WriteLine(message);
             Channel channel = FindChannel(message.typeParams);
             if (channel == null) {
+                Logger.WriteWarn("Channel Handler", "There was a part message without having a channel: {0}", message.typeParams);
                 return;
             }
 
@@ -158,21 +169,12 @@ namespace Rabscuttle.handler {
             }
         }
 
-        private bool CheckIfLastUser(ChannelUser user) {
-            var notLast = false;
-            foreach (Channel channel in channels) {
-                var hasUsr = channel.users.SingleOrDefault(s => s.user == user);
-                notLast = hasUsr != null;
-            }
-            return !notLast;
-        }
 
         private void HandleQuit(NetworkMessage message) {
-            Debug.WriteLine(message);
-            if (message.fromServer) {
+            if (message.fromServer) { // someone left the server
                 ChannelUser user = FindUser(message.prefix);
                 if (user == null) {
-                    Logger.WriteWarn("Channel Handler", "Could not find the specified user: {0}", message.prefix);
+                    Logger.WriteWarn("Channel Handler", "Could not find a quitting user: {0}", message.prefix);
                     return;
                 }
                 foreach (Channel channel in channels) {
@@ -194,15 +196,14 @@ namespace Rabscuttle.handler {
         }
 
         private void HandleNick(NetworkMessage message) {
-            if (message.fromServer) {
+            if (message.fromServer) { // change the users username
                 ChannelUser user = FindUser(message.prefix);
                 user.userName = message.message;
             }
-            // Debug.WriteLine("Not smart enough for: " + message);
         }
 
         private void HandleMode(NetworkMessage message) {
-            if (!message.fromServer) {
+            if (!message.fromServer) { // nothing of value, bot wants to change modes
                 return;
             }
 
@@ -237,7 +238,7 @@ namespace Rabscuttle.handler {
                 MemberCode permission = ParseModePermission(permissionChar);
                 ChannelUser user = FindUser(users[i]);
                 if (user == null) {
-                    Logger.WriteWarn("Channel Handler", "Cannot find user of modeset: {0} in channel: {1}", user, channel.channelName);
+                    Logger.WriteWarn("Channel Handler", "Cannot find user of mode set: {0} in channel: {1}", user, channel.channelName);
                     continue;
                 }
                 if (upranking) {
@@ -286,6 +287,7 @@ namespace Rabscuttle.handler {
             _connection.Send(RawWho.Generate(channelName));
         }
 
+        //@TODO: fr
         private void HandleWhoReply(NetworkMessage message) {
             WhoReply data = new WhoReply(message);
             ChannelUser user = FindUser(data.username);
