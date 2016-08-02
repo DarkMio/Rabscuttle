@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -15,40 +14,71 @@ namespace Rabscuttle.handler {
     /**
      * Creates its own observers to notify them individually.
      */
+    /// <summary>
+    /// The ChannelHandler handles all channel-related messages and generates data structures for channels, user and their relations to channels.
+    /// </summary>
+    /// <seealso cref="ObservableHandler" />
+    /// <seealso cref="Channel"/>
+    /// <seealso cref="ChannelUser"/>
+    /// <seealso cref="UserRelation"/>
     public class ChannelHandler  : ObservableHandler {
-        public List<Channel> channels;
+        public HashSet<Channel> channels;
         public HashSet<ChannelUser> users;
         private readonly ISender _connection;
+        private readonly string[] _operators;
 
         private static readonly Regex USER_REGEX = new Regex(@"^[+%@!.:]?([^!@ ]*)", RegexOptions.Compiled);
         private static readonly Regex PERMISSION_REGEX = new Regex(@"([+|-][^+-]*)([+|-][^+-]*)?", RegexOptions.Compiled);
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ChannelHandler"/> class.
+        /// </summary>
+        /// <param name="connection">A valid, sendable connection. Preferrably an instance of <see cref="ConnectionManager"/>.</param>
         public ChannelHandler(ISender connection){
             _connection = connection;
-            channels = new List<Channel>();
+            channels = new HashSet<Channel>();
             users = new HashSet<ChannelUser>();
+            _operators = ConfigurationProvider.Get("operators").Split(new []{", "}, StringSplitOptions.None);
         }
 
+        /// <summary>
+        /// Finds a user based on his username or his source string.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <returns></returns>
         public ChannelUser FindUser(string source) {
             var userName = USER_REGEX.Matches(source)[0].Groups[1].Value;
             return users.SingleOrDefault(s => s.userName == userName);
         }
 
+        /// <summary>
+        /// Finds or creates a user based on his username or his source string.
+        /// Also adds the user to the user-collection in this handler.
+        /// </summary>
+        /// <param name="source">The source string in <c>:~name!ident@host</c>.</param>
+        /// <param name="isUserName">if set to <c>true</c> and a user has to  be created, .</param>
+        /// <returns></returns>
         private ChannelUser FindOrCreateUser(string source, bool isUserName=false) {
-            ChannelUser user = FindUser(source);
-            if (user != null) {
+            ChannelUser user = FindUser(source); // search
+            if (user != null) { // if found, return him
                 return user;
-            }
+            } // otherwise, create a new
             user = new ChannelUser(source, isUserName);
-            users.Add(user);
-            return user;
+            users.Add(user); // add him
+            return user; // return him
         }
 
+        /// <summary> Finds the channel based on its name <c>#name</c>. </summary>
+        /// <param name="channelName">Name of the channel.</param>
+        /// <returns></returns>
         public Channel FindChannel(string channelName) {
             return channels.SingleOrDefault(s => s.channelName == channelName);
         }
 
+        /// <summary> Finds or creates a channel based on its name <c>#name</c> </summary>
+        /// <param name="name">The name, including the <c>#</c></param>
+        /// <returns></returns>
         private Channel FindOrCreateChannel(string name) {
             Channel channel = FindChannel(name);
             if (channel != null) {
@@ -59,17 +89,23 @@ namespace Rabscuttle.handler {
             return channel;
         }
 
+        /// <summary> Retrieves if the given username left all channels and is thereby not relevant anymore. </summary>
+        /// <param name="user">A user which has to be found in any channel.</param>
+        /// <returns></returns>
         private bool CheckIfLastUser(ChannelUser user) {
-            foreach (Channel channel in channels) {
-                var hasUsr = channel.users.SingleOrDefault(s => s.user == user);
-                if(hasUsr != null) {
+            foreach (Channel channel in channels) { // for all channels, search if he is in a channel
+                var hasUsr = channel.users.SingleOrDefault(s => ReferenceEquals(s.user, user));
+                if(hasUsr != null) { // if he's in a channel, return false
                     return false;
                 }
-            }
+            } // otherwise return true
             return true;
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        /// <summary> Determines whether a given user is logged in or not asynchronously. Might call and wait for a whois-message. </summary>
+        /// <param name="userName">Name of the user.</param>
+        /// <returns>A task, which retrieves a bool eventually.</returns>
         public async Task<bool> IsLoggedIn(string userName) {
             var user = FindUser(userName);
             if (user == null) {
@@ -93,12 +129,14 @@ namespace Rabscuttle.handler {
         }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
+        /// <summary> Handles a <see cref="CommandCode"/>. </summary>
+        /// <param name="message">The network message, pre-parsed.</param>
         public override void HandleCommand(NetworkMessage message) {
             switch ((CommandCode) message.typeEnum) {
                 case CommandCode.JOIN: // someone joinimg
                     HandleJoin(message);
                     break;
-                case CommandCode.PRIVMSG: // not sure if we need this one 
+                case CommandCode.PRIVMSG: // not sure if we need this one
                     HandlePrivMsg(message);
                     break;
                 case CommandCode.PART: // leaving
@@ -160,11 +198,11 @@ namespace Rabscuttle.handler {
                     users.Remove(user);
                 }
             } else { // bot left the channel
-                var users = channel.users;
+                var channelUsers = channel.users;
                 channels.Remove(channel);
 
-                foreach (UserRelation userRelation in users) {
-                    this.users.RemoveWhere(s => CheckIfLastUser(userRelation.user));
+                foreach (UserRelation userRelation in channelUsers) {
+                    users.RemoveWhere(s => CheckIfLastUser(userRelation.user));
                 }
             }
         }
@@ -191,6 +229,7 @@ namespace Rabscuttle.handler {
             }
         }
 
+        // ReSharper disable once UnusedParameter.Local - still not sure if it will be needed at some point.
         private void HandlePrivMsg(NetworkMessage message) {
 
         }
@@ -207,7 +246,7 @@ namespace Rabscuttle.handler {
                 return;
             }
 
-            string[] parameter = message.typeParams.Split(new char[] {' '});
+            string[] parameter = message.typeParams.Split(' ');
             if (parameter.Length < 3) {
                 Logger.WriteWarn("Channel Handler", "No valid parameter info: {0} {1} :{2}", message.type, message.typeParams, message.message);
                 return;
@@ -227,7 +266,7 @@ namespace Rabscuttle.handler {
             UserRanking(secondGroup, secondParameterGroup.ToArray(), channel);
         }
 
-        private void UserRanking(string rankString, string[] users, Channel channel) {
+        private void UserRanking(string rankString, string[] channelUsers, Channel channel) {
             if (rankString.Length == 0) {
                 return;
             }
@@ -236,11 +275,16 @@ namespace Rabscuttle.handler {
             for (int i = 0; i < rankOrder.Length; i++) {
                 char permissionChar = rankOrder.ElementAt(i);
                 MemberCode permission = ParseModePermission(permissionChar);
-                ChannelUser user = FindUser(users[i]);
+                ChannelUser user = FindUser(channelUsers[i]);
                 if (user == null) {
-                    Logger.WriteWarn("Channel Handler", "Cannot find user of mode set: {0} in channel: {1}", user, channel.channelName);
+                    Logger.WriteWarn("Channel Handler", "Cannot find user of mode set: {0} in channel: {1}", channelUsers[i], channel.channelName);
                     continue;
                 }
+
+                if (_operators.SingleOrDefault(s => s == user.userName) != null) {
+                    RawWhois.Generate(user.userName);
+                }
+
                 if (upranking) {
                     channel.AddRank(user, permission);
                 } else {
@@ -257,38 +301,36 @@ namespace Rabscuttle.handler {
         }
 
         private void HandleUserlist(NetworkMessage message) {
-            string[] usernames = message.message.Split(new char[] {' '});
-            string[] param = message.typeParams.Split(new string[] {" @ ", " = ", " * "}, StringSplitOptions.None);
-            string channelName = null;
+            string[] usernames = message.message.Split(' ');
+            string[] param = message.typeParams.Split(new[] {" @ ", " = ", " * "}, StringSplitOptions.None);
+            string channelName;
             if (param.Length > 1) {
                 channelName = param[1];
             } else {
-                Logger.WriteWarn("Channel Handler", "Could not handle: {0}", message);
+                Logger.WriteWarn("Channel Handler", "TypeParams are too short to handle for UserList: {0}", message);
                 return;
             }
 
             Channel channel = FindChannel(channelName);
-            string[] operators = ConfigurationProvider.Get("operators").Split(new []{", "}, StringSplitOptions.None);
             foreach (var username in usernames) {
                 ChannelUser user = FindOrCreateUser(username, true);
                 channel.AddUser(user, ParseModePermission(username[0]));
                 channel.AddRank(user, ParseModePermission(username[0]));
-                /*
-                if (operators.SingleOrDefault(s => s == user.userName) != null) {
-                    var loggedIn = IsLoggedIn(user.userName);
-                    loggedIn.Wait();
-                    if (loggedIn.Result) {
-                        channel.AddRank(user, MemberCode.BOTOPERATOR);
-                    }
-                }
-                */
-            }
 
+                if (_operators.SingleOrDefault(s => s == user.userName) != null) {
+                    // Send the whois request to figure out if he is logged in or not
+                    // this will later land on the channel handler anyway ("when it's time for it")
+                    _connection.Send(RawWhois.Generate(user.userName));
+                }
+            }
             _connection.Send(RawWho.Generate(channelName));
         }
 
-        //@TODO: fr
         private void HandleWhoReply(NetworkMessage message) {
+            if (message.FromClient) {
+                return;
+            }
+
             WhoReply data = new WhoReply(message);
             ChannelUser user = FindUser(data.username);
             // if(user)

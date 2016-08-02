@@ -1,27 +1,38 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using Rabscuttle.networking.commands;
 
 namespace Rabscuttle.channel {
     public class UserRelation {
         public readonly ChannelUser user;
-        public MemberCode permission;
+        private int _permissions;
 
-        // @TODO: Permission parsing seems to be shit right now
+        public MemberCode Permission {
+            get {
+                if (_permissions == 0) {
+                    return MemberCode.DEFAULT;
+                }
+                // following doesn't work when 0
+                // get me the next upper of the exponent of 2
+                var numBits = (int)Math.Ceiling(Math.Log(_permissions + 1, 2));
+                // then shift it one time less (which is why it doesn't work with 0: 1 << -1 -> underflow)
+                return (MemberCode) (1 << (numBits - 1));
+            }
+        }
+
         public UserRelation(ChannelUser user, MemberCode permission) {
             this.user = user;
-            this.permission = permission;
+            _permissions = 0;
+            AddRank(permission);
         }
 
         public void RemoveRank(MemberCode permission) {
-            if (this.permission <= permission) {
-                this.permission = MemberCode.DEFAULT;
-            }
+            _permissions &= ~(int) permission;
         }
 
         public void AddRank(MemberCode permission) {
-            if (this.permission < permission) {
-                this.permission = permission;
-            }
+            _permissions |= (int)permission;
         }
 
         protected bool Equals(UserRelation other) {

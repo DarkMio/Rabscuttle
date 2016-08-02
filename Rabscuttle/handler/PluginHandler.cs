@@ -139,7 +139,7 @@ namespace Rabscuttle.handler {
             } else if (chan != null) { // otherwise, if the channel is null, give us the permission in his channel
                 UserRelation relation = chan.users.SingleOrDefault(s => s.user.userName == user.userName);
                 if (relation != null) {
-                    permission = relation.permission;
+                    permission = relation.Permission;
                 } else { // uh oh, that went wrong - user not found in any channels
                     Logger.WriteWarn("Plugin Handler", "User [ {0} ] requested a command but was not found in the userlists.", user.userName);
                 }
