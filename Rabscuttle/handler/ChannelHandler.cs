@@ -266,6 +266,10 @@ namespace Rabscuttle.handler {
             UserRanking(secondGroup, secondParameterGroup.ToArray(), channel);
         }
 
+        /// <summary> Ranks multiple users from a RPL_NAMRPLY to their rights on the network. </summary>
+        /// <param name="rankString">The string of mode-changes</param>
+        /// <param name="channelUsers">The names of the users to be ranked</param>
+        /// <param name="channel">The channel in which the rank-change happened</param>
         private void UserRanking(string rankString, string[] channelUsers, Channel channel) {
             if (rankString.Length == 0) {
                 return;
@@ -293,13 +297,18 @@ namespace Rabscuttle.handler {
             }
         }
 
-        private MemberCode ParseModePermission(char permission) {
+        /// <summary> Parses the mode permission for user modes (user ranking). </summary>
+        /// <param name="permission">The permission character.</param>
+        /// <returns>A <see cref="MemberCode"/> representing the permissions rank</returns>
+        private MemberCode ParseModePermission(char permission) { // @TODO: Implement all other values
             if(permission == 'v' || permission == '+') return MemberCode.VOICED;
             if(permission == 'o' || permission == '@') return MemberCode.OPERATOR;
             // Debug.WriteLine("CANNOT FIND PERMISSION: " + permission);
             return MemberCode.DEFAULT;
         }
 
+        /// <summary> Upon joining the server will tell the client which users are connected in this channel and their current, highest rank. </summary>
+        /// <param name="message">The network message with RPL_NAMRPLY.</param>
         private void HandleUserlist(NetworkMessage message) {
             string[] usernames = message.message.Split(' ');
             string[] param = message.typeParams.Split(new[] {" @ ", " = ", " * "}, StringSplitOptions.None);
