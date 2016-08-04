@@ -55,6 +55,7 @@
     <Compile Include="channel\Channel.cs" />
     <Compile Include="channel\User.cs" />
     <Compile Include="channel\UserRelation.cs" />
+    <Compile Include="handler\VoidHandler.cs" />
     <Compile Include="networking\CommandSchedule.cs" />
     <Compile Include="networking\commands\IrcReplies.cs" />
     <Compile Include="networking\commands\ProtocolDefinitions.cs" />
