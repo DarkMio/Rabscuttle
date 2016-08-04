@@ -1,22 +1,16 @@
-﻿using NUnit.Framework;
-using Rabscuttle.core.handler;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Rabscuttle.core.channel;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.io;
+using NUnit.Framework;
+using Rabscuttle.handler;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 
-namespace Rabscuttle.core.handler.Tests {
+namespace RabscuttleTests.networking.handler {
     [TestFixture()]
     public class ChannelHandlerTests {
 
         private class MockSenderReceiver : ISender, IReceiver {
-            private readonly Queue<string> messages = new Queue<string>(new [] {
+            private readonly Queue<string> _messages = new Queue<string>(new [] {
                 ":Rabscootle!~Gabe@Somehost.com JOIN #w3x-to-vmf",
                 ":TAL.DE.EU.GameSurge.net RPL_NAMREPLY Rabscootle @ #w3x-to-vmf :Rabscootle +Perry Yoshi2 +DarkMio @SinZ Not-efb8 @penguinwizzard Rabscuttle Renol @ChanServ",
                 ":Rabscootle!~Gabe@Somehost.com JOIN #miomio",
@@ -39,8 +33,8 @@ namespace Rabscuttle.core.handler.Tests {
             }
 
             public NetworkMessage Receive(bool waitResponse = false) {
-                if (messages.Count > 0) {
-                    return new NetworkMessage(messages.Dequeue(), true);
+                if (_messages.Count > 0) {
+                    return new NetworkMessage(_messages.Dequeue(), true);
                 } else {
                     return null;
                 }

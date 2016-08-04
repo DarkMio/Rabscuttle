@@ -5,19 +5,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using Rabscuttle.core.io;
 using Rabscuttle.stuff;
 
 #endregion
 
-namespace Rabscuttle.core {
+namespace Rabscuttle.networking.io {
     /// <summary>
     ///     The Bot Client is the bare TCP Connection from and to the server.
     ///     Contains no hard logic besides some helper methods. No history either.
     /// </summary>
     /// <seealso cref="ISender" />
     /// <seealso cref="IReceiver" />
-    public class BotClient : ISender, IReceiver {
+    public class BotClient : ISender, IReceiver, IDisposable {
         /// <summary> TCP Timeout, 180s until timeout, which is the usual IRC timeout until disconnect.</summary>
         public const int Timeout = 180000; // 300s until timeout; normal IRC timeout
 
@@ -27,29 +26,29 @@ namespace Rabscuttle.core {
         /// <summary>The keep alive time closes the connection after 180s, which</summary>
         public const int KeepAliveTime = 180000; // 300s until timeout
 
-        private readonly TcpClient client;
-        private readonly NetworkStream dataStream;
-        private readonly StreamReader input;
-        private readonly StreamWriter output;
-        private string host;
-        private int port;
+        private readonly TcpClient _client;
+        private readonly NetworkStream _dataStream;
+        private readonly StreamReader _input;
+        private readonly StreamWriter _output;
+        private string _host;
+        private int _port;
 
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="BotClient" /> class.
         ///     Upon construction a connection gets setup, which may take a while.
         /// </summary>
-        /// <param name="host">The connection host, might be hostname or IP.</param>
-        /// <param name="port">The hosts connection port.</param>
+        /// <param name="host">The connection _host, might be hostname or IP.</param>
+        /// <param name="port">The hosts connection _port.</param>
         public BotClient(string host, int port = 6667) {
-            this.host = host;
-            this.port = port;
+            _host = host;
+            _port = port;
             // @TODO: Maybe offload connection process with async
-            client = new TcpClient(host, port) {SendTimeout = Timeout};
-            dataStream = client.GetStream();
-            input = new StreamReader(dataStream);
-            output = new StreamWriter(dataStream);
-            SetKeepAlive(client.Client);
+            _client = new TcpClient(host, port) {SendTimeout = Timeout};
+            _dataStream = _client.GetStream();
+            _input = new StreamReader(_dataStream);
+            _output = new StreamWriter(_dataStream);
+            SetKeepAlive(_client.Client);
         }
 
         /// <summary>
@@ -58,13 +57,14 @@ namespace Rabscuttle.core {
         /// <param name="waitResponse">if set to <c>true</c> method waits until there is a message to receive.</param>
         /// <returns>NetworkMessage if there is any data, or <c>null</c> if <paramref name="waitResponse" /> is <c>false</c>.</returns>
         public NetworkMessage Receive(bool waitResponse = false) {
-            if (!dataStream.DataAvailable && !waitResponse) {
+            if (!_dataStream.DataAvailable && !waitResponse) {
                 return null;
             }
 
-            var s = input.ReadLine();
+            var s = _input.ReadLine();
             try {
                 var msg = new NetworkMessage(s, true);
+                Debug.WriteLine("Client>{0}{1}{2}{3}", " :" + msg.prefix, " " + msg.type, " " + msg.typeParams, " :" + msg.message);
                 return msg;
             } catch (ArgumentException e) {
                 Debug.WriteLine(e);
@@ -76,7 +76,7 @@ namespace Rabscuttle.core {
         /// <summary> Sends a parameterised network message. </summary>
         /// <param name="message">The message.</param>
         /// <param name="prefix">The prefix.</param>
-        /// <param name="type">The type.</param>
+        /// <param name="type">The Type.</param>
         /// <param name="destination">The destination.</param>
         /// <remarks>Does not check for validity!</remarks>
         public void Send(string message, string prefix, string type, string destination) {
@@ -87,8 +87,9 @@ namespace Rabscuttle.core {
         /// <summary> Sends the network message and flushes the socket. </summary>
         /// <param name="message">Pre-assembled network message</param>
         public void Send(NetworkMessage message) {
-            output.Write(message.BuildMessage());
-            output.Flush();
+            Debug.WriteLine("Client>{0}{1}{2}{3}", " :" + message.prefix, " " + message.type, " " + message.typeParams, " :" + message.message);
+            _output.Write(message.BuildMessage());
+            _output.Flush();
         }
 
         /// <summary>
@@ -114,8 +115,8 @@ namespace Rabscuttle.core {
         public void RawSend(string message) {
             message = message.Replace("\r", "").Replace("\n", "");
             // in case you have gotten any linesbreaks from somewhere.
-            output.Write(message + "\r\n");
-            output.Flush();
+            _output.Write(message + "\r\n");
+            _output.Flush();
             Logger.WriteWarn("Bot Client", "Sending raw message: [ {0} ]", message);
         }
 
@@ -124,15 +125,15 @@ namespace Rabscuttle.core {
         /// </summary>
         /// <returns>A single line of plaintext or <c>null</c> if there's no data</returns>
         public string RawReceive() {
-            if (dataStream.DataAvailable) {
-                return input.ReadLine();
+            if (_dataStream.DataAvailable) {
+                return _input.ReadLine();
             }
             return null;
         }
 
         /// <summary>
         ///     Disposes all incoming messages until the most recent message is reached.
-        ///     This is useful if there are multiple messages sent by the server in between of the client receiving frames.
+        ///     This is useful if there are multiple messages sent by the server in between of the _client receiving frames.
         /// </summary>
         /// <param name="waitResponse">if set to <c>true</c> method waits until there is a message to receive.</param>
         /// <returns>
@@ -149,6 +150,21 @@ namespace Rabscuttle.core {
                 lastMessage = message;
             }
             return lastMessage;
+        }
+
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            if (!disposing) {
+                return;
+            }
+
+            _input?.Dispose();
+            _output?.Dispose();
         }
     }
 }

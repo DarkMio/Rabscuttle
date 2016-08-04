@@ -1,9 +1,11 @@
-﻿using Rabscuttle.core.channel;
-using Rabscuttle.core.io;
+﻿using Rabscuttle.channel;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
 
-namespace PluginContract {
+namespace Rabscuttle.plugins {
     public class CommandMessage {
         public ChannelUser user;
+        public MemberCode permission;
         public string parameters;
         public string command;
         public string origin;

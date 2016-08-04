@@ -1,16 +1,16 @@
-﻿namespace Rabscuttle.core.io {
+﻿namespace Rabscuttle.networking.io {
     /// <summary>
     /// Sender Interface for sending any kind of IRC-related network messages in plaintext to any kind of endpoint.
     /// </summary>
     public interface ISender {
         /// <summary>
         /// Sends a properly aligned plaintext message to the endpoint, alignment looks like:
-        /// <c>:source* type typeParam* :message*</c>
+        /// <c>:Source* Type typeParam* :message*</c>
         /// </summary>
         /// <param name="message">Message contents, which are usually at the end of a string.</param>
-        /// <param name="prefix">The source prefix, client to server messages can have this missing.</param>
-        /// <param name="type">Message type, usually a <c>CommandCode</c> when sending from client to server.</param>
-        /// <param name="typeParams">Optional, additional parameter for a message type.</param>
+        /// <param name="prefix">The Source prefix, client to server messages can have this missing.</param>
+        /// <param name="type">Message Type, usually a <c>CommandCode</c> when sending from client to server.</param>
+        /// <param name="typeParams">Optional, additional parameter for a message Type.</param>
         void Send(string message, string prefix, string type, string typeParams);
         /// <summary>
         /// Sends a <see cref="NetworkMessage"/> to the endpoint..

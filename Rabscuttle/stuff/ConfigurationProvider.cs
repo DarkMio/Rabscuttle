@@ -5,9 +5,9 @@ using System.Reflection;
 
 namespace Rabscuttle.stuff {
     public class ConfigurationProvider {
-        private static readonly Configuration _config =
+        private static readonly Configuration CONFIG =
             ConfigurationManager.OpenExeConfiguration(Assembly.GetEntryAssembly().Location);
-        private static readonly KeyValueConfigurationCollection _collection = _config.AppSettings.Settings;
+        private static readonly KeyValueConfigurationCollection COLLECTION = CONFIG.AppSettings.Settings;
 
         public static void Bootstrap() {
             GetOrSetDefault("network", "");
@@ -24,16 +24,18 @@ namespace Rabscuttle.stuff {
         }
 
         public static string Get(string key) {
-            return _collection[key].Value;
+            var c = COLLECTION;
+            var conf = CONFIG;
+            return COLLECTION[key].Value;
         }
 
         private static string GetOrSetDefault(string key, string defaultValue) {
-            if (_collection[key] == null) {
+            if (COLLECTION[key] == null) {
                 Logger.WriteDebug("Config Manager", "Should add?!");
-                _collection.Add(key, defaultValue);
-                _config.Save(ConfigurationSaveMode.Modified);
+                COLLECTION.Add(key, defaultValue);
+                CONFIG.Save(ConfigurationSaveMode.Modified);
             }
-            return _collection[key].ToString();
+            return COLLECTION[key].ToString();
         }
     }
 }

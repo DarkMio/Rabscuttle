@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Rabscuttle.core.channel;
-using Rabscuttle.core;
-using Rabscuttle.core.commands;
+using Rabscuttle.networking.commands;
 
 namespace Rabscuttle.channel {
     public class Channel{
@@ -36,7 +33,7 @@ namespace Rabscuttle.channel {
         public override string ToString() {
             string user = "";
             foreach (UserRelation userRelation in users) {
-                user += ((int)userRelation.permission).ToString("x") + userRelation.user.userName + " ";
+                user += ((int)userRelation.Permission).ToString("x") + userRelation.user.userName + " ";
             }
             return "CHANNEL> N: [ " + channelName + " ] | U: [ " + user + "]";
         }

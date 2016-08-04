@@ -1,44 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using PluginContract;
+using System.Threading.Tasks;
 using Rabscuttle.channel;
-using Rabscuttle.core.channel;
-using Rabscuttle.core.io;
-using Rabscuttle.core.commands;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
+using Rabscuttle.plugins;
 using Rabscuttle.stuff;
 
-namespace Rabscuttle.core.handler {
-    public class PluginHandler : ObservableHandler {
-
+namespace Rabscuttle.handler {
+    public class PluginHandler : ObservableHandler, IDisposable {
         [ImportMany(typeof(IPluginContract), AllowRecomposition = true)]
-        private IPluginContract[] plugins = null;
-
+        public IPluginContract[] plugins = null;
         private readonly ISender _sender;
         private readonly DirectoryCatalog _catalog;
         private CompositionContainer _container;
         private readonly string prefix = ">";
-
-
-        private readonly ChannelHandler _channelHandler;
-        private readonly string path;
+        public readonly ChannelHandler channelHandler;
+        private readonly string _path;
+        private readonly string[] _operators;
 
         public PluginHandler(ISender sender, ChannelHandler channelHandler, string pathToPlugins = "./../Plugins/") {
-            this._sender = sender;
-            path = pathToPlugins;
+            _sender = sender;
+            _path = pathToPlugins;
             _catalog = new DirectoryCatalog(pathToPlugins);
 
-            _channelHandler = channelHandler;
+            this.channelHandler = channelHandler;
+
+            var opList = ConfigurationProvider.Get("operators").Split(',');
+            for (int index = 0; index < opList.Length; index++) {
+                opList[index] = opList[index].Trim();
+            }
+            _operators = opList;
+
             LoadPlugins();
         }
 
-        public void LoadPlugins() {
-
+        private void LoadPlugins() {
             _container = new CompositionContainer(_catalog);
             //plugins = _container.GetExportedValues<IPluginContract>();
             _container.ComposeParts(this);
@@ -47,74 +46,41 @@ namespace Rabscuttle.core.handler {
             foreach (IPluginContract plugin in plugins) {
                 plugin.Sender = _sender;
                 plugin.MessagePrefix = prefix;
-                Logger.WriteDebug("Plugin Handler", "Loaded {0}", plugin.CommandName);
+                plugin.BackReference = this;
+                Logger.WriteDebug("Plugin Handler", "Loaded: [ {0} ]", plugin.CommandName);
             }
-
         }
 
 
 
         public override void HandleCommand(NetworkMessage message) {
-            //@TODO: Does not take care about bot operators.
-            if ((CommandCode) message.typeEnum != CommandCode.PRIVMSG) {
+            //@TODO: Does not take care about bot _operators.
+            CommandCode type = (CommandCode) message.typeEnum;
+            if (type != CommandCode.PRIVMSG && type != CommandCode.NOTICE) {
                 return;
             }
-
             if (!message.message.StartsWith(prefix)) {
                 return;
             }
 
             CommandMessage cmsg = PrepareCommand(message);
-            Channel chan = _channelHandler.FindChannel(cmsg.origin);
-            if (chan == null) { // so the origin is a user
-                HandleCommand(cmsg, MemberCode.DEFAULT);
-                return;
-            }
-
-            UserRelation relation = chan.users.SingleOrDefault(s => s.user.userName == cmsg.user.userName);
-            if (relation == null) {
-                Logger.WriteWarn("Plugin Handler", "No viable user found.");
-                HandleCommand(cmsg, MemberCode.DEFAULT);
-                return;
-            }
-
-            HandleCommand(cmsg, relation.permission);
+            HandleCommand(cmsg);
         }
 
-        public void HandleCommand(CommandMessage message, MemberCode rank) {
-            // Debug.WriteLine("PLUGIN> Received:" + message);
-            // CommandMessage cmm = PrepareCommand(message);
-
+        public void HandleCommand(CommandMessage message) {
             foreach (IPluginContract plugin in plugins) {
-                if (plugin.CommandName != message.command || plugin.Rank > rank) {
+                if (plugin.CommandName != message.command || plugin.Rank > message.permission) {
                     continue;
                 }
+
                 Logger.WriteDebug("Plugin Handler", "Handling message: {0}", message.message);
-                NetworkMessage nm = plugin.OnPrivMsg(message);
-                if (nm == null) {
-                    continue;
+                CommandCode type = (CommandCode) message.message.typeEnum;
+                if (type == CommandCode.PRIVMSG) {
+                    plugin.OnPrivMsg(message);
+                } else {
+                    plugin.OnNotice(message);
                 }
-                _sender.Send(nm);
-            }
-        }
-
-        public void HandleCommand(NetworkMessage message, UserRelation relation) {
-            if (!message.message.StartsWith(prefix)) {
                 return;
-            }
-
-            Debug.WriteLine("PLUGIN> Received:" + message);
-            CommandMessage cmm = PrepareCommand(message);
-
-            foreach (IPluginContract plugin in plugins) {
-                if (plugin.CommandName != cmm.command || plugin.Rank > relation.permission) {
-                    continue;
-                }
-                NetworkMessage nm = plugin.OnPrivMsg(cmm);
-                if (nm == null) {
-                    continue;
-                }
-                _sender.Send(nm);
             }
         }
 
@@ -122,23 +88,87 @@ namespace Rabscuttle.core.handler {
             throw new System.NotImplementedException();
         }
 
-        public CommandMessage PrepareCommand(NetworkMessage message) {
-            string[] split = message.message.Split(new[] {' '}, 2);
+        public IPluginContract FindPlugin(string name) {
+            return plugins.SingleOrDefault(s => s.CommandName == name);
+        }
+
+        private bool CheckForBotoperator(ChannelUser user) {
+            if (_operators.Any(s => s.Trim() == user.userName)) {
+                Task<bool> task = channelHandler.IsLoggedIn(user.userName);
+                Logger.WriteInfo("Plugin Handler", "Searching for bot operator rights on {0}", user.userName);
+                task.Wait();
+                Logger.WriteDebug("Plugin Handler", "Operator Rights are: {0}", task.Result);
+                return task.Result;
+            }
+            return false;
+        }
+
+        private bool SortOutMessage(NetworkMessage message, UserRelation relation) {
+            //@TODO: Once I've come around to write the ban plugin, this will be checking for it
+            return false;
+        }
+
+        /// <summary> Converts a <see cref="NetworkMessage"/> to a <see cref="CommandMessage"/> and searches for all relevant data. </summary>
+        /// <param name="message">A NetworkMessage that has to be of Type <c>NOTICE</c> or <c>PRIVMSG</c>.</param>
+        /// <returns> A CommandMessage which can be sent to plugins. They contain all relevant data. </returns>
+        private CommandMessage PrepareCommand(NetworkMessage message) {
+            CommandCode type = (CommandCode) message.typeEnum;
+            if (type != CommandCode.PRIVMSG && type != CommandCode.NOTICE) { // the message is of an unsupported Type
+                var error =
+                    $"The given NetworkMessage is not of type [ NOTICE ] or [ PRIVMSG ], instead is [ {message.type} ].";
+                Logger.WriteError("Plugin Handler", error);
+                throw new ArgumentException(error);
+            }
+
+            string[] split = message.message.Split(new[] {' '}, 2); // first is command, second are all parameter
             string args = "";
-            string command = split[0].Substring(prefix.Length);
+            string command = split[0].Substring(prefix.Length); // cut off the prefix
             if (split.Length > 1) {
                 args = split[1];
             }
 
+            ChannelUser user = new ChannelUser(message.prefix);
+            // typeParams can be a channel or a user
+            // @TODO: What happens when username and channel name are same?
+            Channel chan = channelHandler.FindChannel(message.typeParams);
+            MemberCode permission = MemberCode.DEFAULT;
+
+
+            if (_operators.Any(s => user.userName == s) && CheckForBotoperator(user)) { // when username in _operators and IS an operator
+                permission = MemberCode.BOTOPERATOR;
+            } else if (chan != null) { // otherwise, if the channel is null, give us the permission in his channel
+                UserRelation relation = chan.users.SingleOrDefault(s => s.user.userName == user.userName);
+                if (relation != null) {
+                    permission = relation.Permission;
+                } else { // uh oh, that went wrong - user not found in any channels
+                    Logger.WriteWarn("Plugin Handler", "User [ {0} ] requested a command but was not found in the userlists.", user.userName);
+                }
+            }
+
+            // Assemble the final command message.
             CommandMessage cmm = new CommandMessage() {
                 message = message,
                 parameters = args,
                 command = command,
                 origin = message.typeParams,
-                user = new ChannelUser(message.prefix)
+                user = user,
+                permission = permission
             };
 
             return cmm;
+        }
+
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            if (disposing) {
+                _catalog?.Dispose();
+                _container?.Dispose();
+            }
         }
     }
 }

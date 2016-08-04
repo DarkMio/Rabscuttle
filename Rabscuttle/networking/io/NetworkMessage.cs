@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
-using Rabscuttle.core.commands;
+using Rabscuttle.networking.commands;
 using Rabscuttle.stuff;
 
-namespace Rabscuttle.core.io {
+namespace Rabscuttle.networking.io {
     public class NetworkMessage {
 
         public readonly string message;
@@ -19,11 +18,11 @@ namespace Rabscuttle.core.io {
         /*
         private readonly Regex r = new Regex(
             @"^(?::(?<prefix>(?<user>[^@!\ ]*)(?:(?:\!(?<ident>[^@]*))?@(?<host>[^\ ]*))?)\ )?"+
-            @"(?<type>[^\ ]+)(?<typeparameter>(?:\ [^:\ ][^\ ]*){0,14})(?:\ :?(?<message>.*))?(?:\r\n)?$",
+            @"(?<Type>[^\ ]+)(?<typeparameter>(?:\ [^:\ ][^\ ]*){0,14})(?:\ :?(?<message>.*))?(?:\r\n)?$",
             RegexOptions.Compiled
         );
 
-        private readonly Regex source = new Regex(@":(?<user>[^@!\ ]*)\!(?<ident>[^@]*)@(?<host>[^\ ]*)", RegexOptions.Compiled);
+        private readonly Regex Source = new Regex(@":(?<user>[^@!\ ]*)\!(?<ident>[^@]*)@(?<host>[^\ ]*)", RegexOptions.Compiled);
         */
 
         public NetworkMessage(string prefix, string typeParams, string message, bool fromServer, Enum type) {
@@ -49,19 +48,19 @@ namespace Rabscuttle.core.io {
                 var messageContent = r.Matches(raw)[0].Groups;
                 prefix = messageContent["prefix"].Value;
                 { // some IRC commands come as reply number, some as actual command.
-                    var rawType = messageContent["type"].Value;
+                    var rawType = messageContent["Type"].Value;
                     int replyCode;
                     bool isNumeric = int.TryParse(rawType, out replyCode);
-                    type = isNumeric ? ((ReplyCode) replyCode).ToString() : rawType;
+                    Type = isNumeric ? ((ReplyCode) replyCode).ToString() : rawType;
                 }
                 var typeParameter = messageContent["typeparameter"].Value;
                 typeParams = String.IsNullOrWhiteSpace(typeParameter) ? typeParameter : typeParameter.Substring(1, typeParameter.Length - 1); // x.Value.Substring(1, x.Length-1);
                 message = messageContent["message"].Value;
 
-                if (Enum.IsDefined(typeof(ReplyCode), type)) {
-                    typeEnum = (ReplyCode) Enum.Parse(typeof(ReplyCode), type, true);
-                } else if (Enum.IsDefined(typeof(CommandCode), type)) {
-                    typeEnum = (CommandCode) Enum.Parse(typeof(CommandCode), type, true);
+                if (Enum.IsDefined(typeof(ReplyCode), Type)) {
+                    typeEnum = (ReplyCode) Enum.Parse(typeof(ReplyCode), Type, true);
+                } else if (Enum.IsDefined(typeof(CommandCode), Type)) {
+                    typeEnum = (CommandCode) Enum.Parse(typeof(CommandCode), Type, true);
                 } else {
                     Debug.WriteLine("!! Unrecorginzed method: " + raw);
                 }
@@ -82,13 +81,13 @@ namespace Rabscuttle.core.io {
 
             // Now split up everything else.
             string[] commandStack = messageSplit[0].Split(' ');
-            if (commandStack[0].StartsWith(":")) { // the source string is the only one which starts with ":"
+            if (commandStack[0].StartsWith(":")) { // the Source string is the only one which starts with ":"
                 prefix = commandStack[0].Substring(1);
-                // if there was a source string, then slice the array forwards.
+                // if there was a Source string, then slice the array forwards.
                 commandStack = commandStack.Skip(1).ToArray();
             }
 
-            // following after is the type, which is either plaintext or a reply-number.
+            // following after is the Type, which is either plaintext or a reply-number.
             var rawType = commandStack[0];
             int replyCode;
             bool isNumeric = int.TryParse(rawType, out replyCode);
@@ -97,10 +96,10 @@ namespace Rabscuttle.core.io {
             // jump one over
             commandStack = commandStack.Skip(1).ToArray();
 
-            // if now anything is left, it should be type-parameter.
+            // if now anything is left, it should be Type-parameter.
             typeParams = commandStack.Length > 0 ? string.Join(" ", commandStack) : null;
 
-            // and finally write out the type-params.
+            // and finally write out the Type-params.
             if (Enum.IsDefined(typeof(ReplyCode), type)) {
                 typeEnum = (ReplyCode) replyCode;
             } else if (Enum.IsDefined(typeof(CommandCode), type)) {
@@ -134,7 +133,7 @@ namespace Rabscuttle.core.io {
         public override bool Equals(object obj) {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((NetworkMessage) obj);
         }
 
@@ -142,12 +141,12 @@ namespace Rabscuttle.core.io {
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode() {
             unchecked {
-                int hashCode = (message != null ? message.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (prefix != null ? prefix.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (type != null ? type.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (typeParams != null ? typeParams.GetHashCode() : 0);
+                int hashCode = message?.GetHashCode() ?? 0;
+                hashCode = (hashCode * 397) ^ (prefix?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (type?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (typeParams?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ fromServer.GetHashCode();
-                hashCode = (hashCode * 397) ^ (typeEnum != null ? typeEnum.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (typeEnum?.GetHashCode() ?? 0);
                 return hashCode;
             }
         }

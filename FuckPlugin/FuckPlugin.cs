@@ -5,10 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using PluginContract;
-using Rabscuttle.core.commands;
-using Rabscuttle.core.handler;
-using Rabscuttle.core.io;
+using Rabscuttle.handler;
+using Rabscuttle.networking.commands;
+using Rabscuttle.networking.io;
+using Rabscuttle.plugins;
 
 namespace FuckPlugin {
     [Export(typeof(IPluginContract))]
@@ -16,6 +16,10 @@ namespace FuckPlugin {
         /// <summary> Gets or sets the name of the command. </summary>
         /// <value> The name of the command should be short and descriptive, usually a single word. </value>
         public string CommandName => "fuck";
+
+        /// <summary> Gets or sets the back reference. </summary>
+        /// <value> The back reference is a the plugin handler reference, to search for other plugins, for example. </value>
+        public PluginHandler BackReference { get; set; }
 
         /// <summary> Gets or sets the rank. </summary>
         /// <value> The rank is the least amount of channel rights he has to have, otherwise the command execute will be ignored. </value>
@@ -39,7 +43,7 @@ namespace FuckPlugin {
             //
         }
 
-        private string[] phrases = {
+        private readonly string[] _phrases = {
             "Fuck off, {0} - {1}",
             "Fuck you, {0} - {1}",
             "{0} can go and fuck off. - {1}",
@@ -59,7 +63,7 @@ namespace FuckPlugin {
             "Well {0}, aren't you a shining example of a rancid fuck-nugget. - {1}",
             "Fuck off, you must, {0}. - {1}",
             "Fucking {0} is a fucking pussy. I'm going to fucking bury that guy, I have done it before, and I will do it again. I'm going to fucking kill Arc Warden. - {1}",
-            "I'd love to stop and chat to you but I'd rather have type 2 diabetes. - {1}",
+            "I'd love to stop and chat to you but I'd rather have Type 2 diabetes. - {1}",
             "Christ on a bendy-bus, {0}, don't be such a fucking faff-arse. - {1}",
             "Merry Fucking Christmas, {0}. - {1}",
             "Happy Fucking Birthday, {0}. - {1}",
@@ -73,22 +77,21 @@ namespace FuckPlugin {
 
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
-        public NetworkMessage OnPrivMsg(CommandMessage message) {
+        public void OnPrivMsg(CommandMessage message) {
             if (String.IsNullOrEmpty(message.parameters)) {
-                return null;
+                return;
             }
             var split = message.parameters.Split(new [] {' '}, 2)[0];
 
             var f = message.user.userName;
             var name = split;
-            int num = new Random().Next(0, phrases.Length);
-            return RawPrivMsg.Generate(message.origin, String.Format(phrases[num], name, f));
+            int num = new Random().Next(0, _phrases.Length);
+            Sender.Send(RawPrivMsg.Generate(message.origin, String.Format(_phrases[num], name, f)));
         }
 
         /// <summary> Called when a notice message was received by the bot. </summary>
         /// <param name="message">The network message received.</param>
-        public NetworkMessage OnNotice(CommandMessage message) {
-            return null;
+        public void OnNotice(CommandMessage message) {
         }
     }
 }

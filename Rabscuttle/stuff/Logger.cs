@@ -3,8 +3,8 @@ using System.Configuration;
 
 namespace Rabscuttle.stuff {
     class Logger {
-        private static Object logLock = new Object();
-        private static Category loggingLevel;
+        private static readonly object LOG_LOCK = new object();
+        private static Category _loggingLevel;
 
         public enum Category {
             DEBUG,
@@ -16,24 +16,18 @@ namespace Rabscuttle.stuff {
 
         public static void Setup() {
             string logLevel = ConfigurationManager.AppSettings["loglevel"];
-            Enum.TryParse(logLevel, true, out loggingLevel);
+            Enum.TryParse(logLevel, true, out _loggingLevel);
         }
 
         public static void WriteLine(Category category, string component, string format, params object[] args) {
-            if (category < loggingLevel) {
+            if (category < _loggingLevel) {
                 return;
             }
 
             string categoryString = ("[" + category.ToString() + "]").PadRight(7);
-            string logLine = string.Format(
-                "{0} {1} {2}: {3}",
-                DateTime.Now.ToLongTimeString(),
-                categoryString,
-                component,
-                string.Format(format, args)
-            );
+            string logLine = $"{DateTime.Now.ToLongTimeString()} {categoryString} {component}: {string.Format(format, args)}";
 
-            lock (logLock) {
+            lock (LOG_LOCK) {
                 switch (category) {
                     case Category.DEBUG:
                         Console.ForegroundColor = ConsoleColor.Green;

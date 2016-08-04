@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rabscuttle", "Rabscuttle\Rabscuttle.csproj", "{718159E3-8A0B-41B8-ABDB-B35C43538697}"
 EndProject
@@ -10,6 +10,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamplePlugin", "ExamplePlugin\ExamplePlugin.csproj", "{14606E2E-A5B9-49BE-9211-05DB99684B0C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuckPlugin", "FuckPlugin\FuckPlugin.csproj", "{BE80ABA2-0B3D-41AB-8165-569B6C4CA251}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RawPlugin", "RawPlugin\RawPlugin.csproj", "{7DDF18EB-CFAE-4C37-A81E-57B3EF8E6A59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RankPlugin", "RankPlugin\RankPlugin.csproj", "{91AC7A19-8F78-4274-AC57-A10000C6BEB7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{5CEFD7C9-D8EC-4F34-9C6D-91945B316AC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandsPlugin", "CommandsPlugin\CommandsPlugin.csproj", "{8BE24ACC-92F7-40B0-933D-3E42C43C93DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,8 +41,27 @@ Global
 		{BE80ABA2-0B3D-41AB-8165-569B6C4CA251}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE80ABA2-0B3D-41AB-8165-569B6C4CA251}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE80ABA2-0B3D-41AB-8165-569B6C4CA251}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DDF18EB-CFAE-4C37-A81E-57B3EF8E6A59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DDF18EB-CFAE-4C37-A81E-57B3EF8E6A59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DDF18EB-CFAE-4C37-A81E-57B3EF8E6A59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DDF18EB-CFAE-4C37-A81E-57B3EF8E6A59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91AC7A19-8F78-4274-AC57-A10000C6BEB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91AC7A19-8F78-4274-AC57-A10000C6BEB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91AC7A19-8F78-4274-AC57-A10000C6BEB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91AC7A19-8F78-4274-AC57-A10000C6BEB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BE24ACC-92F7-40B0-933D-3E42C43C93DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BE24ACC-92F7-40B0-933D-3E42C43C93DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BE24ACC-92F7-40B0-933D-3E42C43C93DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BE24ACC-92F7-40B0-933D-3E42C43C93DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{14606E2E-A5B9-49BE-9211-05DB99684B0C} = {5CEFD7C9-D8EC-4F34-9C6D-91945B316AC0}
+		{BE80ABA2-0B3D-41AB-8165-569B6C4CA251} = {5CEFD7C9-D8EC-4F34-9C6D-91945B316AC0}
+		{7DDF18EB-CFAE-4C37-A81E-57B3EF8E6A59} = {5CEFD7C9-D8EC-4F34-9C6D-91945B316AC0}
+		{91AC7A19-8F78-4274-AC57-A10000C6BEB7} = {5CEFD7C9-D8EC-4F34-9C6D-91945B316AC0}
+		{8BE24ACC-92F7-40B0-933D-3E42C43C93DF} = {5CEFD7C9-D8EC-4F34-9C6D-91945B316AC0}
 	EndGlobalSection
 EndGlobal
