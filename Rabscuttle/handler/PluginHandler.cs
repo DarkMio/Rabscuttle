@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using NUnit.Framework;
 using Rabscuttle.channel;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
@@ -11,21 +15,41 @@ using Rabscuttle.stuff;
 
 namespace Rabscuttle.handler {
     public class PluginHandler : ObservableHandler, IDisposable {
-        [ImportMany(typeof(IPluginContract), AllowRecomposition = true)]
-        public IPluginContract[] plugins = null;
+        [ImportMany(typeof(IPluginContract))]
+        public List<IPluginContract> plugins = null;
         private readonly ISender _sender;
-        private readonly DirectoryCatalog _catalog;
+        private DirectoryCatalog _catalog;
         private CompositionContainer _container;
         private readonly string prefix = ">";
         public readonly ChannelHandler channelHandler;
         private readonly string _path;
         private readonly string[] _operators;
+        private readonly VoidHandler _voidHandler;
 
-        public PluginHandler(ISender sender, ChannelHandler channelHandler, string pathToPlugins = "./../Plugins/") {
+        public static void Main(string[] args) {
+            DirectoryInfo info = new DirectoryInfo("./../Plugins/");
+            if (!info.Exists) {
+                Logger.WriteWarn("Plugin Handler", "Plugin Folder not found!");
+                return;
+            }
+            foreach (FileInfo file in info.GetFiles("*.dll")) {
+
+                Assembly a = Assembly.LoadFrom(file.FullName);
+                Type[] types = a.GetExportedTypes();
+                foreach (Type t in types) {
+                    var instance = (IPluginContract) Activator.CreateInstance(t);
+                    Logger.WriteFatal("Plugin Handler", instance.CommandName);
+                    Logger.WriteFatal("Plugin Handler", t.ToString());
+                }
+
+            }
+        }
+
+        public PluginHandler(ISender sender, ChannelHandler channelHandler, VoidHandler voidHandler, string pathToPlugins = "./../Plugins/") {
             _sender = sender;
             _path = pathToPlugins;
-            _catalog = new DirectoryCatalog(pathToPlugins);
-
+            //_catalog = new DirectoryCatalog(pathToPlugins);
+            _voidHandler = voidHandler;
             this.channelHandler = channelHandler;
 
             var opList = ConfigurationProvider.Get("operators").Split(',');
@@ -34,19 +58,48 @@ namespace Rabscuttle.handler {
             }
             _operators = opList;
 
+            plugins = new List<IPluginContract>();
             LoadPlugins();
         }
 
         private void LoadPlugins() {
+            /*
+            _catalog = new DirectoryCatalog(_path);
             _container = new CompositionContainer(_catalog);
-            //plugins = _container.GetExportedValues<IPluginContract>();
             _container.ComposeParts(this);
-            Logger.WriteInfo("Plugin Handler", "Loaded a total of {0} plugins.", plugins.Length);
+            foreach (IPluginContract contract in plugins) {
+                Console.WriteLine(contract.CommandName);
+            }
+            // var elements = _container.GetExportedValues<IPluginContract>();
+            // _container.ComposeParts(this);
+            */
+            DirectoryInfo info = new DirectoryInfo("./../Plugins/");
+            if (!info.Exists) {
+                Logger.WriteWarn("Plugin Handler", "Plugin Folder not found!");
+                return;
+            }
+
+            foreach (FileInfo file in info.GetFiles("*.dll")) {
+
+                Assembly a = Assembly.LoadFrom(file.FullName);
+                Type[] types = a.GetExportedTypes();
+                foreach (Type t in types) {
+                    var instance = Activator.CreateInstance(t) as IPluginContract;
+                    if (instance != null) { // if it's part of the plugin classing...
+                        plugins.Add(instance);
+                    }
+                }
+
+            }
+            Logger.WriteInfo("Plugin Handler", "Loaded a total of {0} plugins.", plugins.Count);
+
+
 
             foreach (IPluginContract plugin in plugins) {
                 plugin.Sender = _sender;
                 plugin.MessagePrefix = prefix;
                 plugin.BackReference = this;
+                plugin.SubscribeTo(_voidHandler); // currently I don't have much more to subscribe to
                 Logger.WriteDebug("Plugin Handler", "Loaded: [ {0} ]", plugin.CommandName);
             }
         }

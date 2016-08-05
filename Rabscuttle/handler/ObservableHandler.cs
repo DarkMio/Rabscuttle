@@ -9,6 +9,10 @@ namespace Rabscuttle.handler {
         public abstract void HandleCommand(NetworkMessage message);
         public abstract void HandleReply(NetworkMessage message);
 
+        public ObservableHandler() {
+            observers = new List<IObserver<NetworkMessage>>();
+        }
+
         /**
          * Notifies all obserser with given message.
          */
