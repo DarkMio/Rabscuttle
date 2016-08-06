@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{14606E2E-A5B9-49BE-9211-05DB99684B0C}</ProjectGuid>
+    <ProjectGuid>{BE80ABA2-0B3D-41AB-8165-569B6C4CA251}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ExamplePlugin</RootNamespace>
-    <AssemblyName>ExamplePlugin</AssemblyName>
+    <RootNamespace>FuckPlugin</RootNamespace>
+    <AssemblyName>FuckPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\Rabscuttle\bin\Plugins\</OutputPath>
+    <OutputPath>..\..\Rabscuttle\bin\Plugins\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -58,13 +58,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExamplePlugin.cs" />
+    <Compile Include="FuckPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Rabscuttle\Rabscuttle.csproj">
+    <ProjectReference Include="..\..\Rabscuttle\Rabscuttle.csproj">
       <Project>{718159e3-8a0b-41b8-abdb-b35c43538697}</Project>
       <Name>Rabscuttle</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

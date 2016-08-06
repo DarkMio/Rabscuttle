@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{91AC7A19-8F78-4274-AC57-A10000C6BEB7}</ProjectGuid>
+    <ProjectGuid>{7DDF18EB-CFAE-4C37-A81E-57B3EF8E6A59}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RankPlugin</RootNamespace>
-    <AssemblyName>RankPlugin</AssemblyName>
+    <RootNamespace>RawPlugin</RootNamespace>
+    <AssemblyName>RawPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\Rabscuttle\bin\Plugins\</OutputPath>
+    <OutputPath>..\..\Rabscuttle\bin\Plugins\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -59,13 +59,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RankPlugin.cs" />
+    <Compile Include="RawPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Rabscuttle\Rabscuttle.csproj">
+    <ProjectReference Include="..\..\Rabscuttle\Rabscuttle.csproj">
       <Project>{718159e3-8a0b-41b8-abdb-b35c43538697}</Project>
       <Name>Rabscuttle</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

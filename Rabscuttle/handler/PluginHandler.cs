@@ -26,25 +26,6 @@ namespace Rabscuttle.handler {
         private readonly string[] _operators;
         private readonly VoidHandler _voidHandler;
 
-        public static void Main(string[] args) {
-            DirectoryInfo info = new DirectoryInfo("./../Plugins/");
-            if (!info.Exists) {
-                Logger.WriteWarn("Plugin Handler", "Plugin Folder not found!");
-                return;
-            }
-            foreach (FileInfo file in info.GetFiles("*.dll")) {
-
-                Assembly a = Assembly.LoadFrom(file.FullName);
-                Type[] types = a.GetExportedTypes();
-                foreach (Type t in types) {
-                    var instance = (IPluginContract) Activator.CreateInstance(t);
-                    Logger.WriteFatal("Plugin Handler", instance.CommandName);
-                    Logger.WriteFatal("Plugin Handler", t.ToString());
-                }
-
-            }
-        }
-
         public PluginHandler(ISender sender, ChannelHandler channelHandler, VoidHandler voidHandler, string pathToPlugins = "./../Plugins/") {
             _sender = sender;
             _path = pathToPlugins;
@@ -84,12 +65,15 @@ namespace Rabscuttle.handler {
                 Assembly a = Assembly.LoadFrom(file.FullName);
                 Type[] types = a.GetExportedTypes();
                 foreach (Type t in types) {
-                    var instance = Activator.CreateInstance(t) as IPluginContract;
-                    if (instance != null) { // if it's part of the plugin classing...
-                        plugins.Add(instance);
+                    try {
+                        var instance = Activator.CreateInstance(t) as IPluginContract;
+                        if (instance != null) { // if it's part of the plugin classing...
+                            plugins.Add(instance);
+                        }
+                    } catch (Exception e) when (e is ArgumentException || e is MissingMethodException) {
+                        Logger.WriteWarn("Plugin Handler", $"Could not load {file.Name}, caused by: {e.Message}");
                     }
                 }
-
             }
             Logger.WriteInfo("Plugin Handler", "Loaded a total of {0} plugins.", plugins.Count);
 
