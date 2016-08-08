@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PluginDebugger", "PluginDeb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginDebugger", "PluginDebugger\PluginDebugger.csproj", "{E81D325A-A9AF-49B8-9089-5AE2856B1B53}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubUpdatedPlugin", "Plugins\GithubUpdatedPlugin\GithubUpdatedPlugin.csproj", "{1A8773ED-230E-444C-B559-304269D30EAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,14 @@ Global
 		{E81D325A-A9AF-49B8-9089-5AE2856B1B53}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E81D325A-A9AF-49B8-9089-5AE2856B1B53}.Release|x64.ActiveCfg = Release|Any CPU
 		{E81D325A-A9AF-49B8-9089-5AE2856B1B53}.Release|x64.Build.0 = Release|Any CPU
+		{1A8773ED-230E-444C-B559-304269D30EAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A8773ED-230E-444C-B559-304269D30EAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A8773ED-230E-444C-B559-304269D30EAD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1A8773ED-230E-444C-B559-304269D30EAD}.Debug|x64.Build.0 = Debug|Any CPU
+		{1A8773ED-230E-444C-B559-304269D30EAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A8773ED-230E-444C-B559-304269D30EAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A8773ED-230E-444C-B559-304269D30EAD}.Release|x64.ActiveCfg = Release|Any CPU
+		{1A8773ED-230E-444C-B559-304269D30EAD}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,5 +128,6 @@ Global
 		{7DDF18EB-CFAE-4C37-A81E-57B3EF8E6A59} = {3134E00A-4FD7-426D-8C8B-6F34653F603D}
 		{B22538E1-DE92-4BC7-BCDA-57577939E41F} = {3134E00A-4FD7-426D-8C8B-6F34653F603D}
 		{E81D325A-A9AF-49B8-9089-5AE2856B1B53} = {B22538E1-DE92-4BC7-BCDA-57577939E41F}
+		{1A8773ED-230E-444C-B559-304269D30EAD} = {3134E00A-4FD7-426D-8C8B-6F34653F603D}
 	EndGlobalSection
 EndGlobal
