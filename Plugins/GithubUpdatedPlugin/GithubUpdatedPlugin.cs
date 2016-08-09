@@ -55,9 +55,12 @@ namespace GithubUpdatedPlugin
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
         public void OnPrivMsg(CommandMessage message) {
-            if (rateLimitRemainder <= 0 && rateLimitReset.Subtract(DateTime.Now).TotalSeconds > 0) {
-                int remaining = (int) rateLimitReset.Subtract(DateTime.UtcNow).TotalSeconds;
-                Sender.Send(RawPrivMsg.Generate(message.origin, $"Rate limit exceeded - please try again in {remaining} seconds."));
+
+
+            double remaining = rateLimitReset.Subtract(DateTime.UtcNow).TotalSeconds;
+            if (rateLimitRemainder <= 0 && remaining >= 0) {
+                int seconds = (int) remaining;
+                Sender.Send(RawPrivMsg.Generate(message.origin, $"Rate limit exceeded - please try again in {seconds} seconds."));
                 return;
             }
 
