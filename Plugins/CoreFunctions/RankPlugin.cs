@@ -9,12 +9,12 @@ using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 using Rabscuttle.plugins;
 
-namespace RawPlugin {
+namespace CoreFunctions {
     [Export(typeof(IPluginContract))]
-    public class RawPlugin : IPluginContract {
+    public class RankPlugin : IPluginContract {
         /// <summary> Gets or sets the name of the command. </summary>
         /// <value> The name of the command should be short and descriptive, usually a single word. </value>
-        public string CommandName => "raw";
+        public string CommandName => "rank";
 
         /// <summary> Gets or sets the back reference. </summary>
         /// <value> The back reference is a the plugin handler reference, to search for other plugins, for example. </value>
@@ -22,7 +22,7 @@ namespace RawPlugin {
 
         /// <summary> Gets or sets the rank. </summary>
         /// <value> The rank is the least amount of channel rights he has to have, otherwise the command execute will be ignored. </value>
-        public MemberCode Rank => MemberCode.BOTOPERATOR;
+        public MemberCode Rank => MemberCode.DEFAULT;
 
         /// <summary> Gets or sets the message prefix, which will be given by the bot. </summary>
         /// <value> The prefix is the kind of message prefix the bot usually listens to. </value>
@@ -30,7 +30,7 @@ namespace RawPlugin {
 
         /// <summary> Get or sets the help file, which the bot will use on request. </summary>
         /// <value> A helpfile, describing the plugins function, which might be sent by the bot on request. </value>
-        public string HelpFile => "This sends raw commands to the server from the bot.";
+        public string HelpFile => "Gets your rank, as which the bot sees you.";
 
         /// <summary> Gets or sets the sender, which will be given by the bot. </summary>
         /// <value> A sender, which the plugin can send NetworkMessage to. </value>
@@ -45,7 +45,7 @@ namespace RawPlugin {
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
         public void OnPrivMsg(CommandMessage message) {
-            Sender.Send(new NetworkMessage(message.parameters, false));
+            Sender.Send(RawNotice.Generate(message.user.userName, $"You are {message.permission}"));
         }
 
         /// <summary> Called when a notice message was received by the bot. </summary>

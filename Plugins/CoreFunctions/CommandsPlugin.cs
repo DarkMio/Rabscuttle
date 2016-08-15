@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 using Rabscuttle.plugins;
 
-namespace RankPlugin {
+namespace CoreFunctions {
     [Export(typeof(IPluginContract))]
-    public class RankPlugin : IPluginContract {
+    public class CommandsPlugin : IPluginContract {
         /// <summary> Gets or sets the name of the command. </summary>
         /// <value> The name of the command should be short and descriptive, usually a single word. </value>
-        public string CommandName => "rank";
+        public string CommandName => "commands";
 
         /// <summary> Gets or sets the back reference. </summary>
         /// <value> The back reference is a the plugin handler reference, to search for other plugins, for example. </value>
@@ -30,7 +26,7 @@ namespace RankPlugin {
 
         /// <summary> Get or sets the help file, which the bot will use on request. </summary>
         /// <value> A helpfile, describing the plugins function, which might be sent by the bot on request. </value>
-        public string HelpFile => "Gets your rank, as which the bot sees you.";
+        public string HelpFile => "Displays all available commands for you.";
 
         /// <summary> Gets or sets the sender, which will be given by the bot. </summary>
         /// <value> A sender, which the plugin can send NetworkMessage to. </value>
@@ -45,7 +41,18 @@ namespace RankPlugin {
         /// <summary> Called when a private message was received by the bot. Careful: This can be in a channel too! </summary>
         /// <param name="message">The network message received.</param>
         public void OnPrivMsg(CommandMessage message) {
-            Sender.Send(RawNotice.Generate(message.user.userName, $"You are {message.permission}"));
+            var plugins = BackReference.plugins.OrderBy(s => s.Rank);
+            string commands = "";
+            foreach (IPluginContract pluginContract in plugins) {
+                if (message.permission >= pluginContract.Rank) {
+                    commands += pluginContract.CommandName + ", ";
+                } else {
+                    break;
+                }
+            }
+            commands = commands.Substring(0, commands.Length - 2);
+            Sender.Send(RawNotice.Generate(message.user.userName,
+                $"Following commands are available for you: {commands}"));
         }
 
         /// <summary> Called when a notice message was received by the bot. </summary>

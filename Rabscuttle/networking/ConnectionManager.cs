@@ -70,6 +70,12 @@ namespace Rabscuttle.networking {
             _scheduler.Add(message);
         }
 
+        public void Send(NetworkMessage[] messages) {
+            foreach (NetworkMessage networkMessage in messages) {
+                Send(networkMessage);
+            }
+        }
+
         /// <summary>
         /// Receives a message instantaneously unless <paramref name="waitResponse"/> is set to <c>true</c>.
         /// </summary>

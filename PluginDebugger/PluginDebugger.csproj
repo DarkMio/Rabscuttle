@@ -55,11 +55,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Plugins\CommandsPlugin\CommandsPlugin.csproj">
-      <Project>{8be24acc-92f7-40b0-933d-3e42c43c93df}</Project>
-      <Name>CommandsPlugin</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Plugins\ExamplePlugin\ExamplePlugin.csproj">
       <Project>{14606e2e-a5b9-49be-9211-05db99684b0c}</Project>
       <Name>ExamplePlugin</Name>
@@ -77,16 +72,6 @@
     <ProjectReference Include="..\Plugins\KarmaPlugin\KarmaPlugin.csproj">
       <Project>{4fc2252b-4e85-42be-b56c-5e7b646937ac}</Project>
       <Name>KarmaPlugin</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Plugins\RankPlugin\RankPlugin.csproj">
-      <Project>{91ac7a19-8f78-4274-ac57-a10000c6beb7}</Project>
-      <Name>RankPlugin</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Plugins\RawPlugin\RawPlugin.csproj">
-      <Project>{7ddf18eb-cfae-4c37-a81e-57b3ef8e6a59}</Project>
-      <Name>RawPlugin</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Rabscuttle\Rabscuttle.csproj">

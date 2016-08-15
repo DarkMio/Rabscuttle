@@ -64,7 +64,7 @@ namespace Rabscuttle.networking.io {
             var s = _input.ReadLine();
             try {
                 var msg = new NetworkMessage(s, true);
-                Debug.WriteLine("Client>{0}{1}{2}{3}", " :" + msg.prefix, " " + msg.type, " " + msg.typeParams, " :" + msg.message);
+                Debug.WriteLine("Server>{0}{1}{2}{3}", " :" + msg.prefix, " " + msg.type, " " + msg.typeParams, " :" + msg.message);
                 return msg;
             } catch (ArgumentException e) {
                 Debug.WriteLine(e);
@@ -90,6 +90,12 @@ namespace Rabscuttle.networking.io {
             Debug.WriteLine("Client>{0}{1}{2}{3}", " :" + message.prefix, " " + message.type, " " + message.typeParams, " :" + message.message);
             _output.Write(message.BuildMessage());
             _output.Flush();
+        }
+
+        public void Send(NetworkMessage[] messages) {
+            foreach (NetworkMessage networkMessage in messages) {
+                Send(networkMessage);
+            }
         }
 
         /// <summary>

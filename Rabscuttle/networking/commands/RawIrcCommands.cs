@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Web.Security;
 using Rabscuttle.networking.io;
 
 namespace Rabscuttle.networking.commands {
@@ -7,6 +10,8 @@ namespace Rabscuttle.networking.commands {
         public abstract bool HasTypeParameter { get; }
         public abstract bool HasMessage { get; }
         public static T Instance { get; } = new T();
+        private const int MAX_BYTES = 512;
+        private static readonly int SINGLE_BYTE_SIZE = System.Text.Encoding.Unicode.GetByteCount(new [] {' '});
 
         protected NetworkMessage InstanceGenerate(bool fromServer, string prefix = null, string typeParameter = null,
                                                   string message = null) {
@@ -26,7 +31,8 @@ namespace Rabscuttle.networking.commands {
                                                   string typeParameter = null, string message = null) {
             return new NetworkMessage(prefix, type, typeParameter, message, fromServer);
         }
-        protected NetworkMessage Generate(bool fromServer, string prefix = null, string typeParameter = null,
+
+        protected NetworkMessage[] Generate(bool fromServer, string prefix = null, string typeParameter = null,
             string message = null) {
             if (HasTypeParameter && typeParameter == null) {
                 throw new ArgumentException("For this Type [ " + Type + " ] typeParameter cannot be null!");
@@ -35,7 +41,39 @@ namespace Rabscuttle.networking.commands {
                 throw new ArgumentException("For this Type [" + Type + " ] message cannot be null!");
             }
 
-            return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
+            if (message == null) {
+                return new[] {Instance.InstanceGenerate(fromServer, prefix, typeParameter, message)};
+            }
+
+            // build a sample command without the message
+            NetworkMessage byteMessage = Instance.InstanceGenerate(fromServer, prefix, typeParameter);
+            // calculate its size and how much space a message can take.
+            int byteSize = System.Text.Encoding.Unicode.GetByteCount(byteMessage.BuildMessage() + ":");
+            int remainingBytes = MAX_BYTES - byteSize;
+            int chunksPerLine = remainingBytes / SINGLE_BYTE_SIZE;
+
+            // Split newlines
+            string[] messageParts = message.Split(new[] {"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+            List<NetworkMessage> messages = new List<NetworkMessage>();
+            foreach (string messagePart in messageParts) {
+                // get how much space this line will take
+                int messageSize = System.Text.Encoding.Unicode.GetByteCount(messagePart);
+                if (remainingBytes >= messageSize) { // if we have enough space, continue
+                    messages.Add(Instance.InstanceGenerate(fromServer, prefix, typeParameter, messagePart));
+                    continue;
+                }
+                // or else chunk the string and add all chunks to the commands
+                IEnumerable<string> chunks = ChunksUpto(messagePart, chunksPerLine);
+                foreach (string chunk in chunks) {
+                    messages.Add(Instance.InstanceGenerate(fromServer, prefix, typeParameter, messagePart));
+                }
+            }
+            return messages.ToArray();
+        }
+
+        static IEnumerable<string> ChunksUpto(string str, int maxChunkSize) {
+            for (int i = 0; i < str.Length; i += maxChunkSize)
+                yield return str.Substring(i, Math.Min(maxChunkSize, str.Length-i));
         }
     }
 
@@ -88,8 +126,8 @@ namespace Rabscuttle.networking.commands {
         public override CommandCode Type => CommandCode.PRIVMSG;
         public override bool HasTypeParameter => true;
         public override bool HasMessage => true;
-        public static NetworkMessage Generate(string typeParameter, string message, bool fromServer = false, string prefix = null) {
-            return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
+        public static NetworkMessage[] Generate(string typeParameter, string message, bool fromServer = false, string prefix = null) {
+            return Instance.Generate(fromServer, prefix, typeParameter, message);
         }
     }
 
@@ -145,9 +183,11 @@ namespace Rabscuttle.networking.commands {
         public override bool HasTypeParameter => true;
         public override bool HasMessage => true;
 
-        public static NetworkMessage Generate(string typeParameter, string message, bool fromServer = false,
+        public static NetworkMessage[] Generate(string typeParameter, string message, bool fromServer = false,
             string prefix = null) {
-            return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
+
+            return Instance.Generate(fromServer, prefix, typeParameter, message);
+            // return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
         }
     }
 }
