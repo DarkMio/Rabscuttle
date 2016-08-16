@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandsPlugin.cs" />
+    <Compile Include="DebugPlugin.cs" />
     <Compile Include="HelpPlugin.cs" />
     <Compile Include="PingPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
