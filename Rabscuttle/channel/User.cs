@@ -15,7 +15,7 @@ namespace Rabscuttle.channel {
         public string server;
         public int hops;
 
-        public enum LoginStatus {DEFAULT, LOGGED_OUT, LOGGED_IN }
+        public enum LoginStatus {DEFAULT, CHECKING, LOGGED_OUT, LOGGED_IN }
 
         public LoginStatus loggedIn;
         public string loginUserName; // This is maybe short thought - maybe needs an instance of User

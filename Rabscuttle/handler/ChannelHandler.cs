@@ -59,14 +59,21 @@ namespace Rabscuttle.handler {
         /// <param name="source">The source string in <c>:~name!ident@host</c>.</param>
         /// <param name="isUserName">if set to <c>true</c> and a user has to  be created, .</param>
         /// <returns></returns>
-        private ChannelUser FindOrCreateUser(string source, bool isUserName=false) {
+        private ChannelUser FindOrCreateUser(string source,  out bool wasCreated, bool isUserName=false) {
             ChannelUser user = FindUser(source); // search
             if (user != null) { // if found, return him
+                wasCreated = false;
                 return user;
             } // otherwise, create a new
             user = new ChannelUser(source, isUserName);
             users.Add(user); // add him
+            wasCreated = true;
             return user; // return him
+        }
+
+        private ChannelUser FindOrCreateUser(string source, bool isUserName=false) {
+            bool outVal;
+            return FindOrCreateUser(source, out outVal, isUserName);
         }
 
         /// <summary> Finds the channel based on its name <c>#name</c>. </summary>
@@ -280,20 +287,24 @@ namespace Rabscuttle.handler {
                 char permissionChar = rankOrder.ElementAt(i);
                 MemberCode permission = ParseModePermission(permissionChar);
                 ChannelUser user = FindUser(channelUsers[i]);
-                if (user == null) {
+                if(user == null) {
                     Logger.WriteWarn("Channel Handler", "Cannot find user of mode set: {0} in channel: {1}", channelUsers[i], channel.channelName);
                     continue;
                 }
+                CheckUserlogin(user);
 
-                if (_operators.SingleOrDefault(s => s == user.userName) != null) {
-                    RawWhois.Generate(user.userName);
-                }
-
-                if (upranking) {
+                if(upranking) {
                     channel.AddRank(user, permission);
                 } else {
                     channel.RemoveRank(user, permission);
                 }
+            }
+        }
+
+        private void CheckUserlogin(ChannelUser user) {
+            if(_operators.SingleOrDefault(s => s == user.userName && user.loggedIn != ChannelUser.LoginStatus.DEFAULT) != null) {
+                user.loggedIn = ChannelUser.LoginStatus.CHECKING;
+                RawWhois.Generate(user.userName);
             }
         }
 
@@ -321,18 +332,18 @@ namespace Rabscuttle.handler {
             }
 
             Channel channel = FindChannel(channelName);
+            bool newUser = false;
             foreach (var username in usernames) {
-                ChannelUser user = FindOrCreateUser(username, true);
+                bool wasCreated;
+                ChannelUser user = FindOrCreateUser(username, out wasCreated, true);
+                newUser |= wasCreated;
                 channel.AddUser(user, ParseModePermission(username[0]));
                 channel.AddRank(user, ParseModePermission(username[0]));
-
-                if (_operators.SingleOrDefault(s => s == user.userName) != null) {
-                    // Send the whois request to figure out if he is logged in or not
-                    // this will later land on the channel handler anyway ("when it's time for it")
-                    _connection.Send(RawWhois.Generate(user.userName));
-                }
+                CheckUserlogin(user);
             }
-            _connection.Send(RawWho.Generate(channelName));
+            if(newUser) { // only if we found a new user, we want to throw a whoreply.
+                _connection.Send(RawWho.Generate(channelName));
+            }
         }
 
         private void HandleWhoReply(NetworkMessage message) {
