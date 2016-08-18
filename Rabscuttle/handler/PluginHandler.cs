@@ -65,9 +65,12 @@ namespace Rabscuttle.handler {
                 Assembly a = Assembly.LoadFrom(file.FullName);
                 Type[] types = a.GetExportedTypes();
                 foreach (Type t in types) {
+                    if (!typeof(IPluginContract).IsAssignableFrom(t)) {
+                        continue;
+                    }
                     try {
                         var instance = Activator.CreateInstance(t) as IPluginContract;
-                        if (instance != null) { // if it's part of the plugin classing...
+                        if (instance != null) { // if it's really, really part of the plugin classing...
                             plugins.Add(instance);
                         }
                     } catch (Exception e) when (e is ArgumentException || e is MissingMethodException) {
