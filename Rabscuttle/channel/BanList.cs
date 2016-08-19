@@ -2,22 +2,35 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Rabscuttle.channel;
 using Rabscuttle.stuff;
 
-namespace CoreFunctions.BanList {
+namespace Rabscuttle.channel {
     public class BanList {
         private const string FILEPATH = "../Plugins/PluginData/bans/";
         private JArray _banlist;
         private readonly string _filename;
         private const string IDENT_STRING = "{0}!{1}@{2}";
+        private static BanList _instance;
+        private static readonly object LOCK_OBJECT = new Object();
 
-        public BanList(string filename = "banlist.json") {
+        private BanList(string filename = "banlist.json") {
             _filename = filename;
             _banlist = ReadAndParseFile();
+        }
+
+        public static BanList Instance {
+            get {
+                if (_instance == null) {
+                    lock (LOCK_OBJECT) {
+                        if (_instance == null) {
+                            _instance = new BanList();
+                        }
+                    }
+                }
+                return _instance;
+            }
         }
 
         private JObject BuildIdentObject(string user, string ident, string host) {
@@ -62,13 +75,13 @@ namespace CoreFunctions.BanList {
         public bool CheckBan(string user = "*", string ident = "*", string host = "*") {
             var banlist = _banlist.Values<JObject>();
             if (user != "*") {
-                banlist = banlist.Where(c => c["user"].Value<string>() == user);
+                banlist = banlist.Where(c => c["user"].Value<string>() == "*" || c["user"].Value<string>() == user);
             }
             if (ident != "*") {
-                banlist = banlist.Where(c => c["ident"].Value<string>() == ident);
+                banlist = banlist.Where(c => c["ident"].Value<string>() == "*" || c["ident"].Value<string>() == ident);
             }
             if (host != "*") {
-                banlist = banlist.Where(c => c["host"].Value<string>() == ident);
+                banlist = banlist.Where(c => c["host"].Value<string>() == "*" || c["host"].Value<string>() == ident);
             }
             return banlist.Any();
         }
