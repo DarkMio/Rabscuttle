@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Text.RegularExpressions;
 using Rabscuttle.channel;
 using Rabscuttle.handler;
@@ -9,7 +8,6 @@ using Rabscuttle.plugins;
 using Rabscuttle.util;
 
 namespace CoreFunctions {
-    [Export(typeof(IPluginContract))]
     public class BanPlugin : IPluginContract {
         /// <summary> Gets or sets the name of the command. </summary>
         /// <value> The name of the command should be short and descriptive, usually a single word. </value>
@@ -38,7 +36,7 @@ namespace CoreFunctions {
         /// <summary> Gets or sets the sender, which will be given by the bot. </summary>
         /// <value> A sender, which the plugin can send NetworkMessage to. </value>
         public ISender Sender { get; set; }
-        private BanList.BanList _banlist = new BanList.BanList();
+        private readonly BanList _banlist = BanList.Instance;
 
         /// <summary> Let the plugin subscribe to any of these Handlers - totally optional. </summary>
         /// <param name="handler">Any of the handlers, which will be given by the bot.</param>

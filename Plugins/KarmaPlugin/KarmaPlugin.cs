@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Rabscuttle.handler;
@@ -17,7 +9,6 @@ using Rabscuttle.plugins;
 using Rabscuttle.stuff;
 
 namespace KarmaPlugin {
-    [Export(typeof(IPluginContract))]
     public class KarmaPlugin : IPluginContract {
 
         /// <summary> Gets or sets the name of the command. </summary>

@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.Composition;
-using Rabscuttle.handler;
+﻿using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 using Rabscuttle.plugins;
 
 namespace CoreFunctions {
-    [Export(typeof(IPluginContract))]
     public class PingPlugin : IPluginContract {
         public string CommandName => "ping";
         public PluginHandler BackReference { get; set; }

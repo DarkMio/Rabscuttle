@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Primitives;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Rabscuttle.handler;
@@ -14,9 +8,7 @@ using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 using Rabscuttle.plugins;
 
-namespace GithubUpdatedPlugin
-{
-    [Export(typeof(IPluginContract))]
+namespace GithubUpdatedPlugin{
     public class GithubUpdatedPlugin : IPluginContract {
         /// <summary> Gets or sets the name of the command. </summary>
         /// <value> The name of the command should be short and descriptive, usually a single word. </value>

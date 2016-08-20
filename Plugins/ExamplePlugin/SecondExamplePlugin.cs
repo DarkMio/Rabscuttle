@@ -1,19 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 using Rabscuttle.plugins;
-using Rabscuttle.stuff;
 
 namespace SecondExamplePlugin {
-    [Export(typeof(IPluginContract))]
     public class SecondExamplePlugin : IPluginContract, IObserver<NetworkMessage> {
         private IDisposable _disposable;
 

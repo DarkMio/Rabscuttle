@@ -1,19 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 using Rabscuttle.plugins;
-using Rabscuttle.stuff;
 
 namespace ExamplePlugin {
-    [Export(typeof(IPluginContract))]
     public class ExamplePlugin : IPluginContract, IObserver<NetworkMessage> {
         private IDisposable _disposable;
 
@@ -74,7 +65,7 @@ namespace ExamplePlugin {
             }
         }
 
-        
+
 
         /// <summary>Notifies the observer that the provider has experienced an error condition.</summary>
         /// <param name="error">An object that provides additional information about the error.</param>

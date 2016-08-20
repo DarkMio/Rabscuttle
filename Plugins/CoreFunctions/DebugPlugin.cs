@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.Composition;
-using Rabscuttle.handler;
+﻿using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 using Rabscuttle.plugins;
 
 namespace CoreFunctions {
-    [Export(typeof(IPluginContract))]
     public class DebugPlugin : IPluginContract {
         /// <summary> Gets or sets the name of the command. </summary>
         /// <value> The name of the command should be short and descriptive, usually a single word. </value>

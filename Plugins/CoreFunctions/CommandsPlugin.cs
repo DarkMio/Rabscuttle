@@ -1,12 +1,10 @@
-﻿using System.ComponentModel.Composition;
-using System.Linq;
+﻿using System.Linq;
 using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 using Rabscuttle.plugins;
 
 namespace CoreFunctions {
-    [Export(typeof(IPluginContract))]
     public class CommandsPlugin : IPluginContract {
         public string CommandName => "commands";
         public PluginHandler BackReference { get; set; }

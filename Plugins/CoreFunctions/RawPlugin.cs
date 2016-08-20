@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Rabscuttle.handler;
+﻿using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 using Rabscuttle.plugins;
 
 namespace CoreFunctions {
-    [Export(typeof(IPluginContract))]
     public class RawPlugin : IPluginContract {
         public string CommandName => "raw";
         public PluginHandler BackReference { get; set; }

@@ -25,6 +25,7 @@ namespace Rabscuttle.handler {
         private readonly string _path;
         private readonly string[] _operators;
         private readonly VoidHandler _voidHandler;
+        private readonly BanList _banlist;
 
         public PluginHandler(ISender sender, ChannelHandler channelHandler, VoidHandler voidHandler, string pathToPlugins = "./../Plugins/") {
             _sender = sender;
@@ -32,6 +33,7 @@ namespace Rabscuttle.handler {
             //_catalog = new DirectoryCatalog(pathToPlugins);
             _voidHandler = voidHandler;
             this.channelHandler = channelHandler;
+            _banlist = BanList.Instance;
 
             var opList = ConfigurationProvider.Get("operators").Split(',');
             for (int index = 0; index < opList.Length; index++) {
@@ -104,10 +106,15 @@ namespace Rabscuttle.handler {
             }
 
             CommandMessage cmsg = PrepareCommand(message);
+            bool ban = _banlist.CheckBan(cmsg.user);
+            if (_banlist.CheckBan(cmsg.user) && !CheckForBotoperator(cmsg.user)) {
+                Logger.WriteInfo("Plugin Handler", "Ignoring command [ {0} ] from user [ {1} ]", cmsg.command, cmsg.user.userName);
+                return;
+            }
             HandleCommand(cmsg);
         }
 
-        public void HandleCommand(CommandMessage message) {
+        private void HandleCommand(CommandMessage message) {
             foreach (IPluginContract plugin in plugins) {
                 if (plugin.CommandName != message.command || plugin.Rank > message.permission) {
                     continue;
