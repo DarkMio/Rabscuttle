@@ -13,10 +13,15 @@
         /// <param name="typeParams">Optional, additional parameter for a message Type.</param>
         void Send(string message, string prefix, string type, string typeParams);
         /// <summary>
-        /// Sends a <see cref="NetworkMessage"/> to the endpoint..
+        /// Sends a <see cref="NetworkMessage"/> to the endpoint.
         /// </summary>
         /// <param name="message">The message to be sent.</param>
         void Send(NetworkMessage message);
+        /// <summary>
+        /// Sends multiple <see cref="NetworkMessage"/> to the endpoint.
+        /// </summary>
+        /// <param name="messages">The messages to be sent.</param>
+        void Send(NetworkMessage[] messages);
     }
 
     /// <summary>

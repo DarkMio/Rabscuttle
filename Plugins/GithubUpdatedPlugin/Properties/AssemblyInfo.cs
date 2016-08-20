@@ -5,22 +5,22 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RankPlugin")]
+[assembly: AssemblyTitle("GithubUpdatedPlugin")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RankPlugin")]
+[assembly: AssemblyProduct("GithubUpdatedPlugin")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a Type in this assembly from 
-// COM, set the ComVisible attribute to true on that Type.
+// to COM components.  If you need to access a type in this assembly from 
+// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("91ac7a19-8f78-4274-ac57-a10000c6beb7")]
+[assembly: Guid("1a8773ed-230e-444c-b559-304269d30ead")]
 
 // Version information for an assembly consists of the following four values:
 //

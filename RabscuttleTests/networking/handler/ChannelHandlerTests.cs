@@ -32,6 +32,10 @@ namespace RabscuttleTests.networking.handler {
 
             }
 
+            public void Send(NetworkMessage[] messages) {
+
+            }
+
             public NetworkMessage Receive(bool waitResponse = false) {
                 if (_messages.Count > 0) {
                     return new NetworkMessage(_messages.Dequeue(), true);

@@ -21,6 +21,8 @@ namespace Rabscuttle.networking {
 
         public readonly PluginHandler pluginHandler;
 
+        public readonly VoidHandler voidHandler;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionManager"/> class, thereby initilizing <see cref="BotClient"/>, <see cref="CommandSchedule"/>, <see cref="ChannelHandler"/>.
         /// @TODO: Add missing handler into description.
@@ -31,7 +33,8 @@ namespace Rabscuttle.networking {
             _client = new BotClient(host, port);
             _scheduler = new CommandSchedule(_client);
             channelHandler = new ChannelHandler(this);
-            pluginHandler = new PluginHandler(this, channelHandler);
+            voidHandler = new VoidHandler();
+            pluginHandler = new PluginHandler(this, channelHandler, voidHandler);
             Connect();
         }
 
@@ -65,6 +68,12 @@ namespace Rabscuttle.networking {
         public void Send(NetworkMessage message) {
             Handle(message);
             _scheduler.Add(message);
+        }
+
+        public void Send(NetworkMessage[] messages) {
+            foreach (NetworkMessage networkMessage in messages) {
+                Send(networkMessage);
+            }
         }
 
         /// <summary>
@@ -132,8 +141,10 @@ namespace Rabscuttle.networking {
                 if (message.typeEnum is ReplyCode) {
                     // We've received server info.
                     HandleReply(message);
+                    voidHandler.HandleReply(message); // just dump it into the handler
                 } else if (message.typeEnum is CommandCode) {
                     HandleCommand(message);
+                    voidHandler.HandleCommand(message); // here aswell
                 }
             } catch (Exception e) {
                 Logger.WriteError("Connection Manager", "Exception catched, thrown by handlers: {0}", e);

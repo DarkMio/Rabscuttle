@@ -4,34 +4,40 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7DDF18EB-CFAE-4C37-A81E-57B3EF8E6A59}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{E81D325A-A9AF-49B8-9089-5AE2856B1B53}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RawPlugin</RootNamespace>
-    <AssemblyName>RawPlugin</AssemblyName>
+    <RootNamespace>PluginDebugger</RootNamespace>
+    <AssemblyName>PluginDebugger</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\Rabscuttle\bin\Plugins\</OutputPath>
+    <OutputPath>..\Rabscuttle\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\Rabscuttle\bin\Plugins\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -41,13 +47,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RawPlugin.cs" />
+    <Compile Include="PluginDebugger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Plugins\ExamplePlugin\ExamplePlugin.csproj">
+      <Project>{14606e2e-a5b9-49be-9211-05db99684b0c}</Project>
+      <Name>ExamplePlugin</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\FuckPlugin\FuckPlugin.csproj">
+      <Project>{be80aba2-0b3d-41ab-8165-569b6c4ca251}</Project>
+      <Name>FuckPlugin</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\GithubUpdatedPlugin\GithubUpdatedPlugin.csproj">
+      <Project>{1a8773ed-230e-444c-b559-304269d30ead}</Project>
+      <Name>GithubUpdatedPlugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Plugins\KarmaPlugin\KarmaPlugin.csproj">
+      <Project>{4fc2252b-4e85-42be-b56c-5e7b646937ac}</Project>
+      <Name>KarmaPlugin</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Rabscuttle\Rabscuttle.csproj">
       <Project>{718159e3-8a0b-41b8-abdb-b35c43538697}</Project>
       <Name>Rabscuttle</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
