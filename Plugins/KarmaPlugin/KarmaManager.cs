@@ -11,7 +11,7 @@ namespace KarmaPlugin {
     public class KarmaManager {
         private static readonly Object SYNC_LOCK = new Object();
         private static KarmaManager _instance;
-        private static readonly Regex USER_REGEX = new Regex(@"[a-z|0-9]*", RegexOptions.None);
+        private static readonly Regex USER_REGEX = new Regex(@"[\w\d]*", RegexOptions.None);
         private static readonly string PATH = "../Plugins/PluginData/karma/";
         private readonly JObject _commends;
         private readonly JObject _reports;
