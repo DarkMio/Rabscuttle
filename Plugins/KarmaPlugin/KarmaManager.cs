@@ -8,7 +8,7 @@ using Rabscuttle.channel;
 using Rabscuttle.stuff;
 
 namespace KarmaPlugin {
-    public class KarmaManager {
+    internal class KarmaManager {
         private static readonly Object SYNC_LOCK = new Object();
         private static KarmaManager _instance;
         private static readonly Regex USER_REGEX = new Regex(@"[\w\d]*", RegexOptions.None);

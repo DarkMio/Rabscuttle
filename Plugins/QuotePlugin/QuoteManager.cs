@@ -8,7 +8,7 @@ using Rabscuttle.channel;
 using Rabscuttle.stuff;
 
 namespace QuotePlugin {
-    public class QuoteManager {
+    internal class QuoteManager {
         private static readonly object SYNC_LOCK = new Object();
         private static QuoteManager _instance;
         private static readonly string PATH = "../Plugins/PluginData/quotes/";
