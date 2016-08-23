@@ -4,15 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1537E9BA-203B-4F73-A436-A09E0E846298}</ProjectGuid>
+    <ProjectGuid>{F09ED980-1C2E-4F91-AA85-E338FC2E682E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CoreFunctions</RootNamespace>
-    <AssemblyName>CoreFunctions</AssemblyName>
+    <RootNamespace>TheInternationalTrackerPlugin</RootNamespace>
+    <AssemblyName>TheInternationalTrackerPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,32 +30,29 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BanPlugin.cs" />
-    <Compile Include="CommandsPlugin.cs" />
-    <Compile Include="DebugPlugin.cs" />
-    <Compile Include="HelpPlugin.cs" />
-    <Compile Include="JoinPlugin.cs" />
-    <Compile Include="NickPlugin.cs" />
-    <Compile Include="PartPlugin.cs" />
-    <Compile Include="PingPlugin.cs" />
+    <Compile Include="PrizepoolCalculator.cs" />
+    <Compile Include="TI3Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RankPlugin.cs" />
-    <Compile Include="RawPlugin.cs" />
+    <Compile Include="TI4Plugin.cs" />
+    <Compile Include="TI5Plugin.cs" />
+    <Compile Include="TI6Plugin.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Rabscuttle\Rabscuttle.csproj">
       <Project>{718159e3-8a0b-41b8-abdb-b35c43538697}</Project>
       <Name>Rabscuttle</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -38,8 +38,11 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommendPlugin.cs" />
+    <Compile Include="KarmaManager.cs" />
     <Compile Include="KarmaPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportPlugin.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Rabscuttle\Rabscuttle.csproj">
