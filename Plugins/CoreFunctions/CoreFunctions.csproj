@@ -40,6 +40,9 @@
     <Compile Include="CommandsPlugin.cs" />
     <Compile Include="DebugPlugin.cs" />
     <Compile Include="HelpPlugin.cs" />
+    <Compile Include="JoinPlugin.cs" />
+    <Compile Include="NickPlugin.cs" />
+    <Compile Include="PartPlugin.cs" />
     <Compile Include="PingPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RankPlugin.cs" />
