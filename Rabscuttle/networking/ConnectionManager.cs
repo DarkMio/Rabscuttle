@@ -2,6 +2,7 @@
 using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
+using Rabscuttle.stuff;
 using Logger = Rabscuttle.stuff.Logger;
 
 namespace Rabscuttle.networking {
@@ -44,8 +45,8 @@ namespace Rabscuttle.networking {
         /// Server-Related messages are <c>MODE</c>, <c>RPL_ENDOFMOTD</c>, <c>ERR_NOMOTD</c>
         /// </summary>
         private void Connect() {
-            Send(RawUser.Generate("Gabe BotHost AnotherOne", "Rabscuttle"));
-            Send(RawNick.Generate("Rabscootle"));
+            Send(RawUser.Generate("Gabe BotHost AnotherOne", ConfigurationProvider.Get("realname")));
+            Send(RawNick.Generate(ConfigurationProvider.Get("username")));
             ReceiveUntil(CommandCode.MODE, ReplyCode.RPL_ENDOFMOTD, ReplyCode.ERR_NOMOTD); // The last received message will be any of those
         }
 
