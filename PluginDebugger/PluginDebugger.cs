@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Rabscuttle.networking.commands;
-using Rabscuttle.plugins;
+using Rabscuttle.plugin;
 
 namespace PluginDebugger {
     class Debugger {

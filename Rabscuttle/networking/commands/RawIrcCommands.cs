@@ -190,4 +190,14 @@ namespace Rabscuttle.networking.commands {
             // return Instance.InstanceGenerate(fromServer, prefix, typeParameter, message);
         }
     }
+
+    public class RawQuit : RawCommand<RawQuit> {
+        public override CommandCode Type => CommandCode.QUIT;
+        public override bool HasTypeParameter => false;
+        public override bool HasMessage => false;
+
+        public static NetworkMessage Generate(bool fromServer = false, string prefix = null) {
+            return Instance.InstanceGenerate(fromServer, prefix);
+        }
+    }
 }

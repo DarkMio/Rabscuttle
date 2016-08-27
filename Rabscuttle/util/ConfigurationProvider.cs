@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Reflection;
 
-namespace Rabscuttle.stuff {
+namespace Rabscuttle.util {
     public class ConfigurationProvider {
         private static readonly Configuration CONFIG =
             ConfigurationManager.OpenExeConfiguration(Assembly.GetEntryAssembly().Location);

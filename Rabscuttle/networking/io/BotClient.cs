@@ -5,7 +5,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using Rabscuttle.stuff;
+using Rabscuttle.exception;
+using Rabscuttle.networking.commands;
+using Rabscuttle.util;
 
 #endregion
 
@@ -57,6 +59,9 @@ namespace Rabscuttle.networking.io {
         /// <param name="waitResponse">if set to <c>true</c> method waits until there is a message to receive.</param>
         /// <returns>NetworkMessage if there is any data, or <c>null</c> if <paramref name="waitResponse" /> is <c>false</c>.</returns>
         public NetworkMessage Receive(bool waitResponse = false) {
+            if (!_client.Connected) {
+                throw new ConnectionClosedException("The connection was closed from the server side.", true);
+            }
             if (!_dataStream.DataAvailable && !waitResponse) {
                 return null;
             }
@@ -90,6 +95,11 @@ namespace Rabscuttle.networking.io {
             Debug.WriteLine("Client>{0}{1}{2}{3}", " :" + message.prefix, " " + message.type, " " + message.typeParams, " :" + message.message);
             _output.Write(message.BuildMessage());
             _output.Flush();
+            if ((CommandCode) message.typeEnum == CommandCode.QUIT || message.type.ToLower() == "quit") {
+                _dataStream.Close();
+                _client.Close();
+                throw new ConnectionClosedException("The connection was closed on the bots request.", false);
+            }
         }
 
         public void Send(NetworkMessage[] messages) {

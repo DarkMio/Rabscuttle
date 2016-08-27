@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Rabscuttle.networking.commands;
-using Rabscuttle.stuff;
+using Rabscuttle.util;
 
 namespace Rabscuttle.networking.io {
     public class NetworkMessage {

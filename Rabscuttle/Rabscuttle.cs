@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
+using Rabscuttle.exception;
 using Rabscuttle.networking;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
-using Rabscuttle.stuff;
 using Rabscuttle.util;
 
 namespace Rabscuttle {
@@ -13,7 +14,14 @@ namespace Rabscuttle {
 
         public static void Main(string[] args) {
             ConfigurationProvider.Bootstrap();
-            new Rabscuttle().Run();
+            Rabscuttle rabs = new Rabscuttle();
+            bool clientDeath = false;
+            while (!clientDeath) {
+                clientDeath = rabs.Run();
+                if (clientDeath) {       // this should happen when the server disconnects the bot.
+                    Thread.Sleep(30000); // 30s until trying to reconnect.
+                }
+            }
 
         }
 
@@ -38,11 +46,16 @@ namespace Rabscuttle {
             Logger.WriteInfo("Rabscuttle", "Connection ready.");
         }
 
-        public void Run() {
+        public bool Run() {
             BootCommands();
             Join();
-            while (true) {
-                _connectionManager.ReceiveUntil(CommandCode.PING);
+            try {
+                while (true) {
+                    _connectionManager.ReceiveUntil(CommandCode.PING);
+                }
+            } catch (ConnectionClosedException e) {
+                Logger.WriteWarn("Rabscuttle", e.ToString());
+                return e.FromServer;
             }
         }
 

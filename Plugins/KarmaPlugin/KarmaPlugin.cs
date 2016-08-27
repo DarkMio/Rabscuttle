@@ -5,8 +5,7 @@ using Newtonsoft.Json.Linq;
 using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
-using Rabscuttle.plugins;
-using Rabscuttle.stuff;
+using Rabscuttle.plugin;
 
 namespace KarmaPlugin {
     public class KarmaPlugin : IPluginContract {

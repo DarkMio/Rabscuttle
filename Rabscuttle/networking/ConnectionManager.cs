@@ -2,8 +2,8 @@
 using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
-using Rabscuttle.stuff;
-using Logger = Rabscuttle.stuff.Logger;
+using Rabscuttle.util;
+using Logger = Rabscuttle.util.Logger;
 
 namespace Rabscuttle.networking {
     /// <summary>
@@ -205,7 +205,6 @@ namespace Rabscuttle.networking {
                 return;
             }
             _client?.Dispose();
-            pluginHandler?.Dispose();
         }
     }
 }

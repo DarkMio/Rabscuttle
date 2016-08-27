@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Rabscuttle.channel;
-using Rabscuttle.stuff;
+using Rabscuttle.util;
 
 namespace QuotePlugin {
     internal class QuoteManager {

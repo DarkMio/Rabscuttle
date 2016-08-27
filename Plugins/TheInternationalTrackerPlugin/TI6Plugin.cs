@@ -1,7 +1,7 @@
 ﻿using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
-using Rabscuttle.plugins;
+using Rabscuttle.plugin;
 
 namespace TheInternationalTrackerPlugin {
     public class TI6Plugin : IPluginContract {
@@ -18,4 +18,3 @@ namespace TheInternationalTrackerPlugin {
         public void OnNotice(CommandMessage message) { }
     }
 }
-

@@ -10,8 +10,8 @@ using NUnit.Framework;
 using Rabscuttle.channel;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
-using Rabscuttle.plugins;
-using Rabscuttle.stuff;
+using Rabscuttle.plugin;
+using Rabscuttle.util;
 
 namespace Rabscuttle.handler {
     public class PluginHandler : ObservableHandler {

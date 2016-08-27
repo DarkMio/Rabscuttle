@@ -5,20 +5,16 @@ using Rabscuttle.networking.io;
 using Rabscuttle.plugin;
 
 namespace CoreFunctions {
-    public class NickPlugin : IPluginContract {
-        public string CommandName => "nick";
+    public class ShutdownPlugin : IPluginContract {
+        public string CommandName => "shutdown";
         public PluginHandler BackReference { get; set; }
         public MemberCode Rank => MemberCode.BOTOPERATOR;
         public string MessagePrefix { get; set; }
-        public string HelpFile => $"{MessagePrefix}nick <name> : Sets the given name of the bot.";
+        public string HelpFile => $"{MessagePrefix}shutdown : Shuts the bot down.";
         public ISender Sender { get; set; }
         public void SubscribeTo(ObservableHandler handler) { }
         public void OnPrivMsg(CommandMessage message) {
-            if (String.IsNullOrWhiteSpace(message.parameters)) {
-                Sender.Send(RawNotice.Generate(message.user.userName, $"You have to give the bot a name! {HelpFile}"));
-            }
-            string[] parameters = message.parameters.Split();
-            Sender.Send(RawNick.Generate(parameters[0]));
+            Sender.Send(RawQuit.Generate());
         }
         public void OnNotice(CommandMessage message) { }
     }

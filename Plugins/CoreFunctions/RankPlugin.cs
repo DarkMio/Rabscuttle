@@ -1,7 +1,7 @@
 ﻿using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
-using Rabscuttle.plugins;
+using Rabscuttle.plugin;
 
 namespace CoreFunctions {
     public class RankPlugin : IPluginContract {

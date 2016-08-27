@@ -5,7 +5,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Rabscuttle.channel;
-using Rabscuttle.stuff;
+using Rabscuttle.util;
 
 namespace KarmaPlugin {
     internal class KarmaManager {

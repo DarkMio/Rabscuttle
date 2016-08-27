@@ -2,7 +2,7 @@
 using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
-using Rabscuttle.plugins;
+using Rabscuttle.plugin;
 
 namespace SecondExamplePlugin {
     public class SecondExamplePlugin : IPluginContract, IObserver<NetworkMessage> {
