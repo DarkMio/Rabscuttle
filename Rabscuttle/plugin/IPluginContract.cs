@@ -2,7 +2,7 @@
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 
-namespace Rabscuttle.plugins {
+namespace Rabscuttle.plugin {
     public interface IPluginContract {
         /// <summary> Gets or sets the name of the command. </summary>
         /// <value> The name of the command should be short and descriptive, usually a single word. </value>

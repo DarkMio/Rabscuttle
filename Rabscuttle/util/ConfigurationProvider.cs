@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Reflection;
 
-namespace Rabscuttle.stuff {
+namespace Rabscuttle.util {
     public class ConfigurationProvider {
         private static readonly Configuration CONFIG =
             ConfigurationManager.OpenExeConfiguration(Assembly.GetEntryAssembly().Location);
@@ -15,7 +13,7 @@ namespace Rabscuttle.stuff {
             GetOrSetDefault("username", "Rabscuttle"); // username of the bot
             GetOrSetDefault("realname", "Mr. Robit"); // realname string of IRC
             GetOrSetDefault("operators", ""); // comma seperated user names
-            GetOrSetDefault("prefix", ">");
+            GetOrSetDefault("prefix", "+");
             GetOrSetDefault("channels", ""); // comma seperated autojoining channels
             GetOrSetDefault("loglevel", "info");
             GetOrSetDefault("bootcommands", ""); // comma seperated commands which will be sent first
@@ -24,12 +22,14 @@ namespace Rabscuttle.stuff {
         }
 
         public static string Get(string key) {
+            ConfigurationManager.RefreshSection("appSettings");
             var c = COLLECTION;
             var conf = CONFIG;
             return COLLECTION[key].Value;
         }
 
         private static string GetOrSetDefault(string key, string defaultValue) {
+            ConfigurationManager.RefreshSection("appSettings");
             if (COLLECTION[key] == null) {
                 Logger.WriteDebug("Config Manager", "Should add?!");
                 COLLECTION.Add(key, defaultValue);

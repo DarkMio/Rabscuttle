@@ -10,17 +10,15 @@ using NUnit.Framework;
 using Rabscuttle.channel;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
-using Rabscuttle.plugins;
-using Rabscuttle.stuff;
+using Rabscuttle.plugin;
+using Rabscuttle.util;
 
 namespace Rabscuttle.handler {
-    public class PluginHandler : ObservableHandler, IDisposable {
+    public class PluginHandler : ObservableHandler {
         [ImportMany(typeof(IPluginContract))]
         public List<IPluginContract> plugins = null;
         private readonly ISender _sender;
-        private DirectoryCatalog _catalog;
-        private CompositionContainer _container;
-        private readonly string prefix = ">";
+        private readonly string _prefix;
         public readonly ChannelHandler channelHandler;
         private readonly string _path;
         private readonly string[] _operators;
@@ -30,6 +28,7 @@ namespace Rabscuttle.handler {
         public PluginHandler(ISender sender, ChannelHandler channelHandler, VoidHandler voidHandler, string pathToPlugins = "./../Plugins/") {
             _sender = sender;
             _path = pathToPlugins;
+            _prefix = ConfigurationProvider.Get("prefix");
             //_catalog = new DirectoryCatalog(pathToPlugins);
             _voidHandler = voidHandler;
             this.channelHandler = channelHandler;
@@ -86,7 +85,7 @@ namespace Rabscuttle.handler {
 
             foreach (IPluginContract plugin in plugins) {
                 plugin.Sender = _sender;
-                plugin.MessagePrefix = prefix;
+                plugin.MessagePrefix = _prefix;
                 plugin.BackReference = this;
                 plugin.SubscribeTo(_voidHandler); // currently I don't have much more to subscribe to
                 Logger.WriteDebug("Plugin Handler", "Loaded: [ {0} ]", plugin.CommandName);
@@ -101,7 +100,7 @@ namespace Rabscuttle.handler {
             if (type != CommandCode.PRIVMSG && type != CommandCode.NOTICE) {
                 return;
             }
-            if (!message.message.StartsWith(prefix)) {
+            if (!message.message.StartsWith(_prefix)) {
                 return;
             }
 
@@ -169,7 +168,7 @@ namespace Rabscuttle.handler {
 
             string[] split = message.message.Split(new[] {' '}, 2); // first is command, second are all parameter
             string args = "";
-            string command = split[0].Substring(prefix.Length); // cut off the prefix
+            string command = split[0].Substring(_prefix.Length); // cut off the prefix
             if (split.Length > 1) {
                 args = split[1];
             }
@@ -203,19 +202,6 @@ namespace Rabscuttle.handler {
             };
 
             return cmm;
-        }
-
-        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing) {
-            if (disposing) {
-                _catalog?.Dispose();
-                _container?.Dispose();
-            }
         }
     }
 }

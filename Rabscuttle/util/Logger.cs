@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 
-namespace Rabscuttle.stuff {
+namespace Rabscuttle.util {
     public class Logger {
         private static readonly object LOG_LOCK = new object();
         private static Category _loggingLevel;

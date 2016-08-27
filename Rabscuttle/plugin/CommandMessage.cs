@@ -2,7 +2,7 @@
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
 
-namespace Rabscuttle.plugins {
+namespace Rabscuttle.plugin {
     public class CommandMessage {
         public ChannelUser user;
         public MemberCode permission;

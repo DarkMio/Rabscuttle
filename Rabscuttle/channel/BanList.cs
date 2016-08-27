@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Rabscuttle.stuff;
+using Rabscuttle.util;
 
 namespace Rabscuttle.channel {
     public class BanList {

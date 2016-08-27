@@ -4,7 +4,7 @@ using Rabscuttle.channel;
 using Rabscuttle.handler;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
-using Rabscuttle.plugins;
+using Rabscuttle.plugin;
 using Rabscuttle.util;
 
 namespace CoreFunctions {
