@@ -14,7 +14,7 @@ using Rabscuttle.plugins;
 using Rabscuttle.stuff;
 
 namespace Rabscuttle.handler {
-    public class PluginHandler : ObservableHandler, IDisposable {
+    public class PluginHandler : ObservableHandler {
         [ImportMany(typeof(IPluginContract))]
         public List<IPluginContract> plugins = null;
         private readonly ISender _sender;
@@ -202,19 +202,6 @@ namespace Rabscuttle.handler {
             };
 
             return cmm;
-        }
-
-        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing) {
-            if (disposing) {
-                _catalog?.Dispose();
-                _container?.Dispose();
-            }
         }
     }
 }
