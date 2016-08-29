@@ -194,7 +194,7 @@ namespace Rabscuttle.handler {
         private void HandlePart(NetworkMessage message) {
             Channel channel = FindChannel(message.typeParams);
             if (channel == null) {
-                Logger.WriteWarn("Channel Handler", "There was a part message without having a channel: {0}", message.typeParams);
+                Logger.WriteWarn("Channel Handler", "There was a part message without having a channel: {0}", message);
                 return;
             }
 

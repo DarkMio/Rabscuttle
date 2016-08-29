@@ -61,7 +61,7 @@ namespace GithubUpdatedPlugin{
 
             HttpWebRequest request = HttpWebRequest.Create(uri) as HttpWebRequest;
             request.Credentials = CredentialCache.DefaultCredentials;
-            request.UserAgent = "Rabscootle, an IRC Bot.";
+            request.UserAgent = "Rabscuttle, an IRC Bot.";
 
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
 

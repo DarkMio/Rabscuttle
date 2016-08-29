@@ -16,17 +16,25 @@ namespace CoreFunctions {
 
         public void OnPrivMsg(CommandMessage message) {
             var plugins = BackReference.plugins.OrderBy(s => s.Rank);
-            string commands = "";
+            var baserank = plugins.FirstOrDefault()?.Rank;
+            string commands = $"\n{baserank}: ";
+
             foreach (IPluginContract pluginContract in plugins) {
-                if (message.permission >= pluginContract.Rank) {
+                if (message.permission < pluginContract.Rank) {
+                    break;
+                }
+                if (pluginContract.Rank == baserank) {
                     commands += pluginContract.CommandName + ", ";
                 } else {
-                    break;
+                    baserank = pluginContract.Rank;
+                    commands += $"\n{baserank}: {pluginContract.CommandName}, ";
                 }
             }
             commands = commands.Substring(0, commands.Length - 2);
-            Sender.Send(RawNotice.Generate(message.user.userName,
-                $"Following commands are available for you: {commands}"));
+            Sender.Send(RawNotice.Generate(
+                message.user.userName,
+                $"Following commands are available for you: {commands}")
+            );
         }
 
         public void OnNotice(CommandMessage message) { }

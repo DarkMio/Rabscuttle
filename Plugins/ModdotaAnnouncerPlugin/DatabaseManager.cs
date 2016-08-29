@@ -11,34 +11,31 @@ using Rabscuttle.util;
 
 namespace ModdotaAnnouncerPlugin {
     internal class DatabaseManager {
-        private const string HOST = "remote.moddota.com";
-        private const string USER = "forum_ro_bot";
-        private const string DB = "vanilla";
-        private const int PORT = 3306;
-        private const string PATH = "../Plugins/PluginData/moddota/";
+        private const string Host = "remote.moddota.com";
+        private const string User = "forum_ro_bot";
+        private const string Db = "vanilla";
+        private const int Port = 3306;
+        private const string Path = "../Plugins/PluginData/moddota/";
 
-        private readonly string _password;
         private readonly MySqlConnection _connection;
         private readonly JObject _metaStorage;
         private readonly ISender _sender;
-        public string channel;
 
         public DatabaseManager(ISender sender) {
             _sender = sender;
             _metaStorage = ReadAndParseFile("database.json");
-            _password = _metaStorage["dbKey"].Value<String>();
-            _connection = new MySqlConnection($"Server={HOST};Port={PORT};Database={DB};Uid={USER};Pwd={_password};CHARSET=utf8");
+            var password = _metaStorage["dbKey"].Value<string>();
+            _connection = new MySqlConnection($"Server={Host};Port={Port};Database={Db};Uid={User};Pwd={password};CHARSET=utf8");
             _connection.Open();
         }
 
         public void Run(string channel) {
-            this.channel = channel;
             if (!channel.StartsWith("#")) {
                 throw new ArgumentException("This does not appear to be a valid ");
             }
             while (true) {
-                long lastID = _metaStorage[channel].Value<long>();
-                List<ThreadEntry> entries = GetThreads(lastID);
+                long lastId = _metaStorage[channel].Value<long>();
+                IEnumerable<ThreadEntry> entries = GetThreads(lastId);
                 foreach (ThreadEntry entry in entries) {
                     string c = "\x03";
                     _sender.Send(
@@ -54,12 +51,12 @@ namespace ModdotaAnnouncerPlugin {
             }
         }
 
-        List<ThreadEntry> GetThreads(long lastID) {
+        private IEnumerable<ThreadEntry> GetThreads(long lastId) {
             List<ThreadEntry> entries = new List<ThreadEntry>();
             string query = "SELECT GDN_Discussion.DiscussionID, GDN_Discussion.Name, GDN_User.Name, GDN_Category.Name FROM GDN_Discussion " +
                            "JOIN (GDN_User, GDN_Category) " +
                            "ON (GDN_User.UserID = GDN_Discussion.InsertUserID AND GDN_Category.CategoryID = GDN_Discussion.CategoryID)" +
-                          $"WHERE DiscussionID > {lastID}";
+                          $"WHERE DiscussionID > {lastId}";
             using (MySqlCommand command = new MySqlCommand(query, _connection)) {
                 MySqlDataReader reader = command.ExecuteReader();
                 while (reader.Read()) {
@@ -77,7 +74,7 @@ namespace ModdotaAnnouncerPlugin {
 
         private static JObject ReadAndParseFile(string filename) {
             try {
-                using (StreamReader s = new StreamReader(PATH + filename)) {
+                using (StreamReader s = new StreamReader(Path + filename)) {
                     string json = s.ReadToEnd();
                     return (JObject) JsonConvert.DeserializeObject(json);
                 }
@@ -93,7 +90,7 @@ namespace ModdotaAnnouncerPlugin {
             }
 
             string output = JsonConvert.SerializeObject(jObject);
-            using (StreamWriter s = new StreamWriter(PATH + filename)) {
+            using (StreamWriter s = new StreamWriter(Path + filename)) {
                 s.Write(output);
             }
         }
@@ -104,6 +101,5 @@ namespace ModdotaAnnouncerPlugin {
             public string userName;
             public string threadName;
         }
-
     }
 }

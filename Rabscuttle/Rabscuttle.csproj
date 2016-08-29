@@ -80,7 +80,7 @@
   <ItemGroup>
     <Compile Include="channel\BanList.cs" />
     <Compile Include="channel\Channel.cs" />
-    <Compile Include="channel\User.cs" />
+    <Compile Include="channel\ChannelUser.cs" />
     <Compile Include="channel\UserRelation.cs" />
     <Compile Include="exception\ConnectionClosedException.cs" />
     <Compile Include="handler\VoidHandler.cs" />
