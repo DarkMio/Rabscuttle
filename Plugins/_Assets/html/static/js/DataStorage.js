@@ -12,7 +12,7 @@ define(["jquery"],
 
         DataStorage.prototype.loadData = function() {
             var scope = this;
-            return $.getJSON("static/data/quotes.json", function(data) {
+            return $.getJSON("static/data/quotes.json?r=" + Math.random(), function(data) {
                 scope.data = data;
             })
         };

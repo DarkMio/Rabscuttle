@@ -43,9 +43,9 @@ namespace QuotePlugin {
 
             long isDigit = 0;
             if (parameters.Length >= 0 && long.TryParse(parameters[0], out isDigit)) {
-                JArray array = MANAGER.GetQuote(isDigit);
+                JArray array = MANAGER.GetQuote(isDigit - 1);
                 if (array != null) {
-                    SendQuote(MANAGER.GetQuote(isDigit), message.origin, debugInfo);
+                    SendQuote(array, message.origin, debugInfo);
                 } else {
                     Sender.Send(RawPrivMsg.Generate(message.origin, $"There exists no quote with index {isDigit}"));
                 }
@@ -105,7 +105,7 @@ namespace QuotePlugin {
             }
             DateTime dtDateTime = new DateTime(1970,1,1,0,0,0,0,System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(element[3].Value<double>()).ToLocalTime();
-            string format = $"{element[0].Value<long>()}: {element[1].Value<string>()} ";
+            string format = $"{element[0].Value<long>() + 1}: {element[1].Value<string>()} ";
             format = info ? format + $"| submitted by {element[2].Value<string>()} at {dtDateTime}" : format;
             Sender.Send(RawPrivMsg.Generate(channel, format));
         }
