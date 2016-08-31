@@ -1,0 +1,49 @@
+.demo-card-wide.mdl-card {
+    width: 100%;
+}
+.demo-card-wide > .mdl-card__title {
+    color: #fff;
+    height: 176px;
+    padding: 0;
+    background: url('https://getmdl.io/assets/demos/welcome_card.jpg') center / cover;
+}
+.demo-card-wide > .mdl-card__menu {
+    color: #fff;
+}
+
+.mdl-data-table {
+    white-space: normal;
+}
+
+.paging_full {
+    line-height: 18px;
+    padding: 8px;
+    text-align: center;
+}
+
+.first, .previous, .next, .last {
+    background: rgba(158,158,158,.2);
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+    margin: 0 2.5%;
+    width: 71px;
+}
+
+@media(max-width: 839px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+    th:nth-of-type(1), th:nth-of-type(3), td:nth-of-type(1), td:nth-of-type(3) {display: none;}
+}
+
+th:nth-of-type(1), th:nth-of-type(3), td:nth-of-type(1), td:nth-of-type(3) {
+    width: 10px;
+}
+
+.search{
+    height: 23px;
+    max-width: 120px;
+    float: right;
+    text-transform: none;
+}
+
+.graph { }

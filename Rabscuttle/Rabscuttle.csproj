@@ -100,6 +100,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rabscuttle.cs" />
     <Compile Include="util\ConfigurationProvider.cs" />
+    <Compile Include="util\HttpsVerificator.cs" />
     <Compile Include="util\Logger.cs" />
     <Compile Include="util\Validator.cs" />
   </ItemGroup>

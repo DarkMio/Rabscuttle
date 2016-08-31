@@ -34,7 +34,7 @@ namespace StarCitizenPlugin {
             Sender.Send(
                 RawPrivMsg.Generate(
                     message.origin,
-                    $"Total Crowdfunding: ${funds} | Accounts: {fans} | Ships bought: {fleet} | Avg per Ship: {averagePerShip:F} | GPM: ${gpm:F}"
+                    $"Total Crowdfunding: ${funds} | Accounts: {fans} | Ships bought: {fleet} | Avg per Ship: ${averagePerShip:F} | GPM: ${gpm:F}"
                 )
             );
         }

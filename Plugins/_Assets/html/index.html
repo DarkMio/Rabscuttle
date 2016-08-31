@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script data-main="static/js/app.js" src="static/js/lib/require.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" media="screen" href="static/css/material.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="static/css/extension.css">
+</head>
+<body>
+<div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+    <div class="mdl-tabs__tab-bar">
+        <a href="#quotes" class="mdl-tabs__tab is-active">Quotes</a>
+        <a href="#karma" class="mdl-tabs__tab">Karma</a>
+        <a href="#" class="mdl-tabs__tab">Markov ✟</a>
+        <a href="#history" class="mdl-tabs__tab">History</a>
+    </div>
+
+    <div class="mdl-tabs__panel is-active" id="quotes">
+        <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--8-col-desktop mdl-cell--2-offset-desktop mdl-cell--12-col-phone mdl-cell--12-col-tablet">
+                <div class="demo-card-wide mdl-card mdl-shadow--2dp">
+                    <div class="mdl-card__title">
+                        <div style="height: 100%; width: 100%">
+                            <canvas id="chartspace" class="graph" style="height: 100%; width: 100%"></canvas>
+                        </div>
+                    </div>
+                    <div class="mdl-card__supporting-text">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Mauris sagittis pellentesque lacus eleifend lacinia...
+                    </div>
+                    <div class="mdl-cell mdl-cell--12-col" id="tableDiv">
+
+                        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp"
+                               id="table">
+
+                        </table>
+
+                    </div>
+                    <div class="mdl-card__actions mdl-card--border">
+                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                            Get Started
+                        </a>
+                    </div>
+                    <div class="mdl-card__menu">
+                        <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+                            <i class="material-icons">share</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mdl-cell mdl-cell--8-col-desktop mdl-cell--2-offset-desktop mdl-cell--12-col-phone mdl-cell--12-col-tablet">
+
+            </div>
+        </div>
+    </div>
+    <div class="mdl-tabs__panel" id="karma">
+        <ul>
+            <li>Tywin</li>
+            <li>Cersei</li>
+            <li>Jamie</li>
+            <li>Tyrion</li>
+        </ul>
+    </div>
+    <div class="mdl-tabs__panel" id="history">
+        <ul>
+            <li>Viserys</li>
+            <li>Daenerys</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

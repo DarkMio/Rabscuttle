@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
 using System.Threading;
 using Rabscuttle.exception;
 using Rabscuttle.networking;
@@ -13,6 +14,8 @@ namespace Rabscuttle {
 
 
         public static void Main(string[] args) {
+            // fixes some HTTPS issues.
+            ServicePointManager.ServerCertificateValidationCallback = util.HttpsVerificator.MyRemoteCertificateValidationCallback;
             ConfigurationProvider.Bootstrap();
             Rabscuttle rabs = new Rabscuttle();
             bool clientDeath = false;
