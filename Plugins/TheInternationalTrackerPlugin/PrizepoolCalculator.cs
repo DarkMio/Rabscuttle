@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,12 +25,16 @@ namespace TheInternationalTrackerPlugin {
         public long GetRawPrizepool(int leagueID) {
             string url = Url + $"key={_steamAPI}&format=json&leagueid={leagueID}";
             HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+            // the default system credentials + a nice user agent (otherwise they're blank)
             request.Credentials = CredentialCache.DefaultCredentials;
-            request.UserAgent = "Rabscootle, an IRC Bot.";
+            request.UserAgent = "Rabscuttle, an IRC Bot.";
+            // do the request
             HttpWebResponse response = request.GetResponse() as HttpWebResponse;
             string responseContent = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            // read the json response, parse it
             JObject jObject = JsonConvert.DeserializeObject(responseContent) as JObject;
             long status = jObject["result"]["status"].Value<long>();
+            // if the request was OK (and OK in the json), return the Prizepool
             if (status == 200) {
                 return jObject["result"]["prize_pool"].Value<long>();
             }
@@ -43,6 +47,7 @@ namespace TheInternationalTrackerPlugin {
             double prizepool = GetRawPrizepool(leagueID);
             int count = 0;
             string[] formatter = {"", "K", "M", "B", "T", "E"};
+            // decrement by thousand, while incrementing the counter
             while (prizepool > 1000) {
                 prizepool /= 1000.0;
                 count++;
