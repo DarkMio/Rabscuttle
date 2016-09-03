@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Rabscuttle.channel;
 using Rabscuttle.networking.commands;
 using Rabscuttle.networking.io;
@@ -141,9 +139,9 @@ namespace Rabscuttle.handler {
         private bool CheckForBotoperator(ChannelUser user) {
             if (_operators.Any(s => s.Trim() == user.userName)) {
                 Task<bool> task = channelHandler.IsLoggedIn(user.userName);
-                Logger.WriteInfo("Plugin Handler", "Searching for bot operator rights on {0}", user.userName);
+                // Logger.WriteInfo("Plugin Handler", "Searching for bot operator rights on {0}", user.userName);
                 task.Wait();
-                Logger.WriteDebug("Plugin Handler", "Operator Rights are: {0}", task.Result);
+                // Logger.WriteDebug("Plugin Handler", "Operator Rights are: {0}", task.Result);
                 return task.Result;
             }
             return false;
