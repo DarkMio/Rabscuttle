@@ -17,16 +17,16 @@ namespace Rabscuttle.channel {
         }
 
         public void RemoveUser(ChannelUser user) {
-            users.Remove(users.SingleOrDefault(s => s.user == user));
+            users.Remove(users.SingleOrDefault(s => Equals(s.user, user)));
         }
 
         public void RemoveRank(ChannelUser user, MemberCode permission) {
-            UserRelation relation = users.Single(s => s.user == user);
+            UserRelation relation = users.Single(s => Equals(s.user, user));
             relation.RemoveRank(permission);
         }
 
         public void AddRank(ChannelUser user, MemberCode permission) {
-            UserRelation relation = users.Single(s => s.user == user);
+            UserRelation relation = users.Single(s => Equals(s.user, user));
             relation.AddRank(permission);
         }
 

@@ -53,7 +53,8 @@ namespace Rabscuttle.channel {
                 return;
             }
 
-
+            string[] arguments = message.typeParams.Split();
+            loginUserName = arguments.Length > 2 ? arguments[2] : loginUserName;
         }
 
         public void SetUserdata(string dataString=null, string realname = null) {

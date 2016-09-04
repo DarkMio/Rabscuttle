@@ -49,6 +49,7 @@
     <ProjectReference Include="..\..\Rabscuttle\Rabscuttle.csproj">
       <Project>{718159e3-8a0b-41b8-abdb-b35c43538697}</Project>
       <Name>Rabscuttle</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

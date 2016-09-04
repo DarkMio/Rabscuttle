@@ -113,8 +113,16 @@ namespace Rabscuttle.handler {
 
         private void HandleCommand(CommandMessage message) {
             foreach (IPluginContract plugin in plugins) {
-                if (plugin.CommandName != message.command || plugin.Rank > message.permission) {
+                if (plugin.CommandName != message.command) {
                     continue;
+                }
+
+                // if the rank outweights the users permission, we may check for his bot-operator status.
+                if (plugin.Rank > message.permission) {
+                    if (!CheckForBotoperator(message.user)) {
+                        continue;
+                    }
+                    message.permission = MemberCode.BOTOPERATOR;
                 }
 
                 Logger.WriteDebug("Plugin Handler", "Handling message: {0}", message.message);
@@ -137,14 +145,9 @@ namespace Rabscuttle.handler {
         }
 
         private bool CheckForBotoperator(ChannelUser user) {
-            if (_operators.Any(s => s.Trim() == user.userName)) {
-                Task<bool> task = channelHandler.IsLoggedIn(user.userName);
-                // Logger.WriteInfo("Plugin Handler", "Searching for bot operator rights on {0}", user.userName);
-                task.Wait();
-                // Logger.WriteDebug("Plugin Handler", "Operator Rights are: {0}", task.Result);
-                return task.Result;
-            }
-            return false;
+            Task<bool> task = channelHandler.IsLoggedIn(user.userName);
+            task.Wait();
+            return _operators.Any(s => s.Trim() == user.loginUserName);
         }
 
         private bool SortOutMessage(NetworkMessage message, UserRelation relation) {
@@ -171,7 +174,7 @@ namespace Rabscuttle.handler {
                 args = split[1];
             }
 
-            ChannelUser user = new ChannelUser(message.prefix);
+            ChannelUser user = channelHandler.FindUser(message.prefix) ?? new ChannelUser(message.prefix);
             // typeParams can be a channel or a user
             // @TODO: What happens when username and channel name are same?
             Channel chan = channelHandler.FindChannel(message.typeParams);
@@ -180,7 +183,7 @@ namespace Rabscuttle.handler {
 
             if (_operators.Any(s => user.userName == s) && CheckForBotoperator(user)) { // when username in _operators and IS an operator
                 permission = MemberCode.BOTOPERATOR;
-            } else if (chan != null) { // otherwise, if the channel is null, give us the permission in his channel
+            } else if (chan != null) { // otherwise, if the channel is not null, give us the permission in his channel
                 UserRelation relation = chan.users.SingleOrDefault(s => s.user.userName == user.userName);
                 if (relation != null) {
                     permission = relation.Permission;

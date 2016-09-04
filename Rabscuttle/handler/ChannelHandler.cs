@@ -59,7 +59,7 @@ namespace Rabscuttle.handler {
         /// <param name="source">The source string in <c>:~name!ident@host</c>.</param>
         /// <param name="isUserName">if set to <c>true</c> and a user has to  be created, .</param>
         /// <returns></returns>
-        private ChannelUser FindOrCreateUser(string source,  out bool wasCreated, bool isUserName=false) {
+        private ChannelUser FindOrCreateUser(string source, out bool wasCreated, bool isUserName=false) {
             ChannelUser user = FindUser(source); // search
             if (user != null) { // if found, return him
                 wasCreated = false;
@@ -372,6 +372,7 @@ namespace Rabscuttle.handler {
             var user = FindUser(parameters[1]);
             user.loggedIn = ChannelUser.LoginStatus.LOGGED_IN;
             user.loginUserName = parameters[2];
+
         }
     }
 }
