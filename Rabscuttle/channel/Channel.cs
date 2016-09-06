@@ -12,21 +12,28 @@ namespace Rabscuttle.channel {
             users = new HashSet<UserRelation>();
         }
 
+        private UserRelation GetRelation(ChannelUser user) {
+            return users.SingleOrDefault(s => Equals(s.user, user));
+        }
+
         public void AddUser(ChannelUser user, MemberCode permission) {
-            users.Add(new UserRelation(user, permission));
+            if (GetRelation(user) == null) {
+                users.Add(new UserRelation(user, permission));
+            }
         }
 
         public void RemoveUser(ChannelUser user) {
-            users.Remove(users.SingleOrDefault(s => Equals(s.user, user)));
+
+            users.Remove(GetRelation(user));
         }
 
         public void RemoveRank(ChannelUser user, MemberCode permission) {
-            UserRelation relation = users.Single(s => Equals(s.user, user));
+            UserRelation relation = GetRelation(user);
             relation.RemoveRank(permission);
         }
 
         public void AddRank(ChannelUser user, MemberCode permission) {
-            UserRelation relation = users.Single(s => Equals(s.user, user));
+            UserRelation relation = GetRelation(user);
             relation.AddRank(permission);
         }
 

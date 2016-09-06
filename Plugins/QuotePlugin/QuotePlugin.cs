@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace QuotePlugin {
             }
 
             // if there's no additional parameters throw out a random element.
-            if (parameters.Length < 1) {
+            if (parameters.Length < 2 && String.IsNullOrWhiteSpace(parameters[0])) {
                 SendQuote(MANAGER.GetRandomQuote(), message.origin, debugInfo);
                 return;
             }
@@ -92,6 +93,7 @@ namespace QuotePlugin {
                 }
                 if (message.permission >= MemberCode.BOTOPERATOR) {
                     JArray quote = MANAGER.GetQuote(isDigit);
+                    MANAGER.RemoveQuote(isDigit);
                     Sender.Send(RawPrivMsg.Generate(message.origin, $"Deleted this quote: {quote[1].Value<string>()}"));
                 } else {
                     Sender.Send(RawNotice.Generate(message.user.userName, "Sorry, you're not allowed to do that."));
@@ -117,7 +119,7 @@ namespace QuotePlugin {
             if(info) {
                 DateTime dtDateTime = new DateTime(1970,1,1,0,0,0,0,System.DateTimeKind.Utc);
                 dtDateTime = dtDateTime.AddSeconds(element[3].Value<double>()).ToLocalTime();
-                format += $"| submitted by {element[2].Value<string>()} at {dtDateTime}" : format;
+                format += $"| submitted by {element[2].Value<string>()} at {dtDateTime}";
             }
             Sender.Send(RawPrivMsg.Generate(channel, format));
         }

@@ -101,7 +101,7 @@ namespace QuotePlugin {
 
         /// <summary> Gets a Unix Timestamp from the current moment. </summary>
         private static double GetTimestamp() {
-            DateTime unixBegin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.UtcNow);
+            DateTime unixBegin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             DateTime now = DateTime.UtcNow;
             return (unixBegin - now).TotalSeconds;
         }
