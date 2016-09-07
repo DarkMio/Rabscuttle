@@ -19,20 +19,9 @@ namespace LinkPreviewPlugin.Handlers {
             var matches = _urlRegex.Matches(url)[0].Groups;
             string threadId = matches["thread"].Value;
             string commentId = matches["comment"].Value;
-            JArray content = GetRedditThread(threadId, commentId);
-            return BuildResponse(content, !String.IsNullOrWhiteSpace(commentId));
-        }
-
-        private JArray GetRedditThread(string threadId, string commentId) {
             string urlChunk = String.IsNullOrWhiteSpace(commentId) ? threadId : $"{threadId}/_/{commentId}";
-            HttpWebRequest request = WebRequest.Create($"https://reddit.com/comments/{urlChunk}.json") as HttpWebRequest;
-            request.Credentials = CredentialCache.DefaultCredentials;
-            request.UserAgent = "Rabscuttle, an IRC Bot.";
-
-            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-
-            string responseContent = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return JsonConvert.DeserializeObject(responseContent) as JArray;
+            JArray content = Utility.GetFromApi<JArray>($"https://reddit.com/comments/{urlChunk}.json");
+            return BuildResponse(content, !String.IsNullOrWhiteSpace(commentId));
         }
 
         private string BuildResponse(JArray content, bool isComment) {
