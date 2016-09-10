@@ -46,7 +46,7 @@ namespace TheInternationalTrackerPlugin {
         public string GetFormattedPrizepool(int leagueID) {
             double prizepool = GetRawPrizepool(leagueID);
             int count = 0;
-            string[] formatter = {"", "K", "M", "B", "T", "E"};
+            string[] formatter = {"", "K", "M", "G", "T", "E"};
             // decrement by thousand, while incrementing the counter
             while (prizepool > 1000) {
                 prizepool /= 1000.0;

@@ -33,6 +33,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{10E763
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkPreviewPlugin", "Plugins\LinkPreviewPlugin\LinkPreviewPlugin.csproj", "{2A02DAD7-A7B5-4B4C-BD92-6402F99AF9F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomToolsCrashPlugin", "Plugins\RandomToolsCrashPlugin\RandomToolsCrashPlugin.csproj", "{924397FB-E238-49AF-AA72-09CE627D8616}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,6 +147,14 @@ Global
 		{2A02DAD7-A7B5-4B4C-BD92-6402F99AF9F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2A02DAD7-A7B5-4B4C-BD92-6402F99AF9F4}.Release|x64.ActiveCfg = Release|Any CPU
 		{2A02DAD7-A7B5-4B4C-BD92-6402F99AF9F4}.Release|x64.Build.0 = Release|Any CPU
+		{924397FB-E238-49AF-AA72-09CE627D8616}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{924397FB-E238-49AF-AA72-09CE627D8616}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{924397FB-E238-49AF-AA72-09CE627D8616}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{924397FB-E238-49AF-AA72-09CE627D8616}.Debug|x64.Build.0 = Debug|Any CPU
+		{924397FB-E238-49AF-AA72-09CE627D8616}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{924397FB-E238-49AF-AA72-09CE627D8616}.Release|Any CPU.Build.0 = Release|Any CPU
+		{924397FB-E238-49AF-AA72-09CE627D8616}.Release|x64.ActiveCfg = Release|Any CPU
+		{924397FB-E238-49AF-AA72-09CE627D8616}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -162,5 +172,6 @@ Global
 		{A106696B-3E04-4587-8B63-942CA9E2E5F1} = {3134E00A-4FD7-426D-8C8B-6F34653F603D}
 		{10E7631D-A479-4037-B750-9C81F54CFA47} = {3134E00A-4FD7-426D-8C8B-6F34653F603D}
 		{2A02DAD7-A7B5-4B4C-BD92-6402F99AF9F4} = {3134E00A-4FD7-426D-8C8B-6F34653F603D}
+		{924397FB-E238-49AF-AA72-09CE627D8616} = {3134E00A-4FD7-426D-8C8B-6F34653F603D}
 	EndGlobalSection
 EndGlobal

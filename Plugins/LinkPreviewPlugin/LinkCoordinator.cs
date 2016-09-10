@@ -18,6 +18,7 @@ namespace LinkPreviewPlugin {
             _handlers.Add(new RedditHandler());
             _handlers.Add(new TwitchHandler());
             _handlers.Add(new TwitterHandler());
+            _handlers.Add(new ImgurHandler());
         }
 
         public static LinkCoordinator Instance {
