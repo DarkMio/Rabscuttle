@@ -47,7 +47,7 @@ namespace QuotePlugin {
             // otherwise, parse the first parameter as long - if its successful, output a quote with that ID
             long isDigit = 0;
             if (parameters.Length >= 0 && long.TryParse(parameters[0], out isDigit)) {
-                JArray array = MANAGER.GetQuote(isDigit);
+                JArray array = MANAGER.GetQuote(isDigit - 1);
                 if (array != null) { // was found, output it
                     SendQuote(array, message.origin, debugInfo);
                 } else { // send an info that it doesnt exist
@@ -114,14 +114,16 @@ namespace QuotePlugin {
                 return;
             }
             // a quote always formats this way
-            string format = $"{element[0].Value<long>()}: {element[1].Value<string>()} ";
+            string format = $"{element[0].Value<long>() + 1}: {element[1].Value<string>()} ";
+            string[] elements = format.Split(new []{"||"}, StringSplitOptions.RemoveEmptyEntries);
             // and additionally, if the info-output was expected, add this part:
             if(info) {
                 DateTime dtDateTime = new DateTime(1970,1,1,0,0,0,0,System.DateTimeKind.Utc);
                 dtDateTime = dtDateTime.AddSeconds(element[3].Value<double>()).ToLocalTime();
-                format += $"| submitted by {element[2].Value<string>()} at {dtDateTime}";
+                elements[elements.Length - 1] = elements[elements.Length - 1] + $"| submitted by {element[2].Value<string>()} at {dtDateTime}";
             }
-            Sender.Send(RawPrivMsg.Generate(channel, format));
+            elements.ToList<string>().ForEach(c => Sender.Send(RawPrivMsg.Generate(channel, c)));
+            // Sender.Send(RawPrivMsg.Generate(channel, format));
         }
     }
 }
